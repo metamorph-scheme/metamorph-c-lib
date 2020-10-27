@@ -4,14 +4,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "compile and run test.c",
+      "label": "compile test for debug",
       "type": "shell",
-      "command": "gcc src/test.c -o out/Test && out/Test",
-      "problemMatcher": [],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      }
+      "command": "gcc src/test.c -o out/a.out -g"
     }
   ]
 }
