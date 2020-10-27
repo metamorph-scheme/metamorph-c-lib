@@ -7,11 +7,7 @@
 
 // symbol?
 dyntype_t symbol_q(dyntype_t obj) {
-  if(obj.type == SCHEME_TYPE_SYMBOL) {
-    return SCHEME_NEW_BOOLEAN(TRUE);
-  } else {
-    return SCHEME_NEW_BOOLEAN(FALSE);
-  }
+  return SCHEME_NEW_BOOLEAN(obj.type == SCHEME_TYPE_SYMBOL);
 }
 
 // symbol=?
@@ -19,17 +15,12 @@ dyntype_t symbol_eq(ELLIPSIS_PARAM(obj)) {
   if(obj[0].type != SCHEME_TYPE_SYMBOL)
     return SCHEME_NEW_BOOLEAN(FALSE);
 
-  bool_t match = TRUE;
   for(int i = 1; i < len; i++) {
-    if(obj[i].type == SCHEME_TYPE_SYMBOL) {
-      if(strcmp(obj[0].data.symbol_val.name, obj[i].data.symbol_val.name) != 0) {
-        match = FALSE;
-      }
-    } else {
+    if(obj[i].type != SCHEME_TYPE_SYMBOL 
+      || (strcmp(obj[0].data.symbol_val.name, obj[i].data.symbol_val.name) != 0))
       return SCHEME_NEW_BOOLEAN(FALSE);
-    }
   }
-  return SCHEME_NEW_BOOLEAN(match);
+  return SCHEME_NEW_BOOLEAN(TRUE);
 }
 
 // symbol->string
