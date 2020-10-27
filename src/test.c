@@ -39,7 +39,7 @@ int main() {
    ENDTEST
 
    TEST("symbol->string")
-      dyntype_t dyn = SCHEME_LITERAL_SYMBOL("nicesymbol");
+      dyntype_t dyn = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) { "nicesymbol" });
       
       dyntype_t str_dyn = symbol_to_string(dyn);
 
@@ -49,7 +49,7 @@ int main() {
    ENDTEST
 
    TEST("symbol->string wrong datatype")
-      dyntype_t dyn = SCHEME_LITERAL_STRING("nicesymbol");
+      dyntype_t dyn = SCHEME_LITERAL_STRING("nicestring");
       
       dyntype_t str_dyn = symbol_to_string(dyn);
 
@@ -57,7 +57,7 @@ int main() {
    ENDTEST
 
    TEST("symbol?")
-      dyntype_t dyn = SCHEME_LITERAL_SYMBOL("nicesymbol");
+      dyntype_t dyn = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol"});
       
       dyntype_t boolean_dyn = symbol_q(dyn);
 
@@ -77,9 +77,9 @@ int main() {
    ENDTEST
 
    TEST("symbol=?")
-      dyntype_t dyn1 = SCHEME_LITERAL_SYMBOL("nicesymbol");
-      dyntype_t dyn2 = SCHEME_LITERAL_SYMBOL("nicesymbol");
-      dyntype_t dyn3 = SCHEME_LITERAL_SYMBOL("nicesymbol");
+      dyntype_t dyn1 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol"});
+      dyntype_t dyn2 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol"});
+      dyntype_t dyn3 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol"});
       dyntype_t dyns[] = {dyn1, dyn2, dyn3};
 
       dyntype_t boolean_dyn = symbol_eq(dyns, 3);
@@ -90,9 +90,9 @@ int main() {
    ENDTEST
 
    TEST("symbol=? negative")
-      dyntype_t dyn1 = SCHEME_LITERAL_SYMBOL("nicesymbol");
-      dyntype_t dyn2 = SCHEME_LITERAL_SYMBOL("nicesymbol2");
-      dyntype_t dyn3 = SCHEME_LITERAL_SYMBOL("nicesymbol");
+      dyntype_t dyn1 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol"});
+      dyntype_t dyn2 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol2"});
+      dyntype_t dyn3 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol"});
       dyntype_t dyns[] = {dyn1, dyn2, dyn3};
 
       dyntype_t boolean_dyn = symbol_eq(dyns, 3);
@@ -103,9 +103,9 @@ int main() {
    ENDTEST
 
    TEST("symbol=? negative")
-      dyntype_t dyn1 = SCHEME_LITERAL_SYMBOL("nicesymbol");
-      dyntype_t dyn2 = SCHEME_LITERAL_SYMBOL("nicesymbol");
-      dyntype_t dyn3 = SCHEME_LITERAL_SYMBOL("nicesymbol2");
+      dyntype_t dyn1 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol"});
+      dyntype_t dyn2 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol"});
+      dyntype_t dyn3 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol2"});
       dyntype_t dyns[] = {dyn1, dyn2, dyn3};
 
       dyntype_t boolean_dyn = symbol_eq(dyns, 3);
@@ -116,9 +116,9 @@ int main() {
    ENDTEST
 
    TEST("symbol=? negative")
-      dyntype_t dyn1 = SCHEME_LITERAL_SYMBOL("nicesymbol1");
-      dyntype_t dyn2 = SCHEME_LITERAL_SYMBOL("nicesymbol");
-      dyntype_t dyn3 = SCHEME_LITERAL_SYMBOL("nicesymbol");
+      dyntype_t dyn1 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol1"});
+      dyntype_t dyn2 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol"});
+      dyntype_t dyn3 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol"});
       dyntype_t dyns[] = {dyn1, dyn2, dyn3};
 
       dyntype_t boolean_dyn = symbol_eq(dyns, 3);
@@ -130,8 +130,8 @@ int main() {
 
    TEST("symbol=? wrong type")
       dyntype_t dyn1 = SCHEME_LITERAL_STRING("nicesymbol");
-      dyntype_t dyn2 = SCHEME_LITERAL_SYMBOL("nicesymbol");
-      dyntype_t dyn3 = SCHEME_LITERAL_SYMBOL("nicesymbol");
+      dyntype_t dyn2 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol"});
+      dyntype_t dyn3 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol"});
       dyntype_t dyns[] = {dyn1, dyn2, dyn3};
 
       dyntype_t boolean_dyn = symbol_eq(dyns, 3);
@@ -142,12 +142,122 @@ int main() {
    ENDTEST
 
    TEST("symbol=? wrong type")
-      dyntype_t dyn1 = SCHEME_LITERAL_SYMBOL("nicesymbol");
-      dyntype_t dyn2 = SCHEME_LITERAL_SYMBOL("nicesymbol");
+      dyntype_t dyn1 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol"});
+      dyntype_t dyn2 = SCHEME_LITERAL_SYMBOL((scheme_symbol_t) {"nicesymbol"});
       dyntype_t dyn3 = SCHEME_LITERAL_STRING("nicesymbol");
       dyntype_t dyns[] = {dyn1, dyn2, dyn3};
 
       dyntype_t boolean_dyn = symbol_eq(dyns, 3);
+
+      CHECK_TYPE(boolean_dyn, SCHEME_TYPE_BOOLEAN)
+      ASSERT_EQ(FALSE, boolean_dyn.data.boolean_val)
+      ASSERT_EQ(TRUE, boolean_dyn._mutable)
+   ENDTEST
+
+   TEST("evaluate empty string to true")
+      
+      scheme_boolean_t result = obj_to_boolean(SCHEME_LITERAL_STRING(""));
+      ASSERT_EQ(TRUE, result);
+   ENDTEST
+
+   TEST("evaluate #f to false")
+      
+      scheme_boolean_t result = obj_to_boolean(SCHEME_LITERAL_BOOLEAN(FALSE));
+      ASSERT_EQ(FALSE, result);
+   ENDTEST
+
+   TEST("boolean?")
+      dyntype_t dyn = SCHEME_LITERAL_BOOLEAN(TRUE);
+      
+      dyntype_t boolean_dyn = boolean_q(dyn);
+
+      CHECK_TYPE(boolean_dyn, SCHEME_TYPE_BOOLEAN)
+      ASSERT_EQ(TRUE, boolean_dyn.data.boolean_val)
+      ASSERT_EQ(TRUE, boolean_dyn._mutable)
+   ENDTEST
+
+   TEST("boolean? negative")
+      dyntype_t dyn = SCHEME_LITERAL_STRING("mystring");
+      
+      dyntype_t boolean_dyn = boolean_q(dyn);
+
+      CHECK_TYPE(boolean_dyn, SCHEME_TYPE_BOOLEAN)
+      ASSERT_EQ(FALSE, boolean_dyn.data.boolean_val)
+      ASSERT_EQ(TRUE, boolean_dyn._mutable)
+   ENDTEST
+
+   TEST("not")
+      dyntype_t dyn = SCHEME_LITERAL_STRING("");
+      dyntype_t res = not(dyn);
+
+      CHECK_TYPE(res, SCHEME_TYPE_BOOLEAN)
+      ASSERT_EQ(FALSE, res.data.boolean_val)
+      ASSERT_EQ(TRUE, res._mutable)
+   ENDTEST
+
+   TEST("not [2]")
+      dyntype_t dyn = SCHEME_LITERAL_BOOLEAN(TRUE);
+      dyntype_t res = not(dyn);
+
+      CHECK_TYPE(res, SCHEME_TYPE_BOOLEAN)
+      ASSERT_EQ(FALSE, res.data.boolean_val)
+      ASSERT_EQ(TRUE, res._mutable)
+   ENDTEST
+
+   TEST("not [3]")
+      dyntype_t dyn = SCHEME_LITERAL_BOOLEAN(FALSE);
+      dyntype_t res = not(dyn);
+
+      CHECK_TYPE(res, SCHEME_TYPE_BOOLEAN)
+      ASSERT_EQ(TRUE, res.data.boolean_val)
+      ASSERT_EQ(TRUE, res._mutable)
+   ENDTEST
+
+
+   TEST("boolean=?")
+      dyntype_t dyn1 = SCHEME_LITERAL_BOOLEAN(TRUE);
+      dyntype_t dyn2 = SCHEME_LITERAL_BOOLEAN(TRUE);
+      dyntype_t dyn3 = SCHEME_LITERAL_BOOLEAN(TRUE);
+      dyntype_t dyns[] = {dyn1, dyn2, dyn3};
+
+      dyntype_t boolean_dyn = boolean_eq(dyns, 3);
+
+      CHECK_TYPE(boolean_dyn, SCHEME_TYPE_BOOLEAN)
+      ASSERT_EQ(TRUE, boolean_dyn.data.boolean_val)
+      ASSERT_EQ(TRUE, boolean_dyn._mutable)
+   ENDTEST
+
+   TEST("boolean=? one boolean")
+      dyntype_t dyn1 = SCHEME_LITERAL_BOOLEAN(TRUE);
+      dyntype_t dyns[] = {dyn1};
+
+      dyntype_t boolean_dyn = boolean_eq(dyns, 1);
+
+      CHECK_TYPE(boolean_dyn, SCHEME_TYPE_BOOLEAN)
+      ASSERT_EQ(TRUE, boolean_dyn.data.boolean_val)
+      ASSERT_EQ(TRUE, boolean_dyn._mutable)
+   ENDTEST
+
+   TEST("boolean=? wrong datatype")
+      dyntype_t dyn1 = SCHEME_LITERAL_BOOLEAN(TRUE);
+      dyntype_t dyn2 = SCHEME_LITERAL_STRING("abc");
+      dyntype_t dyn3 = SCHEME_LITERAL_BOOLEAN(TRUE);
+      dyntype_t dyns[] = {dyn1, dyn2, dyn3};
+
+      dyntype_t boolean_dyn = boolean_eq(dyns, 3);
+
+      CHECK_TYPE(boolean_dyn, SCHEME_TYPE_BOOLEAN)
+      ASSERT_EQ(FALSE, boolean_dyn.data.boolean_val)
+      ASSERT_EQ(TRUE, boolean_dyn._mutable)
+   ENDTEST
+
+   TEST("boolean=? negative")
+      dyntype_t dyn1 = SCHEME_LITERAL_BOOLEAN(TRUE);
+      dyntype_t dyn2 = SCHEME_LITERAL_BOOLEAN(FALSE);
+      dyntype_t dyn3 = SCHEME_LITERAL_BOOLEAN(TRUE);
+      dyntype_t dyns[] = {dyn1, dyn2, dyn3};
+
+      dyntype_t boolean_dyn = boolean_eq(dyns, 3);
 
       CHECK_TYPE(boolean_dyn, SCHEME_TYPE_BOOLEAN)
       ASSERT_EQ(FALSE, boolean_dyn.data.boolean_val)
