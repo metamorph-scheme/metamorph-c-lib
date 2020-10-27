@@ -6,7 +6,7 @@
     {
       "label": "compile test for debug",
       "type": "shell",
-      "command": "gcc src/*.c src/gc/*.c src/functions/*.c src/primf/*.c src/dyntypes/*.c -o out/a.out -g"
+      "command": "gcc src/*.c src/gc/*.c src/functions/*.c src/primf/*.c src/dyntypes/*.c -o out/a.out -std=c99 -g"
     }
   ]
 }
