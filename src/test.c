@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include "testinc.h"
 
 int main() {
    printf("Hello World!");
