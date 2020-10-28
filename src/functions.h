@@ -26,10 +26,10 @@ extern int return_address;
                     case(0):{
 #define END     }}}
 
-#define FUNCTION(name)  }name:{
+#define FUNCTION(NAME)  }NAME:{
 #define ARGUMENT(number)    (current_activation->formal_parameters[number])
-#define RETURN(value)   {\
-                            return_value=value;\
+#define RETURN(VALUE)   {\
+                            return_value=VALUE;\
                             return_address = current_activation->return_address;\
                             goto table;\
                         }   
@@ -38,12 +38,12 @@ extern int return_address;
                         int i=0;\
                         temporary_activation = REQUEST(activation_t);\
                         temporary_activation->previous_activation=current_activation;
-#define PARAMETER(value)    temporary_activation->formal_parameters[i]=value;\
+#define PARAMETER(VALUE)    temporary_activation->formal_parameters[i]=VALUE;\
                                 i++;
-#define JUMP(name,id)   temporary_activation->return_address=id;\
+#define JUMP(NAME,ID)   temporary_activation->return_address=ID;\
                     current_activation=temporary_activation;\
-                    goto name;\ 
-                    case(id):\
+                    goto NAME;\ 
+                    case(ID):\
                     temporary_activation = current_activation;\
                     current_activation = temporary_activation->previous_activation;\
                     PUTBACK(activation_t, temporary_activation);\

@@ -14,12 +14,12 @@ typedef struct {
 	int index;
 	int current_size;
 	int chunk_count;
-} Allocator;
+} allocator_t;
 
-extern Allocator glob_alloc[MAX_CHUNKS];
+extern allocator_t glob_alloc[MAX_CHUNKS];
 
-void* request(Allocator* a);
-void giveback(Allocator* a, void* );
+void* request(allocator_t* a);
+void giveback(allocator_t* a, void* );
 void initalize_allocator();
 
 #define REQUEST(type) ((type*) request(&glob_alloc[sizeof(type)/CHUNK_SIZE]));

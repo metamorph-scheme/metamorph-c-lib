@@ -1,7 +1,7 @@
 #include "cache.h"
 #include "../cache.h"
 
-Allocator glob_alloc[MAX_CHUNKS];
+allocator_t glob_alloc[MAX_CHUNKS];
 
 void initalize_allocator(){
     int i;
@@ -9,7 +9,7 @@ void initalize_allocator(){
         initalloc(&glob_alloc[i], i+1);
 }
 
-void* request(Allocator* a){
+void* request(allocator_t* a){
     if (a->index) {
         a->index--;
         return a->pointers[a->index];
@@ -17,7 +17,7 @@ void* request(Allocator* a){
     return malloc(a->chunk_count * CHUNK_SIZE);
 }
 
-void giveback(Allocator* a, void* ptr) {
+void giveback(allocator_t* a, void* ptr) {
 
     int c = a->current_size;
     int i = a->index;
@@ -38,7 +38,7 @@ void giveback(Allocator* a, void* ptr) {
     return;
 }
 
-void initalloc(Allocator* a, size_t size) {
+void initalloc(allocator_t* a, size_t size) {
     a->current_size = INIT_CACHE;
     a->index = 0;
     a->pointers = malloc(sizeof(void*)* INIT_CACHE);

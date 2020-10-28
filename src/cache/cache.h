@@ -4,6 +4,6 @@
 #include <stddef.h>
 #include "../cache.h"
 
-void initalloc(Allocator* a, size_t size);
+void initalloc(allocator_t* a, size_t size);
 
 #endif
