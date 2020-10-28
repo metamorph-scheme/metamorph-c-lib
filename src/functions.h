@@ -35,13 +35,14 @@ extern int return_address;
                         }   
 
 #define CALL        {\
-                        int i = 0;\
-                        temporary_activation = current_activation;\
-                        current_activation = REQUEST(Activation);\
-                        current_activation->previous_activation=temporary_activation;
-#define PARAMETER(value)    current_activation->formal_parameters[i]=value;\
+                        int i;\
+                        i=0;\
+                        temporary_activation = REQUEST(Activation);\
+                        temporary_activation->previous_activation=current_activation;
+#define PARAMETER(value)    temporary_activation->formal_parameters[i]=value;\
                                 i++;
-#define JUMP(name,id)   current_activation->return_address=id;\ 
+#define JUMP(name,id)   temporary_activation->return_address=id;\
+                    current_activation=temporary_activation;\
                     goto name;\ 
                     case(id):\
                     temporary_activation = current_activation;\
