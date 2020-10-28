@@ -23,6 +23,6 @@ void giveback(Allocator* a, void* );
 void initalize_allocator();
 
 #define REQUEST(type) ((type*) request(&glob_alloc[sizeof(type)/CHUNK_SIZE]));
-#define RETURN(type, ptr) giveback(&glob_alloc[sizeof(type)/CHUNK_SIZE], ptr);
+#define PUTBACK(type, ptr) giveback(&glob_alloc[sizeof(type)/CHUNK_SIZE], ptr);
 
 #endif
