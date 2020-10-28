@@ -1,7 +1,7 @@
 #include "functions.h"
 #include "../functions.h"
 
-Activation* current_activation;
-Activation* temporary_activation;
+activation_t* current_activation;
+activation_t* temporary_activation;
 Dyntype return_value;
 int return_address = 0;
