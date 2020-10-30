@@ -25,12 +25,12 @@ START
    strcpy(data->str, "Test");
    
    CALL
-      PARAMETER((Dyntype){10})
-      PARAMETER((Dyntype){100})
+      PARAMETER((dyntype_t){10})
+      PARAMETER((dyntype_t){100})
       JUMP(func, 1)
 
    CALL
-      PARAMETER((Dyntype){6})
+      PARAMETER((dyntype_t){6})
       JUMP(fak, 3)
 
    c1 = clock();
@@ -40,11 +40,11 @@ START
 
 FUNCTION(fak)
    if(ARGUMENT(0).payload == 0)
-      RETURN((Dyntype) {1})
+      RETURN((dyntype_t) {1})
    CALL
-      PARAMETER(((Dyntype) {ARGUMENT(0).payload - 1}))
+      PARAMETER(((dyntype_t) {ARGUMENT(0).payload - 1}))
       JUMP(fak, 2)
-   RETURN((Dyntype) {return_value.payload * ARGUMENT(0).payload})
+   RETURN((dyntype_t) {return_value.payload * ARGUMENT(0).payload})
 
 
 FUNCTION(func)
@@ -62,7 +62,7 @@ FUNCTION(func)
          }
       }
    }
-   RETURN((Dyntype) {0})
+   RETURN((dyntype_t) {0})
 END
 
 

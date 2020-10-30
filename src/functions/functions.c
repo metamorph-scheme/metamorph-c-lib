@@ -3,5 +3,5 @@
 
 activation_t* current_activation;
 activation_t* temporary_activation;
-Dyntype return_value;
+dyntype_t return_value;
 int return_address = 0;

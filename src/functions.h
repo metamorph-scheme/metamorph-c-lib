@@ -4,20 +4,16 @@
 #include "dyntypes.h"
 #include "cache.h"
 
-typedef struct dyntype{
-    int payload;
-} Dyntype;
-
 typedef struct activation_struct_t{
     int return_address;
     int references;
     struct activation_struct_t* previous_activation;
-    Dyntype formal_parameters[20];
+    dyntype_t formal_parameters[20];
 } activation_t;
 
 extern activation_t* current_activation;
 extern activation_t* temporary_activation;
-extern Dyntype return_value;
+extern dyntype_t return_value;
 extern int return_address;
 
 
