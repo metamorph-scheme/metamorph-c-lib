@@ -1,9 +1,6 @@
 #ifndef CACHE_GLOB
 #define CACHE_GLOB
 
-#include <stdlib.h>
-#include <stddef.h>
-
 #define MAX_CHUNKS 256
 #define CHUNK_SIZE 4
 #define INIT_CACHE 4
