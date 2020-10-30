@@ -10,6 +10,7 @@ typedef struct dyntype{
 
 typedef struct activation_struct_t{
     int return_address;
+    int references;
     struct activation_struct_t* previous_activation;
     Dyntype formal_parameters[20];
 } activation_t;
@@ -48,5 +49,5 @@ extern int return_address;
                     current_activation = temporary_activation->previous_activation;\
                     PUTBACK(activation_t, temporary_activation);\
                     }
-
+                    
 #endif
