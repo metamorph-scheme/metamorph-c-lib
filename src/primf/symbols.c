@@ -7,27 +7,27 @@
 
 // symbol?
 dyntype_t symbol_q(dyntype_t obj) {
-  return SCHEME_NEW_BOOLEAN(obj.type == SCHEME_TYPE_SYMBOL);
+  return scheme_new_boolean(obj.type == SCHEME_TYPE_SYMBOL);
 }
 
 // symbol=?
 dyntype_t symbol_eq(ELLIPSIS_PARAM(obj)) {
   if(obj[0].type != SCHEME_TYPE_SYMBOL)
-    return SCHEME_NEW_BOOLEAN(FALSE);
+    return scheme_new_boolean(FALSE);
 
   for(int i = 1; i < len; i++) {
     if(obj[i].type != SCHEME_TYPE_SYMBOL 
-      || (strcmp(obj[0].data.symbol_val.name, obj[i].data.symbol_val.name) != 0))
-      return SCHEME_NEW_BOOLEAN(FALSE);
+      || (strcmp(obj[0].data.symbol_val->name, obj[i].data.symbol_val->name) != 0))
+      return scheme_new_boolean(FALSE);
   }
-  return SCHEME_NEW_BOOLEAN(TRUE);
+  return scheme_new_boolean(TRUE);
 }
 
 // symbol->string
 // return immutable string on purpose - see r7rs page 44
 dyntype_t symbol_to_string(dyntype_t sym) {
   REQUIRE_SCHEME_SYMBOL(sym, 0)
-  return SCHEME_LITERAL_STRING(c_sym.name);
+  return scheme_literal_string(c_sym.name);
 }
 
 // string->symbol
@@ -36,5 +36,5 @@ dyntype_t string_to_symbol(dyntype_t str) {
   scheme_symbol_t sym = {
     .name = c_str
   };
-  return SCHEME_NEW_SYMBOL(sym);
+  return scheme_new_symbol(sym);
 }
