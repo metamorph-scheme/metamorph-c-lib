@@ -7,6 +7,11 @@
       "label": "compile test for debug",
       "type": "shell",
       "command": "gcc src/cache/*.c src/*.c src/gc/*.c src/functions/*.c src/primf/*.c src/dyntypes/*.c -o out/a.out -std=c99 -g"
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
     }
   ]
 }
