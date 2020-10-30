@@ -1,5 +1,7 @@
 #include "cache.h"
 #include "../cache.h"
+#include <stddef.h>
+#include <stdlib.h>
 
 allocator_t glob_alloc[MAX_CHUNKS];
 
