@@ -286,5 +286,141 @@ int main() {
       ASSERT_EQ("abc", *car(cdr(cdr(list))).data.string_val)
    ENDTEST
 
+   TEST("length")
+      dyntype_t list = make_list(3);
+      int len = length(list);
+
+      printf("len: %d", len);
+
+      ASSERT_EQ(3, len)
+   ENDTEST
+
+   TEST("append")
+      dyntype_t str = scheme_literal_string("abc");
+      dyntype_t list = make_list_fill(2, str);
+      dyntype_t sym = scheme_literal_symbol((scheme_symbol_t) { .name = "a"});
+      dyntype_t args[] = {list, sym};
+
+      dyntype_t appended_list = append(args, 2);
+
+      CHECK_TYPE(appended_list, SCHEME_TYPE_PAIR)
+      CHECK_TYPE(car(cdr(appended_list)), SCHEME_TYPE_STRING)
+      CHECK_TYPE(cdr(cdr(appended_list)), SCHEME_TYPE_SYMBOL)
+      ASSERT_EQ("abc", *car(appended_list).data.string_val)
+      ASSERT_EQ("abc", *car(cdr(appended_list)).data.string_val)
+      ASSERT_EQ("a", cdr(cdr(appended_list)).data.symbol_val->name)
+   ENDTEST
+
+   TEST("append [2]")
+      dyntype_t str = scheme_literal_string("abc");
+      dyntype_t str2 = scheme_literal_string("cba");
+      dyntype_t list = make_list_fill(2, str);
+      dyntype_t list2 = make_list_fill(1, str2);
+      dyntype_t sym = scheme_literal_symbol((scheme_symbol_t) { .name = "a"});
+      dyntype_t args[] = {list, list2, sym};
+
+      dyntype_t appended_list = append(args, 3);
+
+      CHECK_TYPE(appended_list, SCHEME_TYPE_PAIR)
+      CHECK_TYPE(car(cdr(appended_list)), SCHEME_TYPE_STRING)
+      CHECK_TYPE(cdr(cdr(cdr(appended_list))), SCHEME_TYPE_SYMBOL)
+      ASSERT_EQ("abc", *car(appended_list).data.string_val)
+      ASSERT_EQ("abc", *car(cdr(appended_list)).data.string_val)
+      ASSERT_EQ("cba", *car(cdr(cdr(appended_list))).data.string_val)
+      ASSERT_EQ("a", cdr(cdr(cdr(appended_list))).data.symbol_val->name)
+   ENDTEST
+
+   TEST("append [3]")
+      dyntype_t str = scheme_literal_string("abc");
+      dyntype_t str2 = scheme_literal_string("cba");
+      dyntype_t list = make_list_fill(2, str);
+      dyntype_t list2 = make_list_fill(1, str2);
+      dyntype_t args[] = {list, list2};
+
+      dyntype_t appended_list = append(args, 2);
+
+      CHECK_TYPE(appended_list, SCHEME_TYPE_PAIR)
+      CHECK_TYPE(car(cdr(appended_list)), SCHEME_TYPE_STRING)
+      CHECK_TYPE(cdr(cdr(cdr(appended_list))), SCHEME_TYPE_NULL)
+      ASSERT_EQ("abc", *car(appended_list).data.string_val)
+      ASSERT_EQ("abc", *car(cdr(appended_list)).data.string_val)
+      ASSERT_EQ("cba", *car(cdr(cdr(appended_list))).data.string_val)
+      ASSERT_EQ(TRUE, *list_q(appended_list).data.boolean_val)
+   ENDTEST
+
+   TEST("append [4]")
+      dyntype_t str = scheme_literal_string("abc");
+      dyntype_t args[] = {str};
+
+      dyntype_t appended_list = append(args, 1);
+
+      CHECK_TYPE(appended_list, SCHEME_TYPE_STRING)
+      ASSERT_EQ("abc", *appended_list.data.string_val)
+   ENDTEST
+
+   TEST("append [5]")
+      dyntype_t args[] = {};
+
+      dyntype_t appended_list = append(args, 0);
+
+      CHECK_TYPE(appended_list, SCHEME_TYPE_NULL)
+   ENDTEST
+
+   TEST("append [6]")
+      dyntype_t str = scheme_literal_string("abc");
+      dyntype_t str2 = scheme_literal_string("cba");
+      dyntype_t list = make_list_fill(2, str);
+      dyntype_t list2 = make_list_fill(1, str2);
+      dyntype_t sym = scheme_literal_symbol((scheme_symbol_t) { .name = "a"});
+      dyntype_t args[] = {list, sym, list2};
+
+      dyntype_t appended_list = append(args, 3);
+
+      CHECK_TYPE(appended_list, INTERNAL_TYPE_BAD_ARGUMENT_EXCEPTION)
+   ENDTEST
+
+   TEST("list-set!")
+      dyntype_t replacement = scheme_literal_string("cde");
+      dyntype_t str = scheme_literal_string("abc");
+      dyntype_t list = make_list_fill(3, str);
+
+      dyntype_t unspec = list_set(list, 1, replacement);
+
+      CHECK_TYPE(unspec, SCHEME_TYPE_UNSPECIFIED)
+      ASSERT_EQ("cde", *car(cdr(list)).data.string_val)
+   ENDTEST
+
+   TEST("list-set! [2]")
+      dyntype_t replacement = scheme_literal_string("cde");
+      dyntype_t str = scheme_literal_string("abc");
+      dyntype_t list = make_list_fill(3, str);
+
+      dyntype_t err = list_set(list, 3, replacement);
+
+      CHECK_TYPE(err, INTERNAL_TYPE_BAD_ARGUMENT_EXCEPTION)
+   ENDTEST
+
+   TEST("list-set! [3]")
+      dyntype_t replacement = scheme_literal_string("cde");
+      dyntype_t str = scheme_literal_string("abc");
+      dyntype_t list = make_list_fill(3, str);
+      list._mutable = FALSE;
+
+      dyntype_t err = list_set(list, 3, replacement);
+
+      CHECK_TYPE(err, INTERNAL_TYPE_SETTING_IMMUTABLE_LOCATION)
+   ENDTEST
+
+   TEST("list-copy")
+      dyntype_t str = scheme_literal_string("abc");
+      dyntype_t list = make_list_fill(3, str);
+
+      dyntype_t copied_list = list_copy(list);
+
+      CHECK_TYPE(copied_list, SCHEME_TYPE_PAIR)
+      ASSERT_EQ(TRUE, *list_q(copied_list).data.boolean_val)
+      ASSERT_EQ("abc", *car(cdr(copied_list)).data.string_val)
+   ENDTEST
+
    printf("All tests were successful!\n");
 }
