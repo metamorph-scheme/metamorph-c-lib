@@ -138,17 +138,54 @@ dyntype_t list_set(dyntype_t list, int k, dyntype_t obj);
         (error "memq: argument is not a list"))))
 
 (define mem-int
-  (lambda (obj list)
+  (lambda (obj list compare)
     (cond
       ((null? list)
         #f)
-      ((eq? (car list) obj)
+      ((compare (car list) obj)
         list)
       (else
         (mem-int obj (cdr list))))))
 */
 
-// TODO assocq ...
+/*
+(define assq
+  (lambda (obj alist)
+    (assoc obj alist eq?)))
+
+(define assv
+  (lambda (obj alist)
+    (assoc obj alist eqv?)))
+
+(define assoc
+  (lambda (obj . pair)
+    (let ((len (length pair)))
+      (cond
+        ((= len 0)
+          (error "assoc: no argument"))
+        ((= len 1)
+          (assoc-int obj (car pair) equal?))
+        ((= len 2)
+          (assoc-int obj (car pair) (cadr pair)))
+        (else
+          (error "assoc: too many arguments for member"))))))
+
+(define assoc-int
+  (lambda (obj alist compare)
+      (if (list? alist)
+        (ass-int obj alist compare)
+        (error "assoc: argument is not a list"))))
+
+(define ass-int
+  (lambda (obj alist compare)
+    (cond
+      ((null? alist)
+        #f)
+      ((compare (caar alist) obj)
+        (car alist))
+      (else
+        (ass-int obj (cdr alist) compare)))))
+*/
 
 // list-copy
 dyntype_t list_copy(dyntype_t list);
