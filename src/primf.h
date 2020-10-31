@@ -3,7 +3,6 @@
 
 #define ELLIPSIS_PARAM(NAME) dyntype_t* NAME, int len
 #define NONSTANDARD
-#define STANDARD(NAME)
 
 // Symbols
 
