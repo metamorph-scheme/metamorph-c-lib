@@ -118,7 +118,7 @@ dyntype_t make_list_fill(int c_k, dyntype_t fill) {
     new_pair = cons(new_car, new_empty_cdr);
 
     *cur = new_pair;
-    cur = &(new_pair.data.pair_val->cdr);;
+    cur = &(new_pair.data.pair_val->cdr);
   }
 
   return init;
@@ -136,7 +136,99 @@ dyntype_t list(ELLIPSIS_PARAM(obj)) {
     new_pair = cons(obj[i], new_empty_cdr);
 
     *cur = new_pair;
-    cur = &(new_pair.data.pair_val->cdr);;
+    cur = &(new_pair.data.pair_val->cdr);
+  }
+  return init;
+}
+
+// TODO number type
+int length(dyntype_t list) {
+  if(list.type == SCHEME_TYPE_NULL)
+    return 0;
+  
+  // TODO
+  // if(!i_list_q(list))
+    // return INTERNAL_BAD_ARGUMENT_EXCEPTION(0, "length: argument ist not a list");
+
+  int init = 1;
+  dyntype_t *cur = &list;
+
+  while(cur->data.pair_val->cdr.type != SCHEME_TYPE_NULL) {
+    init++;
+    cur = &(cur->data.pair_val->cdr);
+  }
+
+  return init;
+}
+
+dyntype_t append(ELLIPSIS_PARAM(lists)) {
+  if(len == 0)
+    return SCHEME_NULL;
+
+  if(len == 1)
+    return lists[0];
+
+  dyntype_t init = SCHEME_NULL;
+  dyntype_t *cur = &init;
+  for(int i = 0; i < len-1; i++) {
+    if(!i_list_q(lists[i]))
+      return INTERNAL_BAD_ARGUMENT_EXCEPTION(i, "append: argument is not a list");
+
+    dyntype_t *list_progress = lists + i;
+    while(list_progress->type != SCHEME_TYPE_NULL) {
+      dyntype_t new_pair;
+      dyntype_t new_empty_cdr = SCHEME_NULL;
+
+      new_pair = cons(car(*list_progress), new_empty_cdr);
+
+      *cur = new_pair;
+      cur = &(new_pair.data.pair_val->cdr);
+      list_progress = &list_progress->data.pair_val->cdr;
+    }
+  }
+  *cur = lists[len-1];
+  return init;
+}
+
+dyntype_t list_set(dyntype_t list, int k, dyntype_t obj) {
+  // TODO number
+  int c_k = k;
+  
+  if(!i_list_q(list))
+    return INTERNAL_BAD_ARGUMENT_EXCEPTION(0, "list-set!: argument ist not a list");
+
+  if(!list._mutable)
+    return INTERNAL_SETTING_IMMUTABLE_LOCATION;
+
+  dyntype_t* cur = &list;
+  for(int i = 0; i < c_k; i++) {
+    if(cdr(*cur).type == SCHEME_TYPE_NULL)
+      return INTERNAL_BAD_ARGUMENT_EXCEPTION(1, "list-set!: index is out of bounds");
+
+    cur = &(cur->data.pair_val->cdr);
+  }
+
+  cur->data.pair_val->car = obj;
+
+  return SCHEME_UNSPECIFIED;
+}
+
+dyntype_t list_copy(dyntype_t list) {
+  if(!i_list_q(list))
+    return INTERNAL_BAD_ARGUMENT_EXCEPTION(0, "list-copy: argument ist not a list");
+  
+  dyntype_t init = SCHEME_NULL;
+  dyntype_t *cur_new_list = &init;
+  dyntype_t *cur_orig_list = &list;
+  while(cur_orig_list->type != SCHEME_TYPE_NULL) {
+    dyntype_t new_pair;
+    dyntype_t new_empty_cdr = SCHEME_NULL;
+
+    new_pair = cons(car(*cur_orig_list), new_empty_cdr);
+
+    *cur_new_list = new_pair;
+    cur_new_list = &(new_pair.data.pair_val->cdr);
+    cur_orig_list = &(cur_orig_list->data.pair_val->cdr);
   }
   return init;
 }
