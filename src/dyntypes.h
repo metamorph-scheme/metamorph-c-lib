@@ -62,7 +62,6 @@ typedef struct dyntype_t_struct {
     struct scheme_pair_struct_t* pair_val;
     internal_type_exception_t internal_type_exception_val;
     internal_bad_argument_exception_t internal_bad_argument_exception_t;
-    internal_t
   } data;
 } dyntype_t;
 
