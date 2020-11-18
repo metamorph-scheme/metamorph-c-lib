@@ -1,0 +1,17 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "compile test for debug",
+      "type": "shell",
+      "command": "gcc src/cache/*.c src/*.c src/gc/*.c src/functions/*.c src/primf/*.c src/dyntypes/*.c -o out/a.out -std=c99 -g"
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
