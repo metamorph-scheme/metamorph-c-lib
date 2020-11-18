@@ -1,7 +1,9 @@
 #ifndef DYNTYPES
 #define DYNTYPES
 
-#define SIMPLE_MALLOC(TYPE, VAL) TYPE *ptr = (TYPE*) malloc(sizeof(TYPE)); *ptr = VAL;
+#include "../cache.h"
+
+#define SIMPLE_MALLOC(TYPE, VAL)  TYPE *ptr = REQUEST(TYPE); *ptr = VAL;
 #define OBJ_CREATION_FUNCS(TYPE, SCHEME_TYPE) dyntype_t scheme_##TYPE(scheme_##TYPE##_t obj, bool_t _mutable) {\
   SIMPLE_MALLOC(scheme_##TYPE##_t, obj)\
   return (dyntype_t) {\

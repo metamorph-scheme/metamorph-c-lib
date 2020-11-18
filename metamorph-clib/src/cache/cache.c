@@ -1,10 +1,12 @@
-#include "cache.h"
+#include "cache_internal.h"
 #include "../cache.h"
 #include <stddef.h>
 #include <stdlib.h>
 
 allocator_t glob_alloc[MAX_CHUNKS];
-
+//DEBUG
+int cbalance = 0;
+int total = 0;
 void initalize_allocator(){
     int i;
     for (i = 0; i < MAX_CHUNKS; i++)
@@ -12,14 +14,27 @@ void initalize_allocator(){
 }
 
 void* request(allocator_t* a){
+    //DEBUG
+    cbalance++;
+    total++;
+    
+    //DELETE
+    //return calloc(a->chunk_count, CHUNK_SIZE);
+
     if (a->index) {
         a->index--;
         return a->pointers[a->index];
     }
-    return malloc(a->chunk_count * CHUNK_SIZE);
+    return calloc(a->chunk_count, CHUNK_SIZE);
 }
 
 void giveback(allocator_t* a, void* ptr) {
+    //DEBUG
+    cbalance--;
+    
+    //DELETE
+    //free(ptr);
+    //return;
 
     int c = a->current_size;
     int i = a->index;
@@ -43,6 +58,6 @@ void giveback(allocator_t* a, void* ptr) {
 void initalloc(allocator_t* a, size_t size) {
     a->current_size = INIT_CACHE;
     a->index = 0;
-    a->pointers = malloc(sizeof(void*)* INIT_CACHE);
+    a->pointers = calloc(sizeof(void*) , INIT_CACHE);
     a->chunk_count = size;
 }

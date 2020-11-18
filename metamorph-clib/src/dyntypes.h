@@ -3,6 +3,7 @@
 
 #include "common.h"
 
+
 // Types of dyntype
 
 #define SCHEME_TYPE_BOOLEAN 0
@@ -18,15 +19,25 @@
 #define SCHEME_TYPE_EOF_OBJECT 10
 #define SCHEME_TYPE_PORT 11
 #define SCHEME_TYPE_UNSPECIFIED 12
-#define INTERNAL_TYPE_TYPE_EXCEPTION 13
-#define INTERNAL_TYPE_BAD_ARGUMENT_EXCEPTION 14
-#define INTERNAL_TYPE_SETTING_IMMUTABLE_LOCATION 15
+
+#define INTERNAL_TYPE_TYPE_EXCEPTION 0
+#define INTERNAL_TYPE_BAD_ARGUMENT_EXCEPTION 1
+#define INTERNAL_TYPE_SETTING_IMMUTABLE_LOCATION 2
+
+#define INTERNAL_GLOBAL_EXCEPTION 1
 
 typedef char scheme_type_t;
 
 // Value Types
 
 typedef bool_t scheme_boolean_t;
+
+struct activation_struct_t;
+
+typedef struct {
+  int function_id;
+  struct activation_struct_t* activation;
+} scheme_procedure_t;
 
 typedef struct {
   char* name;
@@ -44,6 +55,15 @@ typedef struct
   char* message;
 } internal_bad_argument_exception_t;
 
+typedef struct exception_struct_t {
+    union {
+        internal_bad_argument_exception_t bad_argument_exception;
+        internal_type_exception_t type_exception;
+    } data;
+    int internal_error_type;
+} exception_t;
+
+extern exception_t global_exception;
 
 typedef char* scheme_string_t;
 
@@ -59,9 +79,8 @@ typedef struct dyntype_t_struct {
     scheme_boolean_t* boolean_val;
     scheme_symbol_t* symbol_val;
     scheme_string_t* string_val;
+    scheme_procedure_t* procedure_val;
     struct scheme_pair_struct_t* pair_val;
-    internal_type_exception_t internal_type_exception_val;
-    internal_bad_argument_exception_t internal_bad_argument_exception_t;
   } data;
 } dyntype_t;
 
@@ -71,57 +90,66 @@ typedef struct scheme_pair_struct_t {
   bool_t list;
 } scheme_pair_t;
 
-#define INTERNAL_TYPE_EXCEPTION(WANTED, RECEIVED, POS) (dyntype_t) {\
-  .data.internal_type_exception_val = (internal_type_exception_t) {\
+
+
+#define SET_TYPE_EXCEPTION(WANTED, RECEIVED, POS) {\
+  global_exception.data.type_exception=(internal_type_exception_t) {\
     .wanted = WANTED,\
     .received = RECEIVED,\
     .position = POS\
-  },\
-  .type = INTERNAL_TYPE_TYPE_EXCEPTION,\
-  ._mutable = FALSE\
+  };\
+  global_exception.internal_error_type = INTERNAL_TYPE_TYPE_EXCEPTION;\
+  CRASH(INTERNAL_GLOBAL_EXCEPTION);\
 }
 
-#define INTERNAL_SETTING_IMMUTABLE_LOCATION (dyntype_t) {\
-  .type = INTERNAL_TYPE_SETTING_IMMUTABLE_LOCATION,\
-  ._mutable = TRUE,\
-  .data = NULL\
+#define SET_SETTING_IMMUTABLE_LOCATION {\
+    global_exception.internal_error_type=INTERNAL_TYPE_SETTING_IMMUTABLE_LOCATION;\
+    CRASH(INTERNAL_GLOBAL_EXCEPTION);\
 }
 
-#define INTERNAL_BAD_ARGUMENT_EXCEPTION(POS, MSG) (dyntype_t) {\
-  .type = INTERNAL_TYPE_BAD_ARGUMENT_EXCEPTION,\
-  ._mutable = TRUE,\
-  .data.internal_bad_argument_exception_t = (internal_bad_argument_exception_t) {\
+#define SET_BAD_ARGUMENT_EXCEPTION(POS, MSG)  {\
+   global_exception.internal_error_type=INTERNAL_TYPE_BAD_ARGUMENT_EXCEPTION;\
+   global_exception.data.type_exception = (internal_bad_argument_exception_t) {\
     .position = POS,\
     .message = MSG\
-  }\
+   };\
+  CRASH(INTERNAL_GLOBAL_EXCEPTION);\
 }
 
 #define REQUIRE_SCHEME_SYMBOL(PARAM, POS) scheme_symbol_t c_##PARAM;\
   if (PARAM.type == SCHEME_TYPE_SYMBOL) { \
     c_##PARAM = *PARAM.data.symbol_val;\
   } else {\
-    return INTERNAL_TYPE_EXCEPTION(SCHEME_TYPE_SYMBOL, PARAM.type, POS);\
+    SET_TYPE_EXCEPTION(SCHEME_TYPE_SYMBOL, PARAM.type, POS)\
   }
 
 #define REQUIRE_SCHEME_PAIR(PARAM, POS) scheme_pair_t c_##PARAM;\
   if (PARAM.type == SCHEME_TYPE_PAIR) { \
     c_##PARAM = *PARAM.data.pair_val;\
   } else {\
-    return INTERNAL_TYPE_EXCEPTION(SCHEME_TYPE_PAIR, PARAM.type, POS);\
+    SET_TYPE_EXCEPTION(SCHEME_TYPE_PAIR, PARAM.type, POS);\
   }
 
 #define REQUIRE_SCHEME_BOOLEAN(PARAM, POS) scheme_boolean_t c_##PARAM;\
   if (PARAM.type == SCHEME_TYPE_BOOLEAN) { \
     c_##PARAM = *PARAM.data.boolean_val;\
   } else {\
-    return INTERNAL_TYPE_EXCEPTION(SCHEME_TYPE_BOOLEAN, PARAM.type, POS);\
+    SET_TYPE_EXCEPTION(SCHEME_TYPE_BOOLEAN, PARAM.type, POS);\
   }
 
-#define REQUIRE_SCHEME_STRING(PARAM, POS) scheme_string_t c_##PARAM;\
+#define REQUIRE_SCHEME_STRING(PARAM, POS) scheme_string_t c_##PARAM=NULL;\
   if (PARAM.type == SCHEME_TYPE_STRING) { \
     c_##PARAM = *PARAM.data.string_val;\
   } else {\
-    return INTERNAL_TYPE_EXCEPTION(SCHEME_TYPE_STRING, PARAM.type, POS);\
+    SET_TYPE_EXCEPTION(SCHEME_TYPE_STRING, PARAM.type, POS);\
+  }
+
+
+#define REQUIRE_SCHEME_PROCEDURE(PARAM, POS) scheme_procedure_t c_##PARAM;\
+  if (PARAM.type == SCHEME_TYPE_PROCEDURE) { \
+    c_##PARAM = *PARAM.data.procedure_val;\
+  } else {\
+    SET_TYPE_EXCEPTION(SCHEME_TYPE_STRING, PARAM.type, POS);\
   }
 
 dyntype_t scheme_new_boolean(scheme_boolean_t obj);
@@ -132,7 +160,13 @@ dyntype_t scheme_new_pair(scheme_pair_t obj);
 dyntype_t scheme_literal_pair(scheme_pair_t obj);
 dyntype_t scheme_new_symbol(scheme_symbol_t obj);
 dyntype_t scheme_literal_symbol(scheme_symbol_t obj);
+dyntype_t scheme_literal_procedure(scheme_procedure_t obj);
 
+
+void release_dyntype(dyntype_t);
+dyntype_t copy_dyntype(dyntype_t);
+
+int count_references_dyntype(dyntype_t dyntype, struct activation_struct_t * activation);
 
 #define SCHEME_UNSPECIFIED (dyntype_t) {\
   .type = SCHEME_TYPE_UNSPECIFIED,\

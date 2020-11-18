@@ -1,0 +1,5 @@
+// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
+// such as names of functions and macros.
+// For more information see https://go.microsoft.com/fwlink/?linkid=865984
+#define START(GLOBALS) int main(){ if(!setjmp(error_buffer)){prog(); cleanup();} error(); } void prog(){ initprog(GLOBALS); table: switch(return_address){ case(0):{
+#define OBJ_CREATION_FUNCS(TYPE, SCHEME_TYPE) dyntype_t scheme_##TYPE(scheme_##TYPE##_t obj, bool_t _mutable) { SIMPLE_MALLOC(scheme_##TYPE##_t, obj) return (dyntype_t) { .type = SCHEME_TYPE, ._mutable = _mutable, .data.TYPE##_val = ptr };}dyntype_t scheme_new_##TYPE(scheme_##TYPE##_t obj) { return scheme_##TYPE(obj, TRUE);}dyntype_t scheme_literal_##TYPE(scheme_##TYPE##_t obj) { return scheme_##TYPE(obj, FALSE);}
