@@ -60,7 +60,6 @@ dyntype_t copy_dyntype(dyntype_t dyntype) {
         scheme_procedure_t procedure;
         procedure = *dyntype.data.procedure_val;
         return copy_procedure(dyntype);
-        //return scheme_literal_procedure(procedure);
     }
     case(SCHEME_TYPE_BOOLEAN): {
         scheme_boolean_t boolean;
