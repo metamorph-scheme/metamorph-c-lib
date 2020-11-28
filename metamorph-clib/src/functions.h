@@ -34,6 +34,7 @@ int count_references_activation(activation_t* src, activation_t* target);
 void cleanup();
 void error(int);
 void release_activation(activation_t*);
+int count_cycle_references(activation_t* activation);
 /*
 void prejump(int, int);
 void postjump();
@@ -80,7 +81,7 @@ void postjump();
                     case(ID):\
                     postjump();}
 */
-                  
+                
 #define CRASH(CODE) longjmp(error_buffer,CODE);
 
 #endif
