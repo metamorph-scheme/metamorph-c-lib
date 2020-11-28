@@ -6,7 +6,10 @@
 #include "functions.h"
 #include "dyntypes.h"
 #include "lambda.h"
+#include "common.h"
 
+#ifdef _TEST_PRIMF
+#else
 struct X{
    int x;
    int y;
@@ -85,5 +88,4 @@ FUNCTION(90)
    RETURN_LITERAL(scheme_new_boolean(9));
 END
 
-
-
+#endif
