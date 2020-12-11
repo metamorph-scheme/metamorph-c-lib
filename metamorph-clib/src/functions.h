@@ -45,6 +45,9 @@ void stack_push(activation_t*, dyntype_t);
 void stack_push_literal(activation_t*, dyntype_t);
 dyntype_t stack_pop(activation_t*);
 
+#define POP_EMPTY_STACK 7
+
+
 
 /*
 void prejump(int, int);

@@ -84,7 +84,7 @@ void stack_push_literal(activation_t* activation, dyntype_t value) {
 }
 dyntype_t stack_pop(activation_t* activation) {
     if (!activation->stack) {
-        //CRASH(7)
+        CRASH(POP_EMPTY_STACK)
     }
     dyntype_t value = activation->stack->value;
     auxillary_stack_t* tmp = activation->stack;
@@ -93,6 +93,12 @@ dyntype_t stack_pop(activation_t* activation) {
     return value;
 }
 
+//Eigentlich nicht nötig, aber sicher ist sicher
+void release_stack(activation_t* activation) {
+    while ( activation->stack != NULL) {
+        release_dyntype(stack_pop(activation));
+    }
+}
 
 void release_activation(activation_t* activation){
     if (!activation->previous_activation)
@@ -121,6 +127,8 @@ void release_activation(activation_t* activation){
         release_activation(activation->parent_activation);
     release_activation(previous_activation);
 
+    //Nur für den Notfall, sollte immer leer sein
+    release_stack(activation);
     RELEASE_ARRAY(dyntype_t,activation->number_parameters,activation->formal_parameters);
     RELEASE(activation_t,activation);
 }
@@ -160,6 +168,15 @@ void cleanup(){
 }
 
 void error(int code){
-    printf("Error %d occured\n", code);
+    switch (code)
+    {
+    case(POP_EMPTY_STACK): 
+        printf("Attempted to perfrom a pop operation on an empty stack");
+        break;
+    case(INTERNAL_GLOBAL_EXCEPTION):
+        break;
+    default:
+        break;
+    }
     exit(1);
 }
