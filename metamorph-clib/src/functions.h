@@ -1,4 +1,4 @@
-#ifndef FUNCTIONS_GLOB
+ï»¿#ifndef FUNCTIONS_GLOB
 #define FUNCTIONS_GLOB
 
 #include "dyntypes.h"
@@ -40,6 +40,7 @@ int count_references_activation(activation_t* src, activation_t* target);
 void cleanup();
 void error(int);
 void release_activation(activation_t*);
+int count_cycle_references(activation_t* activation);
 void stack_push(activation_t*, dyntype_t);
 void stack_push_literal(activation_t*, dyntype_t);
 dyntype_t stack_pop(activation_t*);
@@ -84,14 +85,14 @@ void postjump();
 #define PARAMETER_LITERAL(VALUE)    bind_literal(i, VALUE);\
                                     i++;
                                 
-//ACHTUNG JUMP allokiert keine Parentactivation kann zu SEGFAULT führen
+//ACHTUNG JUMP allokiert keine Parentactivation kann zu SEGFAULT fï¿½hren
 /*
 #define JUMP(FUNCTION_ID,ID)   prejump(FUNCTION_ID, ID);\
                     goto table;\
                     case(ID):\
                     postjump();}
 */
-                  
+                
 #define CRASH(CODE) longjmp(error_buffer,CODE);
 
 #endif

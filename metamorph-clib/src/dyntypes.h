@@ -43,13 +43,13 @@ typedef struct {
   char* name;
 } scheme_symbol_t;
 
-typedef struct {
+typedef struct internal_type_exception_struct_t {
   scheme_type_t wanted;
   scheme_type_t received;
   int position;
 } internal_type_exception_t;
 
-typedef struct
+typedef struct internal_bad_argument_exception_struct_t
 {
   int position;
   char* message;
@@ -93,27 +93,28 @@ typedef struct scheme_pair_struct_t {
 
 
 #define SET_TYPE_EXCEPTION(WANTED, RECEIVED, POS) {\
-  global_exception.data.type_exception=(internal_type_exception_t) {\
-    .wanted = WANTED,\
-    .received = RECEIVED,\
-    .position = POS\
-  };\
-  global_exception.internal_error_type = INTERNAL_TYPE_TYPE_EXCEPTION;\
-  CRASH(INTERNAL_GLOBAL_EXCEPTION);\
+    internal_type_exception_t ex = { \
+      .wanted = WANTED,\
+      .received = RECEIVED,\
+      .position = POS\
+    };\
+    global_exception.data.type_exception = ex;\
+    global_exception.internal_error_type = INTERNAL_TYPE_TYPE_EXCEPTION;\
+    CRASH(INTERNAL_GLOBAL_EXCEPTION)\
 }
 
 #define SET_SETTING_IMMUTABLE_LOCATION {\
     global_exception.internal_error_type=INTERNAL_TYPE_SETTING_IMMUTABLE_LOCATION;\
-    CRASH(INTERNAL_GLOBAL_EXCEPTION);\
+    CRASH(INTERNAL_GLOBAL_EXCEPTION)\
 }
 
 #define SET_BAD_ARGUMENT_EXCEPTION(POS, MSG)  {\
    global_exception.internal_error_type=INTERNAL_TYPE_BAD_ARGUMENT_EXCEPTION;\
-   global_exception.data.type_exception = (internal_bad_argument_exception_t) {\
+   global_exception.data.bad_argument_exception = (internal_bad_argument_exception_t) {\
     .position = POS,\
     .message = MSG\
    };\
-  CRASH(INTERNAL_GLOBAL_EXCEPTION);\
+  CRASH(INTERNAL_GLOBAL_EXCEPTION)\
 }
 
 #define REQUIRE_SCHEME_SYMBOL(PARAM, POS) scheme_symbol_t c_##PARAM;\

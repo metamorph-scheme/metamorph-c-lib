@@ -73,10 +73,13 @@
     <ClCompile Include="src\primf\symbols.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\test.c">
+    <ClCompile Include="src\test_functions.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\test_functions.c">
+    <ClCompile Include="src\primf\numbers.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\primf-test\test_primf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
