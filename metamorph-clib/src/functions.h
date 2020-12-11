@@ -88,6 +88,10 @@ void postjump();
 #define PARAMETER_LITERAL(VALUE)    bind_literal(i, VALUE);\
                                     i++;
                                 
+#define PUSH(dyntype)           stack_push(current_activation, dyntype);
+#define PUSH_LITERAL(dyntype)   stack_push_literal(current_activation, dyntype);
+#define POP                     stack_pop(current_activation)
+
 //ACHTUNG JUMP allokiert keine Parentactivation kann zu SEGFAULT f�hren
 /*
 #define JUMP(FUNCTION_ID,ID)   prejump(FUNCTION_ID, ID);\
