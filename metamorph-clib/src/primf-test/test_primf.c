@@ -516,6 +516,53 @@ TEST(list_copy) {
 
 }
 
+TEST(integer_plus) {
+    scheme_integer_t a = from_unsigned_int64(0x4000000000000000);
+    scheme_integer_t b = from_unsigned_int64(0x4000000000000000);
+
+    scheme_integer_t c = integer_plus(a, b);
+    ASSERT_EQ("first block is not zero", 0u, c.block[0]);
+    ASSERT_EQ("last block is not one", 0x8000000000000000, c.block[1]);
+}
+
+TEST(integer_plus_negative) {
+    scheme_integer_t a = from_unsigned_int64(0b0010110100001111001011110011101010001001110000111110011010101101); // 3246865784823342765
+    scheme_integer_t b = from_unsigned_int64(0b1111111111010000111001010101000000100110111110000100001101000110); // -13258666468162746
+
+    scheme_integer_t c = integer_plus(a, b); // should be 3233607118355180019
+    ASSERT_EQ("first block is not zero", 0u, c.block[0]);
+    ASSERT_EQ("last block is not one", 0b0010110011100000000101001000101010110000101111000010100111110011, c.block[1]);
+}
+
+TEST(integer_plus_2) {
+    scheme_integer_t a = from_unsigned_int64(0b0111111101001111001011110011101010001001110000111110011010101101); // 9173602894442915501
+    scheme_integer_t b = from_unsigned_int64(0b0000110010111011000111100101001010100111011000000110001111001100); // 917360289444291532
+
+    scheme_integer_t c = integer_plus(a, b); // should be 10090963183887207033
+    ASSERT_EQ("first block is not zero", 0u, c.block[0]);
+    ASSERT_EQ("last block is not one", 0b1000110000001010010011011000110100110001001001000100101001111001, c.block[1]);
+}
+
+TEST(integer_plus_3) {
+    scheme_integer_t a = from_unsigned_int64(0b0111111101001111001011110011101010001001110000111110011010101101); // 9173602894442915501
+    uint64_t b_arr[] = { 0b0000000000000000000000000000000000100000100110110000110010010010, 0b0101001001110100010101011100010101100101110100010100101000110000 };
+    scheme_integer_t b = from_int_array(b_arr, 2); // 10090963183887207033323211312
+
+    scheme_integer_t c = integer_plus(a, b); // should be 10090963193060809927766126813
+    ASSERT_EQ("first block is not zero", 0u, c.block[0]);                                
+    ASSERT_EQ("second block is not expected binary", 0b0000000000000000000000000000000000100000100110110000110010010010, c.block[1]);
+    ASSERT_EQ("last block is not expected binary", 0b1101000111000011100001001111111111101111100101010011000011011101, c.block[2]);
+}
+
+TEST(integer_subtract) {
+    scheme_integer_t a = from_unsigned_int64(0b0000000000000000000000000000000000000000000000000000000000101000); // 40
+    scheme_integer_t b = from_unsigned_int64(0b0000000000000000000000000000000000000000000000000000000000000111); // 7
+
+    scheme_integer_t c = integer_subtract(a, b); // should be 33
+    ASSERT_EQ("first block is not zero", 0u, c.block[0]);
+    ASSERT_EQ("last block is not 33", 0b0000000000000000000000000000000000000000000000000000000000100001, c.block[1]);
+}
+
 
 static char* all_tests() {
     MU_RUN_TEST(string_to_symbol);
@@ -554,6 +601,11 @@ static char* all_tests() {
     MU_RUN_TEST(list_set_2);
     MU_RUN_TEST(list_set_3);
     MU_RUN_TEST(list_copy);
+    MU_RUN_TEST(integer_plus);
+    MU_RUN_TEST(integer_plus_2);
+    MU_RUN_TEST(integer_plus_3);
+    MU_RUN_TEST(integer_plus_negative);
+    MU_RUN_TEST(integer_subtract);
     return 0;
 }
 

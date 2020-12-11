@@ -2,6 +2,7 @@
 #define DYNTYPES_GLOB
 
 #include "common.h"
+#include <stdint.h>
 
 
 // Types of dyntype
@@ -20,6 +21,12 @@
 #define SCHEME_TYPE_PORT 11
 #define SCHEME_TYPE_UNSPECIFIED 12
 
+#define SCHEME_NUMERICAL_TYPE_EXACT_INTEGER 13
+#define SCHEME_NUMERICAL_TYPE_INEXACT_INTEGER 14
+#define SCHEME_NUMERICAL_TYPE_EXACT_RATIONAL 15
+#define SCHEME_NUMERICAL_TYPE_INEXACT_RATIONAL 16
+#define SCHEME_NUMERICAL_TYPE_INEXACT_REAL 17
+
 #define INTERNAL_TYPE_TYPE_EXCEPTION 0
 #define INTERNAL_TYPE_BAD_ARGUMENT_EXCEPTION 1
 #define INTERNAL_TYPE_SETTING_IMMUTABLE_LOCATION 2
@@ -27,12 +34,17 @@
 #define INTERNAL_GLOBAL_EXCEPTION 1
 
 typedef char scheme_type_t;
+typedef char internal_exception_type_t;
+typedef char scheme_numerical_type_t;
 
-// Value Types
+// Value Structs
+
+struct scheme_pair_struct_t;
+struct activation_struct_t;
 
 typedef bool_t scheme_boolean_t;
 
-struct activation_struct_t;
+typedef char* scheme_string_t;
 
 typedef struct {
   int function_id;
@@ -42,6 +54,20 @@ typedef struct {
 typedef struct {
   char* name;
 } scheme_symbol_t;
+
+typedef struct scheme_integer_struct_t {
+    uint64_t *block; // array because mutation of numbers is not possible
+    uint8_t length;
+} scheme_integer_t;
+
+typedef struct scheme_number_struct_t {
+    scheme_numerical_type_t type;
+    union {
+        scheme_integer_t* exact_integer_val;
+    } data;
+} scheme_number_t;
+
+// Exception Structs
 
 typedef struct internal_type_exception_struct_t {
   scheme_type_t wanted;
@@ -60,17 +86,12 @@ typedef struct exception_struct_t {
         internal_bad_argument_exception_t bad_argument_exception;
         internal_type_exception_t type_exception;
     } data;
-    int internal_error_type;
+    internal_exception_type_t internal_error_type;
 } exception_t;
 
 extern exception_t global_exception;
 
-typedef char* scheme_string_t;
-
-
-struct scheme_pair_struct_t;
-
-// dyntype
+// Dyntype
 
 typedef struct dyntype_t_struct {
   scheme_type_t type;
@@ -81,16 +102,17 @@ typedef struct dyntype_t_struct {
     scheme_string_t* string_val;
     scheme_procedure_t* procedure_val;
     struct scheme_pair_struct_t* pair_val;
+    scheme_number_t* number_val;
   } data;
 } dyntype_t;
 
 typedef struct scheme_pair_struct_t {
-  dyntype_t car;
-  dyntype_t cdr;
-  bool_t list;
+    dyntype_t car;
+    dyntype_t cdr;
+    bool_t list;
 } scheme_pair_t;
 
-
+// Throw Exception Macros
 
 #define SET_TYPE_EXCEPTION(WANTED, RECEIVED, POS) {\
     internal_type_exception_t ex = { \
@@ -116,6 +138,8 @@ typedef struct scheme_pair_struct_t {
    };\
   CRASH(INTERNAL_GLOBAL_EXCEPTION)\
 }
+
+// Require Macros
 
 #define REQUIRE_SCHEME_SYMBOL(PARAM, POS) scheme_symbol_t c_##PARAM;\
   if (PARAM.type == SCHEME_TYPE_SYMBOL) { \
@@ -145,6 +169,20 @@ typedef struct scheme_pair_struct_t {
     SET_TYPE_EXCEPTION(SCHEME_TYPE_STRING, PARAM.type, POS);\
   }
 
+#define REQUIRE_SCHEME_NUMBER(PARAM, POS) scheme_number_t c_##PARAM;\
+  if (PARAM.type == SCHEME_TYPE_NUMBER) { \
+    c_##PARAM = *PARAM.data.number_val;\
+  } else {\
+    SET_TYPE_EXCEPTION(SCHEME_TYPE_NUMBER, PARAM.type, POS);\
+  }
+
+#define REQUIRE_SCHEME_EXACT_INTEGER(PARAM,POS) scheme_integer_t cn_##PARAM=NULL;\
+  REQUIRE_SCHEME_NUMBER(PARAM, POS)\
+  if (c_##PARAM.type == SCHEME_NUMERICAL_TYPE_EXACT_INTEGER) { \
+    cn_##PARAM = *PARAM.data.exact_integer_val;\
+  } else {\
+    SET_TYPE_EXCEPTION(SCHEME_NUMERICAL_TYPE_EXACT_INTEGER, PARAM.type, POS);\
+  }
 
 #define REQUIRE_SCHEME_PROCEDURE(PARAM, POS) scheme_procedure_t c_##PARAM;\
   if (PARAM.type == SCHEME_TYPE_PROCEDURE) { \
@@ -152,6 +190,8 @@ typedef struct scheme_pair_struct_t {
   } else {\
     SET_TYPE_EXCEPTION(SCHEME_TYPE_STRING, PARAM.type, POS);\
   }
+
+// Value constructors
 
 dyntype_t scheme_new_boolean(scheme_boolean_t obj);
 dyntype_t scheme_literal_boolean(scheme_boolean_t obj);
@@ -162,12 +202,8 @@ dyntype_t scheme_literal_pair(scheme_pair_t obj);
 dyntype_t scheme_new_symbol(scheme_symbol_t obj);
 dyntype_t scheme_literal_symbol(scheme_symbol_t obj);
 dyntype_t scheme_literal_procedure(scheme_procedure_t obj);
-
-
-void release_dyntype(dyntype_t);
-dyntype_t copy_dyntype(dyntype_t);
-
-int count_references_dyntype(dyntype_t dyntype, struct activation_struct_t * activation);
+dyntype_t scheme_new_number(scheme_number_t obj);
+dyntype_t scheme_literal_number(scheme_number_t obj);
 
 #define SCHEME_UNSPECIFIED (dyntype_t) {\
   .type = SCHEME_TYPE_UNSPECIFIED,\
@@ -180,6 +216,11 @@ int count_references_dyntype(dyntype_t dyntype, struct activation_struct_t * act
   ._mutable = TRUE,\
   .data = NULL\
 }
+
+void release_dyntype(dyntype_t);
+dyntype_t copy_dyntype(dyntype_t);
+
+int count_references_dyntype(dyntype_t dyntype, struct activation_struct_t *activation);
 
 //dyntype_t eqv_q(dyntype_t a, dyntype_t b);
 

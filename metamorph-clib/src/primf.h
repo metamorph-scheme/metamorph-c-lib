@@ -179,4 +179,25 @@ dyntype_t list_set(dyntype_t list, int k, dyntype_t obj);
 // list-copy
 dyntype_t list_copy(dyntype_t list);
 
+
+dyntype_t number_q(dyntype_t obj);
+
+dyntype_t complex_q(dyntype_t obj);
+dyntype_t real_q(dyntype_t obj);
+dyntype_t rational_q(dyntype_t obj);
+dyntype_t integer_q(dyntype_t obj);
+
+dyntype_t inexact_q(dyntype_t z);
+dyntype_t exact_q(dyntype_t z);
+
+/*
+(define exact-integer?
+    (lambda (z) (and (integer? z) (exact? z))))
+*/
+
+scheme_integer_t integer_plus(scheme_integer_t a, scheme_integer_t b);
+scheme_integer_t integer_subtract(scheme_integer_t a, scheme_integer_t b);
+scheme_integer_t from_unsigned_int64(uint64_t int_);
+scheme_integer_t from_int_array(uint64_t ints[], uint8_t length);
+
 #endif
