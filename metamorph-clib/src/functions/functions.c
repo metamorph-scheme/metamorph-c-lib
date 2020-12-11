@@ -44,6 +44,7 @@ void create_activation(int parameters) {
     temporary_activation->number_parameters = parameters;
     temporary_activation->formal_parameters = REQUEST_ARRAY(dyntype_t, parameters);
     temporary_activation->previous_activation = current_activation;
+    temporary_activation->stack = NULL;
     //Current activation will be previous activation of temp activation
     current_activation->references++;
 }
@@ -70,6 +71,29 @@ void postjump(){
     release_activation(temporary_activation);
 }
 */
+
+void stack_push(activation_t* activation, dyntype_t value) {
+    stack_push_literal(activation, copy_dyntype(value));
+}
+void stack_push_literal(activation_t* activation, dyntype_t value) {
+    auxillary_stack_t* elem = REQUEST(auxillary_stack_t);
+    elem->next = activation->stack;
+    activation->stack = elem;
+    activation->stack->value = value;
+
+}
+dyntype_t stack_pop(activation_t* activation) {
+    if (!activation->stack) {
+        //CRASH(7)
+    }
+    dyntype_t value = activation->stack->value;
+    auxillary_stack_t* tmp = activation->stack;
+    activation->stack = activation->stack->next;
+    RELEASE(auxillary_stack_t, tmp);
+    return value;
+}
+
+
 void release_activation(activation_t* activation){
     if (!activation->previous_activation)
         return;

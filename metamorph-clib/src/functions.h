@@ -5,6 +5,11 @@
 #include "cache.h"
 #include <setjmp.h>
 
+typedef struct auxillary_stack_struct_t {
+    dyntype_t value;
+    struct auxillary_stack_struct_t* next;
+} auxillary_stack_t;
+
 typedef struct activation_struct_t{
     int return_address;
     int references;
@@ -12,6 +17,7 @@ typedef struct activation_struct_t{
     struct activation_struct_t* previous_activation;
     struct activation_struct_t* parent_activation;
     dyntype_t* formal_parameters;
+    auxillary_stack_t* stack;
 } activation_t;
 
 extern activation_t* current_activation;
@@ -34,6 +40,11 @@ int count_references_activation(activation_t* src, activation_t* target);
 void cleanup();
 void error(int);
 void release_activation(activation_t*);
+void stack_push(activation_t*, dyntype_t);
+void stack_push_literal(activation_t*, dyntype_t);
+dyntype_t stack_pop(activation_t*);
+
+
 /*
 void prejump(int, int);
 void postjump();

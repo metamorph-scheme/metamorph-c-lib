@@ -6,7 +6,7 @@
 #include "functions.h"
 #include "dyntypes.h"
 #include "lambda.h"
-
+/*
 struct X{
    int x;
    int y;
@@ -87,3 +87,4 @@ END
 
 
 
+*/

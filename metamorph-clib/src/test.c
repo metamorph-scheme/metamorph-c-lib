@@ -1,5 +1,5 @@
 //#include <stdlib.h>
-//#include <stdio.h>
+#include <stdio.h>
 //#include <string.h>
 //#include "dyntypes.h"
 //#include "common.h"
@@ -288,3 +288,8 @@
 //
 //   printf("All tests were successful!\n");
 //}
+
+
+int main() {
+	printf("sdf");
+}
