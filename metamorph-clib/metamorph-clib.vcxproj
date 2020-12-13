@@ -262,6 +262,7 @@
     <ClInclude Include="src\cache.h" />
     <ClInclude Include="src\cache\cache_internal.h" />
     <ClInclude Include="src\common.h" />
+    <ClInclude Include="src\continuation.h" />
     <ClInclude Include="src\dyntypes.h" />
     <ClInclude Include="src\dyntypes\dyntypes_internal.h" />
     <ClInclude Include="src\functions.h" />
@@ -276,6 +277,7 @@
     <ClCompile Include="src\dyntypes\dyntypes.c" />
     <ClCompile Include="src\functions\functions.c" />
     <ClCompile Include="src\primf\booleans.c" />
+    <ClCompile Include="src\primf\continuation.c" />
     <ClCompile Include="src\primf\lambda.c" />
     <ClCompile Include="src\primf\numbers.c" />
     <ClCompile Include="src\primf\pairs.c" />

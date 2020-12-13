@@ -50,6 +50,9 @@
     <ClInclude Include="src\primf.h">
       <Filter>Header Files\Public</Filter>
     </ClInclude>
+    <ClInclude Include="src\continuation.h">
+      <Filter>Header Files\Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dyntypes\dyntypes.c">
@@ -80,6 +83,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\primf-test\test_primf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\primf\continuation.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
