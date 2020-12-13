@@ -8,42 +8,26 @@
 #include "lambda.h"
 #include "common.h"
 
-#ifdef _TEST_PRIMF
-#else
+#ifdef _TEST_FUNCTIONS
 struct X{
    int x;
    int y;
    char str[100];
 };
 
-START(3)           
+START(4)           
    clock_t c0 = clock();
    clock_t c1;
 
    GLOBAL_BOUND(0) = LAMBDA(90);
    GLOBAL_BOUND(1) = LAMBDA(89);
    GLOBAL_BOUND(2) = LAMBDA(70);
+   GLOBAL_BOUND(3) = LAMBDA(456);
    
 
-   CALL(2)
-       PARAMETER_LITERAL(scheme_new_boolean(5))
-       PARAMETER_LITERAL(scheme_new_boolean(5))
-       APPLICATE(GLOBAL_BOUND(2), 345)
-
    CALL(1)
-       PARAMETER_LITERAL(scheme_new_boolean(5));
-       APPLICATE(GLOBAL_BOUND(1), 3);
-
-    CALL(2)
-        PARAMETER_LITERAL(scheme_new_boolean(100))
-        PARAMETER_LITERAL(scheme_new_boolean(10))
-        APPLICATE(GLOBAL_BOUND(0), 2)
-
-   CALL(1)
-       PARAMETER_LITERAL(scheme_new_boolean(5))
-       APPLICATE(GLOBAL_BOUND(1), 98)
-
-
+       PARAMETER_LITERAL(scheme_new_boolean(9000000))
+       APPLICATE(GLOBAL_BOUND(3), 342)
 
    c1 = clock();
    double runtime_diff_ms = (c1 - c0) * 1000. / CLOCKS_PER_SEC;
@@ -86,6 +70,27 @@ FUNCTION(90)
       }
    }
    RETURN_LITERAL(scheme_new_boolean(9));
+
+
+/*
+    (define (f x) (if (= (- x 1) 0) 0 (f (- x 1))))
+*/
+FUNCTION(456)
+    PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
+    PUSH_LITERAL(scheme_new_boolean(*(POP.data.boolean_val) == 0))
+    POP_FORCE_GC
+    if (*(POP.data.boolean_val)) {
+        POP_FORCE_GC
+        RETURN_LITERAL(scheme_new_boolean(0))
+    }
+    else {
+        POP_FORCE_GC
+        PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
+        CALL(1)
+            PARAMETER_LITERAL(POP)
+            APPLICATE(GLOBAL_BOUND(3), -1)
+        RETURN(return_value)
+    }
 END
 
 #endif

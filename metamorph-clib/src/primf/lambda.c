@@ -34,12 +34,35 @@ dyntype_t copy_procedure(dyntype_t lambda){
 }
 
 void preapplication(dyntype_t lambda, int id){
-    temporary_activation->return_address=id;
     REQUIRE_SCHEME_PROCEDURE(lambda, id);
-    temporary_activation->parent_activation=c_lambda.activation;
-    current_activation = temporary_activation;
+
     //Lambda activation is now referenced by temporary activation
-    temporary_activation->parent_activation->references++; 
+    temporary_activation->parent_activation=c_lambda.activation;
+    temporary_activation->parent_activation->references++;
+
+    //Check For Tailcall
+    if (id != -1){
+        temporary_activation->return_address = id;
+        //Current activation will be previous activation of temp activation
+        temporary_activation->previous_activation = current_activation;
+        current_activation->references++;
+    }
+    else {
+        temporary_activation->return_address = current_activation->return_address;
+        //Previous activation of current activation will be previous activation of temp activation
+        temporary_activation->previous_activation = current_activation->previous_activation;
+        current_activation->previous_activation->references++;
+
+        //Release current activation for constant memory
+        current_activation->references--;
+        release_activation(current_activation);
+
+
+    }
+
+    current_activation = temporary_activation;
+
+    //Set next jump to function
     return_address=c_lambda.function_id;
 }
 

@@ -43,10 +43,7 @@ void create_activation(int parameters) {
     temporary_activation->references = 1;
     temporary_activation->number_parameters = parameters;
     temporary_activation->formal_parameters = REQUEST_ARRAY(dyntype_t, parameters);
-    temporary_activation->previous_activation = current_activation;
     temporary_activation->stack = NULL;
-    //Current activation will be previous activation of temp activation
-    current_activation->references++;
 }
 
 void bind(int number, dyntype_t src) {
@@ -87,6 +84,7 @@ dyntype_t stack_pop(activation_t* activation) {
         CRASH(POP_EMPTY_STACK)
     }
     dyntype_t value = activation->stack->value;
+    activation->last_pop = value;
     auxillary_stack_t* tmp = activation->stack;
     activation->stack = activation->stack->next;
     RELEASE(auxillary_stack_t, tmp);
@@ -164,6 +162,8 @@ void cleanup(){
     release_dyntype(return_value);
     root_activation->references--;
     release_root_activation(root_activation);
+
+
     exit(0);
 }
 

@@ -17,6 +17,7 @@ typedef struct activation_struct_t{
     struct activation_struct_t* previous_activation;
     struct activation_struct_t* parent_activation;
     dyntype_t* formal_parameters;
+    dyntype_t last_pop;
     auxillary_stack_t* stack;
 } activation_t;
 
@@ -92,7 +93,10 @@ void postjump();
 #define PUSH_LITERAL(dyntype)   stack_push_literal(current_activation, dyntype);
 #define POP                     stack_pop(current_activation)
 
-//ACHTUNG JUMP allokiert keine Parentactivation kann zu SEGFAULT f�hren
+//POP produces a literal, only if a manual destruction of said literal is necessary, this directive is legal to use
+#define POP_FORCE_GC            release_dyntype(current_activation->last_pop);
+
+//ACHTUNG JUMP allokiert keine Parentactivation kann zu SEGFAULT führen
 /*
 #define JUMP(FUNCTION_ID,ID)   prejump(FUNCTION_ID, ID);\
                     goto table;\
