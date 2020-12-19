@@ -81,7 +81,9 @@ FUNCTION(456)
     POP_FORCE_GC
     if (*(POP.data.boolean_val)) {
         POP_FORCE_GC
-        RETURN_LITERAL(scheme_new_boolean(0))
+            //discard_computation(current_activation);
+            RETURN_LITERAL(scheme_new_boolean(23));
+
     }
     else {
         POP_FORCE_GC

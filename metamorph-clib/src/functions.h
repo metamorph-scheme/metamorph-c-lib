@@ -37,14 +37,18 @@ void bind(int, dyntype_t);
 void bind_literal(int, dyntype_t);
 void prereturn_literal(dyntype_t );
 void create_activation(int parameters);
+activation_t* copy_activation(activation_t* src);
 int count_references_activation(activation_t* src, activation_t* target);
 void cleanup();
 void error(int);
+void discard_computation(activation_t* activation);
 void release_activation(activation_t*);
 int count_cycle_references(activation_t* activation);
 void stack_push(activation_t*, dyntype_t);
 void stack_push_literal(activation_t*, dyntype_t);
 dyntype_t stack_pop(activation_t*);
+
+auxillary_stack_t* copy_stack(auxillary_stack_t* src);
 
 #define POP_EMPTY_STACK 7
 
@@ -93,7 +97,7 @@ void postjump();
 #define PUSH_LITERAL(dyntype)   stack_push_literal(current_activation, dyntype);
 #define POP                     stack_pop(current_activation)
 
-//POP produces a literal, only if a manual destruction of said literal is necessary, this directive is legal to use
+//POP produces a literal, only if a manual destruction of said literal is necessary this directive is legal to use
 #define POP_FORCE_GC            release_dyntype(current_activation->last_pop);
 
 //ACHTUNG JUMP allokiert keine Parentactivation kann zu SEGFAULT führen

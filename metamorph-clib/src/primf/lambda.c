@@ -45,13 +45,13 @@ void preapplication(dyntype_t lambda, int id){
         temporary_activation->return_address = id;
         //Current activation will be previous activation of temp activation
         temporary_activation->previous_activation = current_activation;
-        current_activation->references++;
+        temporary_activation->previous_activation->references++;
     }
     else {
         temporary_activation->return_address = current_activation->return_address;
         //Previous activation of current activation will be previous activation of temp activation
         temporary_activation->previous_activation = current_activation->previous_activation;
-        current_activation->previous_activation->references++;
+        temporary_activation->previous_activation->previous_activation->references++;
 
         //Release current activation for constant memory
         current_activation->references--;
@@ -75,7 +75,7 @@ void postapplication(){
     temporary_activation = current_activation;
     current_activation = temporary_activation->previous_activation;
     //Temporary activation is no longer current activation
-    temporary_activation->references--; 
+    temporary_activation->references--;
     release_activation(temporary_activation);
 }
 

@@ -46,6 +46,33 @@ void create_activation(int parameters) {
     temporary_activation->stack = NULL;
 }
 
+activation_t* copy_activation(activation_t* src) {
+    activation_t* dest = REQUEST(activation_t);
+    dest->references = 0;
+    
+    dest->parent_activation = src->parent_activation;
+    dest->parent_activation->references++;
+
+    dest->previous_activation = src->previous_activation;
+    dest->previous_activation++;
+    
+    dest->return_address = src->return_address;
+
+    //Copy Parameters
+    dest->number_parameters = src->number_parameters;
+    dest->formal_parameters = REQUEST_ARRAY(dyntype_t, dest->number_parameters);
+    int i=0;
+    for (i = 0; i < src->number_parameters; i++) {
+        dest->formal_parameters[i] = copy_dyntype(src->formal_parameters[i]);
+    }
+
+    dest->stack = copy_stack(src->stack);
+
+    dest->last_pop = copy_dyntype(src->last_pop);
+
+    return dest;
+}
+
 void bind(int number, dyntype_t src) {
     bind_literal(number, copy_dyntype(src));
 }
@@ -91,7 +118,17 @@ dyntype_t stack_pop(activation_t* activation) {
     return value;
 }
 
-//Eigentlich nicht nötig, aber sicher ist sicher
+auxillary_stack_t* copy_stack(auxillary_stack_t* src) {
+    if (!src)
+        return NULL;
+    auxillary_stack_t* dest = REQUEST(auxillary_stack_t);
+    dest->value = copy_dyntype(src->value);
+
+    //Not a tailcall, stack is usually small
+    dest->next = copy_stack(src->next);
+    return dest;
+}
+
 void release_stack(activation_t* activation) {
     while ( activation->stack != NULL) {
         release_dyntype(stack_pop(activation));
@@ -125,10 +162,10 @@ void release_activation(activation_t* activation){
         release_activation(activation->parent_activation);
     release_activation(previous_activation);
 
-    //Nur für den Notfall, sollte immer leer sein
+    //Just in case, stack should be empty
     release_stack(activation);
-    RELEASE_ARRAY(dyntype_t,activation->number_parameters,activation->formal_parameters);
-    RELEASE(activation_t,activation);
+    RELEASE_ARRAY(dyntype_t, activation->number_parameters, activation->formal_parameters);
+    RELEASE(activation_t, activation);
 }
 
 void release_root_activation(activation_t* activation) {
@@ -162,7 +199,6 @@ void cleanup(){
     release_dyntype(return_value);
     root_activation->references--;
     release_root_activation(root_activation);
-
 
     exit(0);
 }
