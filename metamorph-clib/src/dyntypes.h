@@ -19,6 +19,7 @@
 #define SCHEME_TYPE_EOF_OBJECT 10
 #define SCHEME_TYPE_PORT 11
 #define SCHEME_TYPE_UNSPECIFIED 12
+#define SCHEME_TYPE_CONTINUATION 13
 
 #define INTERNAL_TYPE_TYPE_EXCEPTION 0
 #define INTERNAL_TYPE_BAD_ARGUMENT_EXCEPTION 1
@@ -33,6 +34,11 @@ typedef char scheme_type_t;
 typedef bool_t scheme_boolean_t;
 
 struct activation_struct_t;
+
+typedef struct {
+    int continuation_id;
+    struct activtion_struct_t* activation;
+} scheme_continuation_t;
 
 typedef struct {
   int function_id;
@@ -81,6 +87,7 @@ typedef struct dyntype_t_struct {
     scheme_string_t* string_val;
     scheme_procedure_t* procedure_val;
     struct scheme_pair_struct_t* pair_val;
+    scheme_continuation_t* continuation_val;
   } data;
 } dyntype_t;
 
@@ -162,6 +169,7 @@ dyntype_t scheme_literal_pair(scheme_pair_t obj);
 dyntype_t scheme_new_symbol(scheme_symbol_t obj);
 dyntype_t scheme_literal_symbol(scheme_symbol_t obj);
 dyntype_t scheme_literal_procedure(scheme_procedure_t obj);
+dyntype_t scheme_literal_continuation(scheme_continuation_t obj);
 
 
 void release_dyntype(dyntype_t);
