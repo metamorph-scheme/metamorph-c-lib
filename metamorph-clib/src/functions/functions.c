@@ -48,13 +48,13 @@ void create_activation(int parameters) {
 
 activation_t* copy_activation(activation_t* src) {
     activation_t* dest = REQUEST(activation_t);
-    dest->references = 0;
+    dest->references = 1;
     
     dest->parent_activation = src->parent_activation;
     dest->parent_activation->references++;
 
     dest->previous_activation = src->previous_activation;
-    dest->previous_activation++;
+    dest->previous_activation->references++;
     
     dest->return_address = src->return_address;
 
@@ -215,4 +215,16 @@ void error(int code){
         break;
     }
     exit(1);
+}
+
+//Should only be performed on activation which are part of a computation
+void discard_computation(activation_t* activation)
+{
+    activation_t* next;
+    while (activation) {
+        next = activation->previous_activation;
+        activation->references--;
+        release_activation(activation);
+        activation = next;
+    }
 }

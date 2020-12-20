@@ -77,12 +77,14 @@ FUNCTION(90)
 */
 FUNCTION(456)
     PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
-    PUSH_LITERAL(scheme_new_boolean(*(POP.data.boolean_val) == 0))
+    PUSH_LITERAL(scheme_new_boolean(*(POP.data.boolean_val) == 8000))
     POP_FORCE_GC
     if (*(POP.data.boolean_val)) {
         POP_FORCE_GC
-            //discard_computation(current_activation);
-            RETURN_LITERAL(scheme_new_boolean(23));
+            activation_t* act = copy_activation(current_activation);
+            discard_computation(current_activation);
+            discard_computation(act);
+        //RETURN_LITERAL(scheme_new_boolean(23));
 
     }
     else {
@@ -90,7 +92,7 @@ FUNCTION(456)
         PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
         CALL(1)
             PARAMETER_LITERAL(POP)
-            APPLICATE(GLOBAL_BOUND(3), -1)
+            APPLICATE(GLOBAL_BOUND(3), 3193)
         RETURN(return_value)
     }
 END
