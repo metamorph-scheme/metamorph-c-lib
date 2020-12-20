@@ -48,7 +48,7 @@ void prereturn_literal(dyntype_t value) {
     //Temporary activation is no longer part of current computation
     temporary_activation->computations--;
 
-    //If temporary activation is part of computations other than current, then current activation is part of ONE additional computation
+    //If temporary activation is part of computations other than current, then current activation is part of ONE additional computation (correct number of computations would be difficult to handle)
     //Basically a lazy update through all activations of the previous_activation chain
     if (temporary_activation->computations)
         current_activation->computations++;
@@ -80,7 +80,7 @@ activation_t* copy_activation(activation_t* src) {
     dest->parent_activation = src->parent_activation;
     dest->parent_activation->references++;
 
-    //Additional new head of compuation
+    //Weak reference to previous activation
     dest->previous_activation = src->previous_activation;
     
     //New activation is generally not a part of any computation
@@ -109,21 +109,6 @@ void bind(int number, dyntype_t src) {
 void bind_literal(int number, dyntype_t src) {
     temporary_activation->formal_parameters[number] = src;
 }
-
-/*
-void prejump(int function, int id){
-    temporary_activation->return_address=id;
-    current_activation=temporary_activation;
-    return_address=function;
-}
-
-void postjump(){
-    temporary_activation = current_activation;
-    temporary_activation->references--;
-    current_activation = temporary_activation->previous_activation;
-    release_activation(temporary_activation);
-}
-*/
 
 void stack_push(activation_t* activation, dyntype_t value) {
     stack_push_literal(activation, copy_dyntype(value));
@@ -260,8 +245,11 @@ void discard_computation(activation_t* activation)
 
         //Activation is no longer part of discarded computation
         activation->computations--;
+
+        //Check if activation (and previous activations) is part of different computation
         if (activation->computations)
             return;
+
         release_activation(activation);
         activation = next;
     }

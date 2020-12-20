@@ -44,7 +44,7 @@ void preapplication(dyntype_t lambda, int id){
     if (id != -1){
         temporary_activation->return_address = id;
         //Current activation will be previous activation of temp activation
-        //Current activation is still part of the compuatation, therefore no reference needed
+        //Current activation is still part of the computation, therefore no reference needed
         temporary_activation->previous_activation = current_activation;
         
     }
@@ -57,6 +57,7 @@ void preapplication(dyntype_t lambda, int id){
         //Release current activation for constant memory
         //Current activation is no longer part of current computation
         current_activation->computations--;
+        //Discard computation would throw away whole computation, instead of excluding one activation from it
         release_activation(current_activation);
 
 
@@ -71,21 +72,6 @@ void preapplication(dyntype_t lambda, int id){
 void preapplication_literal(dyntype_t lambda, int id) {
     preapplication(lambda, id);
     release_dyntype(lambda);
-}
-
-void postapplication(){
-    //temporary_activation = current_activation;
-    //current_activation = temporary_activation->previous_activation;
-
-    ////Temporary activation is no longer part of current computation
-    //temporary_activation->computations--;
-
-    ////If temporary activation is part of computations other than current, then current activation is part of ONE additional computation
-    ////Basically a lazy update through all activations of the previous_activation chain
-    //if(temporary_activation->computations)
-    //    current_activation->computations++;
-
-    //release_activation(temporary_activation);
 }
 
 int count_references_procedure(scheme_procedure_t procedure, 
