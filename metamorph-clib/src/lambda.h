@@ -19,13 +19,11 @@ void release_procedure(scheme_procedure_t);
 //ACHTUNG Activation werden nicht deallokiert
 #define APPLICATE(LAMBDA, ID)  preapplication(LAMBDA, ID);\
                     goto table;\
-                    case(ID):\
-                    postapplication();}
+                    case(ID):;}
 
 #define APPLICATE_LITERAL(LAMBDA, ID) preapplication_literal(LAMBDA, ID);\
                     goto table;\
-                    case(ID):\
-                    postapplication();}
+                    case(ID):;}
 
 #define BOUND(PARENT, NUMBER) (*(bound(PARENT, NUMBER)))
 #define GLOBAL_BOUND(NUMBER) (root_activation->formal_parameters[NUMBER])

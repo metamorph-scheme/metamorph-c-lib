@@ -37,7 +37,7 @@ struct activation_struct_t;
 
 typedef struct {
     int continuation_id;
-    struct activtion_struct_t* activation;
+    struct activation_struct_t* activation;
 } scheme_continuation_t;
 
 typedef struct {
@@ -157,7 +157,14 @@ typedef struct scheme_pair_struct_t {
   if (PARAM.type == SCHEME_TYPE_PROCEDURE) { \
     c_##PARAM = *PARAM.data.procedure_val;\
   } else {\
-    SET_TYPE_EXCEPTION(SCHEME_TYPE_STRING, PARAM.type, POS);\
+    SET_TYPE_EXCEPTION(SCHEME_TYPE_PROCEDURE, PARAM.type, POS);\
+  }
+
+#define REQUIRE_SCHEME_CONTINUATION(PARAM, POS) scheme_continuation_t c_##PARAM;\
+  if (PARAM.type == SCHEME_TYPE_CONTINUATION) { \
+    c_##PARAM = *PARAM.data.continuation_val;\
+  } else {\
+    SET_TYPE_EXCEPTION(SCHEME_TYPE_CONTINUATION, PARAM.type, POS);\
   }
 
 dyntype_t scheme_new_boolean(scheme_boolean_t obj);

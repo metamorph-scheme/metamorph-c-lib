@@ -12,8 +12,12 @@ typedef struct auxillary_stack_struct_t {
 
 typedef struct activation_struct_t{
     int return_address;
+    //References which can be used to access data directly
     int references;
     int number_parameters;
+    //Count how many activation have the ability to make activation current activation 
+    //Basically one called activation and all continuations
+    int computations;
     struct activation_struct_t* previous_activation;
     struct activation_struct_t* parent_activation;
     dyntype_t* formal_parameters;

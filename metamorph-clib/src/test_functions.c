@@ -6,6 +6,7 @@
 #include "functions.h"
 #include "dyntypes.h"
 #include "lambda.h"
+#include "continuation.h"
 #include "common.h"
 
 #ifdef _TEST_FUNCTIONS
@@ -15,7 +16,7 @@ struct X{
    char str[100];
 };
 
-START(4)           
+START(5)           
    clock_t c0 = clock();
    clock_t c1;
 
@@ -23,12 +24,17 @@ START(4)
    GLOBAL_BOUND(1) = LAMBDA(89);
    GLOBAL_BOUND(2) = LAMBDA(70);
    GLOBAL_BOUND(3) = LAMBDA(456);
-   
+   GLOBAL_BOUND(4) = scheme_new_boolean(3);
 
    CALL(1)
        PARAMETER_LITERAL(scheme_new_boolean(9000000))
        APPLICATE(GLOBAL_BOUND(3), 342)
 
+       if (*return_value.data.boolean_val == 10) {
+           CONTINUATION_RESULT_LITERAL(scheme_new_boolean(54))
+           APPLICATE_CONTINUATION(GLOBAL_BOUND(4))
+        }
+   SET_GLOBAL_BOUND_LITERAL(4, scheme_new_boolean(3))
    c1 = clock();
    double runtime_diff_ms = (c1 - c0) * 1000. / CLOCKS_PER_SEC;
    printf("%f \n", runtime_diff_ms);
@@ -76,15 +82,16 @@ FUNCTION(90)
     (define (f x) (if (= (- x 1) 0) 0 (f (- x 1))))
 */
 FUNCTION(456)
-    PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
-    PUSH_LITERAL(scheme_new_boolean(*(POP.data.boolean_val) == 8000))
+     PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
+    PUSH_LITERAL(scheme_new_boolean(*(POP.data.boolean_val) == 5))
     POP_FORCE_GC
     if (*(POP.data.boolean_val)) {
         POP_FORCE_GC
-            activation_t* act = copy_activation(current_activation);
-            discard_computation(current_activation);
-            discard_computation(act);
-        //RETURN_LITERAL(scheme_new_boolean(23));
+        CALL(1)
+            PARAMETER_LITERAL(CONTINUATION(9508))
+            APPLICATE_LITERAL(LAMBDA(4869), 9508)
+        printf("%d \n", *return_value.data.boolean_val);
+        RETURN_LITERAL(return_value);
 
     }
     else {
@@ -92,9 +99,13 @@ FUNCTION(456)
         PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
         CALL(1)
             PARAMETER_LITERAL(POP)
-            APPLICATE(GLOBAL_BOUND(3), 3193)
+            APPLICATE(GLOBAL_BOUND(3), -1)
         RETURN(return_value)
     }
-END
 
+FUNCTION(4869)
+    SET_GLOBAL_BOUND(4, BOUND(0, 0))
+    RETURN_LITERAL(scheme_new_boolean(10))
+    
+END
 #endif
