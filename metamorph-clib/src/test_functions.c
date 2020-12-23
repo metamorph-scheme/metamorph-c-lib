@@ -26,20 +26,20 @@ START(5)
    GLOBAL_BOUND(3) = LAMBDA(456);
    GLOBAL_BOUND(4) = scheme_new_boolean(3);
 
-   CALL(1)
-       PARAMETER_LITERAL(scheme_new_boolean(9000000))
-       APPLICATE(GLOBAL_BOUND(3), 342)
+    CALL(1)
+        PARAMETER_LITERAL(scheme_new_boolean(9000000))
+        APPLICATE(GLOBAL_BOUND(3), 342)
 
-       if (*return_value.data.boolean_val == 10) {
-           CONTINUATION_RESULT_LITERAL(scheme_new_boolean(54))
-           APPLICATE_CONTINUATION(GLOBAL_BOUND(4))
-        }
-   SET_GLOBAL_BOUND_LITERAL(4, scheme_new_boolean(3))
-   c1 = clock();
-   double runtime_diff_ms = (c1 - c0) * 1000. / CLOCKS_PER_SEC;
-   printf("%f \n", runtime_diff_ms);
-   printf("%d \n", *return_value.data.boolean_val);
-   EXIT
+    if (*return_value.data.boolean_val == 10) {
+        CONTINUATION_RESULT_LITERAL(scheme_new_boolean(54))
+        APPLICATE_CONTINUATION(GLOBAL_BOUND(4))
+    }
+    SET_GLOBAL_BOUND_LITERAL(4, scheme_new_boolean(3))
+    c1 = clock();
+    double runtime_diff_ms = (c1 - c0) * 1000. / CLOCKS_PER_SEC;
+    printf("%f \n", runtime_diff_ms);
+    printf("%d \n", *return_value.data.boolean_val);
+    EXIT
 
  FUNCTION(70)
     SET_BOUND(0,1, BOUND(0, 0));
@@ -91,7 +91,7 @@ FUNCTION(456)
             PARAMETER_LITERAL(CONTINUATION(9508))
             APPLICATE_LITERAL(LAMBDA(4869), 9508)
         printf("%d \n", *return_value.data.boolean_val);
-        RETURN_LITERAL(return_value);
+        RETURN(return_value);
 
     }
     else {
@@ -99,13 +99,31 @@ FUNCTION(456)
         PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
         CALL(1)
             PARAMETER_LITERAL(POP)
-            APPLICATE(GLOBAL_BOUND(3), -1)
+            TAIL_APPLICATE(GLOBAL_BOUND(3))
         RETURN(return_value)
     }
 
 FUNCTION(4869)
     SET_GLOBAL_BOUND(4, BOUND(0, 0))
     RETURN_LITERAL(scheme_new_boolean(10))
+
+FUNCTION(864)
+    PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
+    PUSH_LITERAL(scheme_new_boolean(*(POP.data.boolean_val) == 5))
+    POP_FORCE_GC
+    if (*(POP.data.boolean_val)) {
+        POP_FORCE_GC
+        RETURN_LITERAL(scheme_new_boolean(0));
+
+    }
+    else {
+        POP_FORCE_GC
+            PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
+            CALL(1)
+                PARAMETER_LITERAL(POP)
+                TAIL_APPLICATE(GLOBAL_BOUND(3))
+            RETURN(return_value)
+    }
     
 END
 #endif

@@ -178,13 +178,16 @@ void release_activation(activation_t* activation){
     //Mark as ongoing release
     activation->previous_activation = NULL;
 
+    //Save parent activation
+    activation_t* parent_activation = activation->parent_activation;
+
     //Just in case, stack should be empty
     release_stack(activation);
     RELEASE_ARRAY(dyntype_t, activation->number_parameters, activation->formal_parameters);
     RELEASE(activation_t, activation);
 
     //Tail call
-    release_activation(activation->parent_activation);
+    release_activation(parent_activation);
 }
 
 void release_root_activation(activation_t* activation) {
