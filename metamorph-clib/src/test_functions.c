@@ -16,7 +16,7 @@ struct X{
    char str[100];
 };
 
-START(5)           
+START(6)           
    clock_t c0 = clock();
    clock_t c1;
 
@@ -25,15 +25,17 @@ START(5)
    GLOBAL_BOUND(2) = LAMBDA(70);
    GLOBAL_BOUND(3) = LAMBDA(456);
    GLOBAL_BOUND(4) = scheme_new_boolean(3);
+   GLOBAL_BOUND(5) = LAMBDA(864);
 
     CALL(1)
         PARAMETER_LITERAL(scheme_new_boolean(9000000))
-        APPLICATE(GLOBAL_BOUND(3), 342)
+        APPLICATE(GLOBAL_BOUND(3), 9683)
 
     if (*return_value.data.boolean_val == 10) {
         CONTINUATION_RESULT_LITERAL(scheme_new_boolean(54))
         APPLICATE_CONTINUATION(GLOBAL_BOUND(4))
     }
+
     SET_GLOBAL_BOUND_LITERAL(4, scheme_new_boolean(3))
     c1 = clock();
     double runtime_diff_ms = (c1 - c0) * 1000. / CLOCKS_PER_SEC;
@@ -105,7 +107,12 @@ FUNCTION(456)
 
 FUNCTION(4869)
     SET_GLOBAL_BOUND(4, BOUND(0, 0))
+    CONTINUATION_RESULT_LITERAL(scheme_new_boolean(99))
+    APPLICATE_CONTINUATION(BOUND(0,0))
     RETURN_LITERAL(scheme_new_boolean(10))
+
+FUNCTION(8984)
+    RETURN_LITERAL(scheme_new_boolean(5))
 
 FUNCTION(864)
     PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
@@ -121,7 +128,7 @@ FUNCTION(864)
             PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
             CALL(1)
                 PARAMETER_LITERAL(POP)
-                TAIL_APPLICATE(GLOBAL_BOUND(3))
+                TAIL_APPLICATE(GLOBAL_BOUND(5))
             RETURN(return_value)
     }
     

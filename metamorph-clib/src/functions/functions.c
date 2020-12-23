@@ -97,8 +97,6 @@ activation_t* copy_activation(activation_t* src) {
 
     dest->stack = copy_stack(src->stack);
 
-    dest->last_pop = copy_dyntype(src->last_pop);
-
     return dest;
 }
 
@@ -221,7 +219,6 @@ void cleanup(){
     root_activation->references--;
     release_root_activation(root_activation);
 
-
     exit(0);
 }
 
@@ -250,6 +247,7 @@ void discard_computation(activation_t* activation)
         activation->computations--;
 
         //Check if activation (and previous activations) is part of different computation
+        //because of lazy update only the first activation is aware of the correct number of computations
         if (activation->computations)
             return;
 

@@ -56,8 +56,8 @@ void release_dyntype(dyntype_t dyntype){
             scheme_continuation_t cont;
             cont = *dyntype.data.continuation_val;
             release_continuation(cont);
-            RELEASE(scheme_symbol_t, dyntype.data.symbol_val)
-                break;
+            RELEASE(scheme_continuation_t, dyntype.data.continuation_val)
+            break;
         }
         default: break;
     }

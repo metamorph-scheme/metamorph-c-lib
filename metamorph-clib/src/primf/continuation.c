@@ -54,14 +54,15 @@ void applicate_continuation(dyntype_t cont)
 {
 	REQUIRE_SCHEME_CONTINUATION(cont, 0);
 
-	//current computation will be generated from the computation represented by the continuation
-	discard_computation(current_activation);
-	current_activation = c_cont.activation;
-
 	//activation is now part of the current computation and the computation represented by the continuation
 	//previous activation will be made part of the current computation at RETURN, it is already part of the continuation computation
-	current_activation->computations++;
+	c_cont.activation->computations++;
 	return_address = c_cont.continuation_id;
+
+	//current computation is generated from continuation, old one can be discarded
+	discard_computation(current_activation);
+
+	current_activation = c_cont.activation;
 }
 
 void applicate_continuation_literal(dyntype_t cont)
