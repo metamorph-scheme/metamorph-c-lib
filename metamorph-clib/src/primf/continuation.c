@@ -17,7 +17,8 @@ dyntype_t create_continuation(int id)
 
 	//The activations below are now a part of this computation
 	//Not handled by RETURN as new activation is not current activation
-	cont.activation->previous_activation->computations++;
+	if(cont.activation->previous_activation)
+		cont.activation->previous_activation->computations++;
 
 	return scheme_literal_continuation(cont);
 }

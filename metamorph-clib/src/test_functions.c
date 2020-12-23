@@ -43,7 +43,7 @@ START(6)
     printf("%d \n", *return_value.data.boolean_val);
     EXIT
 
- FUNCTION(70)
+FUNCTION(70)
     SET_BOUND(0,1, BOUND(0, 0));
     CALL(1)
        PARAMETER_LITERAL(scheme_new_boolean(5))
@@ -84,7 +84,7 @@ FUNCTION(90)
     (define (f x) (if (= (- x 1) 0) 0 (f (- x 1))))
 */
 FUNCTION(456)
-     PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
+    PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
     PUSH_LITERAL(scheme_new_boolean(*(POP.data.boolean_val) == 5))
     POP_FORCE_GC
     if (*(POP.data.boolean_val)) {
@@ -105,10 +105,11 @@ FUNCTION(456)
         RETURN(return_value)
     }
 
+
 FUNCTION(4869)
     SET_GLOBAL_BOUND(4, BOUND(0, 0))
-    CONTINUATION_RESULT_LITERAL(scheme_new_boolean(99))
-    APPLICATE_CONTINUATION(BOUND(0,0))
+    //CONTINUATION_RESULT_LITERAL(scheme_new_boolean(99))
+    //APPLICATE_CONTINUATION(BOUND(0,0))
     RETURN_LITERAL(scheme_new_boolean(10))
 
 FUNCTION(8984)
@@ -125,11 +126,11 @@ FUNCTION(864)
     }
     else {
         POP_FORCE_GC
-            PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
-            CALL(1)
-                PARAMETER_LITERAL(POP)
-                TAIL_APPLICATE(GLOBAL_BOUND(5))
-            RETURN(return_value)
+        PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
+        CALL(1)
+            PARAMETER_LITERAL(POP)
+            TAIL_APPLICATE(GLOBAL_BOUND(5))
+        RETURN(return_value)
     }
     
 END

@@ -50,8 +50,6 @@ void prereturn_literal(dyntype_t value) {
 
     //If temporary activation is part of computations other than current, then current activation is part of ONE additional computation (correct number of computations would be difficult to handle)
     //Basically a lazy update through all activations of the previous_activation chain
-    if (temporary_activation->computations)
-        current_activation->computations++;
 
     release_activation(temporary_activation);
 }

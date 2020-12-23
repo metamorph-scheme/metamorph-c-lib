@@ -15,7 +15,7 @@ typedef struct activation_struct_t{
     //References which can be used to access data directly
     int references;
     int number_parameters;
-    //Count how many activation have the ability to make activation current activation 
+    //Count how many activations have the ability to make activation current activation 
     //Basically one called activation and all continuations
     int computations;
     struct activation_struct_t* previous_activation;
