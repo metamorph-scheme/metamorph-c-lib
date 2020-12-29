@@ -5,105 +5,106 @@
 #include "primf_internal.h"
 #include "../cache.h"
 #include "../functions.h"
+#include "../tommath/tommath.h"
 
+// libtommath wrapper
 
-// Arbitrary lenght integer implementation
-// based on uint64_t
+scheme_integer_t integer_add(scheme_integer_t a, scheme_integer_t b) {
+	mp_int c;
+	CATCH_MP_ERROR(mp_init(&c))
 
-scheme_integer_t from_int_array(uint64_t ints[], uint8_t length) {
-	uint64_t* ptr = REQUEST_ARRAY(uint64_t, length);
-	for (int i = 0; i < length; i++) {
-		ptr[i] = ints[i];
-	}
-	return (scheme_integer_t) { .block = ptr, .length = length };
+	CATCH_MP_ERROR(mp_add(&a, &b, &c))
+
+	return c;
 }
 
-scheme_integer_t from_unsigned_int64(uint64_t int_) {
-	// const size_t BITS = 8 * sizeof(signedInt); = 32
+scheme_integer_t integer_sub(scheme_integer_t a, scheme_integer_t b) {
+	mp_int c;
+	CATCH_MP_ERROR(mp_init(&c))
 
-	uint64_t *a = REQUEST_ARRAY(uint64_t, 1);
-	a[0] = int_;
+	CATCH_MP_ERROR(mp_sub(&a, &b, &c))
 
-	scheme_integer_t new_int = (scheme_integer_t){
-		.length = 1,
-		.block = a
-	};
-
-	return new_int;
+	return c;
 }
 
-uint64_t half_add(uint64_t a, uint64_t b, bool_t *carry_out) {
-	uint64_t res = a + b;
-	*carry_out = (res < a) ? TRUE : FALSE;
-	return res;
+scheme_integer_t integer_mul(scheme_integer_t a, scheme_integer_t b) {
+	mp_int c;
+	CATCH_MP_ERROR(mp_init(&c))
+
+	CATCH_MP_ERROR(mp_mul(&a, &b, &c))
+
+	return c;
 }
 
-uint64_t full_add(uint64_t a, uint64_t b, bool_t carry_in, bool_t* carry_out) {
-	bool_t carry_out_first_half_add = FALSE;
-	uint64_t sum = half_add(a, b, &carry_out_first_half_add);
-	bool_t carry_out_second_half_add = FALSE;
-	uint64_t res = half_add(sum, carry_in, &carry_out_second_half_add);
-	*carry_out = (carry_out_first_half_add || carry_out_second_half_add);
-	return res;
+// TODO: multiple return values, derive floor division from mp_div result
+scheme_integer_t integer_truncate_div(scheme_integer_t a, scheme_integer_t b) {
+	mp_int c,d;
+	CATCH_MP_ERROR(mp_init_multi(&c, &d, NULL))
+
+	CATCH_MP_ERROR(mp_div(&a, &b, &c, &d))
+
+	return c;
 }
 
-scheme_integer_t i_integer_plus(scheme_integer_t a, scheme_integer_t b) {
-	// b is longer
+scheme_integer_t integer_truncate_remainder(scheme_integer_t a, scheme_integer_t b) {
+	mp_int c, d;
+	CATCH_MP_ERROR(mp_init_multi(&c, &d, NULL))
 
-	uint64_t msb_check = 1ull << (sizeof(uint64_t) * 8 - 1);
+	CATCH_MP_ERROR(mp_div(&a, &b, &c, &d))
 
-	bool_t a_msb = (a.block[0] & msb_check) == 0u ? FALSE : TRUE;
-	bool_t b_msb = (b.block[0] & msb_check) == 0u ? FALSE : TRUE;
-	uint64_t a_fill = a_msb ? 0xFFFFFFFFFFFFFFFF : 0ull;
-
-	bool_t carry_out;
-	bool_t carry_in = FALSE;
-	uint64_t *ptr = REQUEST_ARRAY(uint64_t, b.length + 1);
-	for (int i = 1; i <= a.length; i++) {
-		ptr[b.length - i + 1] = full_add(a.block[a.length - i], b.block[b.length - i], carry_in, &carry_out);
-		carry_in = carry_out;
-	}
-	for (int i = a.length + 1; i <= b.length; i++) {
-		ptr[b.length - i + 1] = full_add(a_fill, b.block[b.length - i], carry_in, &carry_out);
-		carry_in = carry_out;
-	}
-
-	bool_t ptr_msb = (ptr[1] & msb_check) == 0 ? FALSE : TRUE;
-
-	if (a_msb == b_msb && ptr_msb != a_msb) {
-		// overflow
-		// use carry
-		ptr[0] = carry_out ? 0xFFFFFFFFFFFFFFFF : 0ull;
-	}
-	else {
-		// ignore carry
-		ptr[0] = ptr_msb ? 0xFFFFFFFFFFFFFFFF : 0ull;
-	}
-	return (scheme_integer_t) {
-		.block = ptr,
-		.length = b.length + 1
-	};
+	return d;
 }
 
-scheme_integer_t integer_plus(scheme_integer_t a, scheme_integer_t b) {
-	if (a.length > b.length) {
-		// a is longer
-		return i_integer_plus(b, a);
+scheme_integer_t integer_truncate_quotient(scheme_integer_t a, scheme_integer_t b) {
+	mp_int c, d;
+	CATCH_MP_ERROR(mp_init_multi(&c, &d, NULL) != MP_OKAY) {
+		SET_TOMMATH_NUMBER_EXCEPTION
 	}
-	else {
-		// b is longer
-		return i_integer_plus(a, b);
+
+	CATCH_MP_ERROR(mp_div(&a, &b, &c, &d) != MP_OKAY) {
+		SET_TOMMATH_NUMBER_EXCEPTION
 	}
+
+	return c;
 }
 
-scheme_integer_t integer_negate(scheme_integer_t n) {
-	uint64_t* ptr = REQUEST_ARRAY(uint64_t, n.length);
-	for (int i = 0; i < n.length; i++) {
-		ptr[i] = ~n.block[i];
+dyntype_t integer_gcd(ELLIPSIS_PARAM(n)) {
+	mp_int result;
+	CATCH_MP_ERROR(mp_init(&result))
+	
+	mp_set_u32(&result, 0u);
+
+	for (int i = 0; i < len; i++) {
+		dyntype_t elem = n[i];	
+		REQUIRE_SCHEME_EXACT_INTEGER(elem, i)
+
+		CATCH_MP_ERROR(mp_gcd(&result, &cn_elem, &result))
 	}
-	return integer_plus((scheme_integer_t) { .block = ptr, .length = n.length }, from_unsigned_int64(1));
+
+	return scheme_new_number(scheme_exact_integer(result));
 }
 
-scheme_integer_t integer_subtract(scheme_integer_t a, scheme_integer_t b) {
-	return integer_plus(a, integer_negate(b));
+dyntype_t integer_lcm(ELLIPSIS_PARAM(n)) {
+	mp_int result;
+	CATCH_MP_ERROR(mp_init(&result))
+
+		mp_set_u32(&result, 1u);
+
+	for (int i = 0; i < len; i++) {
+		dyntype_t elem = n[i];
+		REQUIRE_SCHEME_EXACT_INTEGER(elem, i)
+
+		CATCH_MP_ERROR(mp_lcm(&result, &cn_elem, &result))
+	}
+
+	return scheme_new_number(scheme_exact_integer(result));
+}
+
+scheme_integer_t integer_neg(scheme_integer_t a) {
+	mp_int result;
+	CATCH_MP_ERROR(mp_init(&result))
+
+	CATCH_MP_ERROR(mp_neg(&a, &result))
+
+	return result;
 }

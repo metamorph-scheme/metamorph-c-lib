@@ -4,6 +4,7 @@
 #define ELLIPSIS_PARAM(NAME) dyntype_t* NAME, int len
 #define NONSTANDARD
 #define STANDARD(NAME)
+#define CATCH_MP_ERROR(EXPR) if((EXPR) != MP_OKAY) { SET_TOMMATH_NUMBER_EXCEPTION } 
 
 // Symbols
 
@@ -195,9 +196,35 @@ dyntype_t exact_q(dyntype_t z);
     (lambda (z) (and (integer? z) (exact? z))))
 */
 
-scheme_integer_t integer_plus(scheme_integer_t a, scheme_integer_t b);
-scheme_integer_t integer_subtract(scheme_integer_t a, scheme_integer_t b);
-scheme_integer_t from_unsigned_int64(uint64_t int_);
-scheme_integer_t from_int_array(uint64_t ints[], uint8_t length);
+scheme_integer_t integer_add(scheme_integer_t a, scheme_integer_t b);
+scheme_integer_t integer_sub(scheme_integer_t a, scheme_integer_t b);
+scheme_integer_t integer_mul(scheme_integer_t a, scheme_integer_t b);
+
+scheme_integer_t integer_truncate_div(scheme_integer_t a, scheme_integer_t b);
+scheme_integer_t integer_truncate_remainder(scheme_integer_t a, scheme_integer_t b);
+scheme_integer_t integer_truncate_quotient(scheme_integer_t a, scheme_integer_t b);
+
+/*
+(define quotient truncate-quotient)
+(define remainder truncate-remainder)
+(define modulo floor-remainder)
+*/
+
+scheme_real_t real_add(scheme_real_t a, scheme_real_t b);
+scheme_real_t real_sub(scheme_real_t a, scheme_real_t b);
+scheme_real_t real_mul(scheme_real_t a, scheme_real_t b);
+scheme_real_t real_div(scheme_real_t a, scheme_real_t b);
+scheme_real_t real_neg(scheme_real_t a);
+scheme_rational_t real_to_rational(scheme_real_t a);
+scheme_real_t rational_to_real(scheme_rational_t a);
+
+void rational_min(scheme_rational_t * q);
+scheme_rational_sign_t rational_sign(scheme_rational_t a);
+scheme_boolean_t rational_sign_negative(scheme_rational_sign_t sign);
+scheme_rational_t rational_add(scheme_rational_t a, scheme_rational_t b);
+scheme_rational_t rational_sub(scheme_rational_t a, scheme_rational_t b);
+scheme_rational_t rational_mul(scheme_rational_t a, scheme_rational_t b);
+scheme_rational_t rational_div(scheme_rational_t a, scheme_rational_t b);
+scheme_rational_t rational_neg(scheme_rational_t a);
 
 #endif

@@ -14,6 +14,22 @@ OBJ_CREATION_FUNCS(pair, SCHEME_TYPE_PAIR)
 OBJ_CREATION_FUNCS(procedure, SCHEME_TYPE_PROCEDURE)
 OBJ_CREATION_FUNCS(number, SCHEME_TYPE_NUMBER)
 
+scheme_number_t scheme_exact_integer(scheme_integer_t obj) {
+  SIMPLE_MALLOC(scheme_integer_t, obj)
+  return (scheme_number_t) {
+      .type = SCHEME_NUMERICAL_TYPE_EXACT_INTEGER,
+      .data.exact_integer_val = ptr
+  };
+}
+
+scheme_number_t scheme_exact_rational(scheme_rational_t obj) {
+    SIMPLE_MALLOC(scheme_rational_t, obj)
+        return (scheme_number_t) {
+        .type = SCHEME_NUMERICAL_TYPE_EXACT_RATIONAL,
+            .data.exact_integer_val = ptr
+    };
+}
+
 void release_dyntype(dyntype_t dyntype){
     switch(dyntype.type){
         case(SCHEME_TYPE_PROCEDURE):{

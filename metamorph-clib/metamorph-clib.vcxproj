@@ -231,6 +231,8 @@
     <ClCompile Include="src\primf\lambda.c" />
     <ClCompile Include="src\primf\numbers.c" />
     <ClCompile Include="src\primf\numbers_integer.c" />
+    <ClCompile Include="src\primf\numbers_rational.c" />
+    <ClCompile Include="src\primf\numbers_real.c" />
     <ClCompile Include="src\primf\pairs.c" />
     <ClCompile Include="src\primf\symbols.c" />
     <ClCompile Include="src\primf-test\test_primf.c" />

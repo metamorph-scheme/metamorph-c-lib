@@ -516,6 +516,7 @@ TEST(list_copy) {
 
 }
 
+/*
 TEST(integer_plus) {
     scheme_integer_t a = from_unsigned_int64(0x4000000000000000);
     scheme_integer_t b = from_unsigned_int64(0x4000000000000000);
@@ -562,7 +563,244 @@ TEST(integer_subtract) {
     ASSERT_EQ("first block is not zero", 0u, c.block[0]);
     ASSERT_EQ("last block is not 33", 0b0000000000000000000000000000000000000000000000000000000000100001, c.block[1]);
 }
+*/
 
+TEST(tommath_negative_division) {
+    mp_int a,b,c,d;
+    if (mp_init_multi(&a, &b, &c, &d, NULL) != MP_OKAY) {
+        MU_ASSERT("Number initialisation failed", FALSE);
+    }
+
+    mp_set_i64(&a, 5);
+    mp_set_i64(&b, -2);
+
+
+    mp_div(&a, &b, &c, &d);
+
+    char c_str[200];
+    char d_str[200];
+
+    mp_to_radix(&c, &c_str, 200, NULL, 10);
+    mp_to_radix(&d, &d_str, 200, NULL, 10);
+
+    printf("c: %s, d: %s\n", c_str, d_str);
+
+    mp_clear_multi(&a, &b, &c, &d, NULL);
+
+    return 0;
+}
+
+
+TEST(rational_to_real) {
+    mp_int a, b;
+ 
+    if (mp_init_multi(&a, &b, NULL) != MP_OKAY) {
+        MU_ASSERT("Number initialisation failed", FALSE);
+    }
+    
+    // 4253529586511731/21267647932558653966460912964485513216
+    mp_set_i64(&a, -4253529586511731);
+    mp_read_radix(&b, "21267647932558653966460912964485513216", 10);
+    //mp_set_u64(&b, 3);
+
+    scheme_rational_t rat = {
+        .numerator = a,
+        .denominator = b
+    };
+
+    scheme_real_t res = rational_to_real(rat);
+
+    char str[35];
+    sprintf(str, "%.30lf", res);
+
+    mp_clear_multi(&a, &b, NULL);
+
+    ASSERT_EQ("result string does not match", 0, strcmp(str, "-0.000000000000000000000200000000"));
+
+    return 0;
+}
+
+
+TEST(real_to_rational) {
+
+    scheme_rational_t res = real_to_rational(-0.34);
+    char d[100], n[100];
+
+    mp_to_radix(&res.denominator, d, 100, NULL, 10);
+    mp_to_radix(&res.numerator, n, 100, NULL, 10);
+
+    ASSERT_EQ("numerator is wrong", 0, strcmp(n, "-6124895493223875"));
+    ASSERT_EQ("denominator is wrong", 0, strcmp(d, "18014398509481984"));
+
+    mp_clear_multi(&res.denominator, &res.numerator, NULL);
+
+    return 0;
+}
+
+TEST(real_to_rational_overflow_check) {
+    scheme_rational_t res = real_to_rational(0.000000000000000000000002);
+    char d[100], n[100];
+
+    mp_to_radix(&res.denominator, d, 100, NULL, 10);
+    mp_to_radix(&res.numerator, n, 100, NULL, 10);
+
+    ASSERT_EQ("numerator is wrong", 0, strcmp(n, "5444517870735015"));
+    ASSERT_EQ("denominator is wrong", 0, strcmp(d, "2722258935367507707706996859454145691648"));
+
+    mp_clear_multi(&res.denominator, &res.numerator, NULL);
+
+    return 0;
+}
+
+TEST(rational_add) {
+    mp_int a, b, c, d;
+    if (mp_init_multi(&a, &b, &c, &d, NULL) != MP_OKAY) {
+        MU_ASSERT("Number initialisation failed", FALSE);
+    }
+
+    mp_set_i64(&a, -20);
+    mp_set_i64(&b, 6);
+    mp_set_i64(&c, 9);
+    mp_set_i64(&d, 4);
+
+    scheme_rational_t n1 = {
+        .numerator = a,
+        .denominator = b
+    };
+
+    scheme_rational_t n2 = {
+        .numerator = c,
+        .denominator = d
+    };
+
+    scheme_rational_t res = rational_add(n1, n2);
+
+    char ds[100], ns[100];
+
+    mp_to_radix(&res.denominator, ds, 100, NULL, 10);
+    mp_to_radix(&res.numerator, ns, 100, NULL, 10);
+
+    ASSERT_EQ("numerator is wrong", 0, strcmp(ns, "-13"));
+    ASSERT_EQ("denominator is wrong", 0, strcmp(ds, "12"));
+
+    mp_clear_multi(&a, &b, &c, &d, NULL);
+
+    return 0;
+}
+
+
+TEST(rational_sub) {
+    mp_int a, b, c, d;
+    if (mp_init_multi(&a, &b, &c, &d, NULL) != MP_OKAY) {
+        MU_ASSERT("Number initialisation failed", FALSE);
+    }
+
+    mp_set_i64(&a, -20);
+    mp_set_i64(&b, 6);
+    mp_set_i64(&c, 9);
+    mp_set_i64(&d, 4);
+
+    scheme_rational_t n1 = {
+        .numerator = a,
+        .denominator = b
+    };
+
+    scheme_rational_t n2 = {
+        .numerator = c,
+        .denominator = d
+    };
+
+    scheme_rational_t res = rational_sub(n1, n2);
+
+    char ds[100], ns[100];
+
+    mp_to_radix(&res.denominator, ds, 100, NULL, 10);
+    mp_to_radix(&res.numerator, ns, 100, NULL, 10);
+
+
+    ASSERT_EQ("numerator is wrong", 0, strcmp(ns, "-67"));
+    ASSERT_EQ("denominator is wrong", 0, strcmp(ds, "12"));
+
+    mp_clear_multi(&a, &b, &c, &d, NULL);
+
+    return 0;
+}
+
+
+TEST(rational_mul) {
+    mp_int a, b, c, d;
+    if (mp_init_multi(&a, &b, &c, &d, NULL) != MP_OKAY) {
+        MU_ASSERT("Number initialisation failed", FALSE);
+    }
+
+    mp_set_i64(&a, -20);
+    mp_set_i64(&b, 6);
+    mp_set_i64(&c, 9);
+    mp_set_i64(&d, 4);
+
+    scheme_rational_t n1 = {
+        .numerator = a,
+        .denominator = b
+    };
+
+    scheme_rational_t n2 = {
+        .numerator = c,
+        .denominator = d
+    };
+
+    scheme_rational_t res = rational_mul(n1, n2);
+
+    char ds[100], ns[100];
+
+    mp_to_radix(&res.denominator, ds, 100, NULL, 10);
+    mp_to_radix(&res.numerator, ns, 100, NULL, 10);
+
+
+    ASSERT_EQ("numerator is wrong", 0, strcmp(ns, "-15"));
+    ASSERT_EQ("denominator is wrong", 0, strcmp(ds, "2"));
+
+    mp_clear_multi(&a, &b, &c, &d, NULL);
+
+    return 0;
+}
+
+
+TEST(rational_div) {
+    mp_int a, b, c, d;
+    if (mp_init_multi(&a, &b, &c, &d, NULL) != MP_OKAY) {
+        MU_ASSERT("Number initialisation failed", FALSE);
+    }
+
+    mp_set_i64(&a, -20);
+    mp_set_i64(&b, 6);
+    mp_set_i64(&c, 9);
+    mp_set_i64(&d, 4);
+
+    scheme_rational_t n1 = {
+        .numerator = a,
+        .denominator = b
+    };
+
+    scheme_rational_t n2 = {
+        .numerator = c,
+        .denominator = d
+    };
+
+    scheme_rational_t res = rational_div(n1, n2);
+
+    char ds[100], ns[100];
+
+    mp_to_radix(&res.denominator, ds, 100, NULL, 10);
+    mp_to_radix(&res.numerator, ns, 100, NULL, 10);
+
+
+    ASSERT_EQ("numerator is wrong", 0, strcmp(ns, "-40"));
+    ASSERT_EQ("denominator is wrong", 0, strcmp(ds, "27"));
+
+    mp_clear_multi(&a, &b, &c, &d, NULL);
+
+    return 0;
+}
 
 static char* all_tests() {
     MU_RUN_TEST(string_to_symbol);
@@ -601,11 +839,19 @@ static char* all_tests() {
     MU_RUN_TEST(list_set_2);
     MU_RUN_TEST(list_set_3);
     MU_RUN_TEST(list_copy);
-    MU_RUN_TEST(integer_plus);
-    MU_RUN_TEST(integer_plus_2);
-    MU_RUN_TEST(integer_plus_3);
-    MU_RUN_TEST(integer_plus_negative);
-    MU_RUN_TEST(integer_subtract);
+    //MU_RUN_TEST(integer_plus);
+    //MU_RUN_TEST(integer_plus_2);
+    //MU_RUN_TEST(integer_plus_3);
+    //MU_RUN_TEST(integer_plus_negative);
+    //MU_RUN_TEST(integer_subtract);
+    //MU_RUN_TEST(tommath_negative_division);
+    MU_RUN_TEST(rational_to_real);
+    MU_RUN_TEST(real_to_rational);
+    MU_RUN_TEST(real_to_rational_overflow_check);
+    MU_RUN_TEST(rational_add);
+    MU_RUN_TEST(rational_sub);
+    MU_RUN_TEST(rational_mul);
+    MU_RUN_TEST(rational_div);
     return 0;
 }
 

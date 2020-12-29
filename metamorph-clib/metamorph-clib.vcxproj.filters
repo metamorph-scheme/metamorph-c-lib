@@ -571,6 +571,12 @@
     <ClCompile Include="src\tommath\bn_s_mp_toom_sqr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\primf\numbers_rational.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\primf\numbers_real.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

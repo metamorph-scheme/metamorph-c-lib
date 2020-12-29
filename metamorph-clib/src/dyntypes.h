@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include <stdint.h>
-
+#include "tommath/tommath.h"
 
 // Types of dyntype
 
@@ -27,15 +27,22 @@
 #define SCHEME_NUMERICAL_TYPE_INEXACT_RATIONAL 16
 #define SCHEME_NUMERICAL_TYPE_INEXACT_REAL 17
 
+#define SCHEME_RATIONAL_B_POS 1
+#define SCHEME_RATIONAL_B_NEG 2
+#define SCHEME_RATIONAL_D_NEG 3
+#define SCHEME_RATIONAL_N_NEG 4
+
 #define INTERNAL_TYPE_TYPE_EXCEPTION 0
 #define INTERNAL_TYPE_BAD_ARGUMENT_EXCEPTION 1
 #define INTERNAL_TYPE_SETTING_IMMUTABLE_LOCATION 2
+#define INTERNAL_TYPE_TOMMATH_NUMBER_EXCEPTION 3
 
 #define INTERNAL_GLOBAL_EXCEPTION 1
 
 typedef char scheme_type_t;
 typedef char internal_exception_type_t;
 typedef char scheme_numerical_type_t;
+typedef char scheme_rational_sign_t;
 
 // Value Structs
 
@@ -55,15 +62,21 @@ typedef struct {
   char* name;
 } scheme_symbol_t;
 
-typedef struct scheme_integer_struct_t {
-    uint64_t *block; // array because mutation of numbers is not possible
-    uint8_t length;
-} scheme_integer_t;
+typedef mp_int scheme_integer_t;
+
+typedef double scheme_real_t;
+
+typedef struct scheme_rational_struct_t {
+    mp_int numerator;
+    mp_int denominator;
+} scheme_rational_t;
 
 typedef struct scheme_number_struct_t {
     scheme_numerical_type_t type;
     union {
         scheme_integer_t* exact_integer_val;
+        scheme_rational_t* exact_rational_val;
+        scheme_real_t* inexact_real_val;
     } data;
 } scheme_number_t;
 
@@ -130,6 +143,11 @@ typedef struct scheme_pair_struct_t {
     CRASH(INTERNAL_GLOBAL_EXCEPTION)\
 }
 
+#define SET_TOMMATH_NUMBER_EXCEPTION {\
+    global_exception.internal_error_type=INTERNAL_TYPE_TOMMATH_NUMBER_EXCEPTION;\
+    CRASH(INTERNAL_GLOBAL_EXCEPTION)\
+}
+
 #define SET_BAD_ARGUMENT_EXCEPTION(POS, MSG)  {\
    global_exception.internal_error_type=INTERNAL_TYPE_BAD_ARGUMENT_EXCEPTION;\
    global_exception.data.bad_argument_exception = (internal_bad_argument_exception_t) {\
@@ -162,7 +180,7 @@ typedef struct scheme_pair_struct_t {
     SET_TYPE_EXCEPTION(SCHEME_TYPE_BOOLEAN, PARAM.type, POS);\
   }
 
-#define REQUIRE_SCHEME_STRING(PARAM, POS) scheme_string_t c_##PARAM=NULL;\
+#define REQUIRE_SCHEME_STRING(PARAM, POS) scheme_string_t c_##PARAM;\
   if (PARAM.type == SCHEME_TYPE_STRING) { \
     c_##PARAM = *PARAM.data.string_val;\
   } else {\
@@ -176,10 +194,10 @@ typedef struct scheme_pair_struct_t {
     SET_TYPE_EXCEPTION(SCHEME_TYPE_NUMBER, PARAM.type, POS);\
   }
 
-#define REQUIRE_SCHEME_EXACT_INTEGER(PARAM,POS) scheme_integer_t cn_##PARAM=NULL;\
+#define REQUIRE_SCHEME_EXACT_INTEGER(PARAM,POS) scheme_integer_t cn_##PARAM;\
   REQUIRE_SCHEME_NUMBER(PARAM, POS)\
   if (c_##PARAM.type == SCHEME_NUMERICAL_TYPE_EXACT_INTEGER) { \
-    cn_##PARAM = *PARAM.data.exact_integer_val;\
+    cn_##PARAM = *c_##PARAM.data.exact_integer_val;\
   } else {\
     SET_TYPE_EXCEPTION(SCHEME_NUMERICAL_TYPE_EXACT_INTEGER, PARAM.type, POS);\
   }
@@ -204,6 +222,8 @@ dyntype_t scheme_literal_symbol(scheme_symbol_t obj);
 dyntype_t scheme_literal_procedure(scheme_procedure_t obj);
 dyntype_t scheme_new_number(scheme_number_t obj);
 dyntype_t scheme_literal_number(scheme_number_t obj);
+
+scheme_number_t scheme_exact_integer(scheme_integer_t obj);
 
 #define SCHEME_UNSPECIFIED (dyntype_t) {\
   .type = SCHEME_TYPE_UNSPECIFIED,\
