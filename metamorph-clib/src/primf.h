@@ -214,6 +214,13 @@ scheme_integer_t integer_lcm(scheme_integer_t* n, size_t len);
 scheme_integer_t integer_neg(scheme_integer_t a);
 scheme_integer_t integer_create(char* bytes, size_t len);
 
+scheme_ord_t integer_cmp(scheme_integer_t a, scheme_integer_t b);
+scheme_boolean_t integer_eq(scheme_integer_t a, scheme_integer_t b);
+scheme_boolean_t integer_lt(scheme_integer_t a, scheme_integer_t b);
+scheme_boolean_t integer_gt(scheme_integer_t a, scheme_integer_t b);
+scheme_boolean_t integer_gte(scheme_integer_t a, scheme_integer_t b);
+scheme_boolean_t integer_lte(scheme_integer_t a, scheme_integer_t b);
+
 void integer_release(scheme_integer_t);
 scheme_integer_t integer_copy(scheme_integer_t obj);
 
@@ -225,6 +232,13 @@ scheme_real_t real_neg(scheme_real_t a);
 scheme_rational_t real_to_rational(scheme_real_t a);
 scheme_real_t rational_to_real(scheme_rational_t a);
 scheme_real_t real_create(double fp);
+
+scheme_ord_t real_cmp(scheme_real_t a, scheme_real_t b);
+scheme_boolean_t real_eq(scheme_real_t a, scheme_real_t b);
+scheme_boolean_t real_lt(scheme_real_t a, scheme_real_t b);
+scheme_boolean_t real_lte(scheme_real_t a, scheme_real_t b);
+scheme_boolean_t real_gt(scheme_real_t a, scheme_real_t b);
+scheme_boolean_t real_gte(scheme_real_t a, scheme_real_t b);
 
 void rational_min(scheme_rational_t * q);
 scheme_rational_sign_t rational_sign(scheme_rational_t a);
@@ -240,6 +254,15 @@ scheme_rational_t rational_create_raw(char* a_bytes, size_t alen, char* b_bytes,
 
 scheme_integer_t rational_numerator(scheme_rational_t x);
 scheme_integer_t rational_denominator(scheme_rational_t x);
+
+scheme_ord_t rational_cmp(scheme_rational_t a, scheme_rational_t b);
+scheme_boolean_t rational_eq(scheme_rational_t a, scheme_rational_t b);
+scheme_boolean_t rational_lt(scheme_rational_t a, scheme_rational_t b);
+scheme_boolean_t rational_lte(scheme_rational_t a, scheme_rational_t b);
+scheme_boolean_t rational_gt(scheme_rational_t a, scheme_rational_t b);
+scheme_boolean_t rational_gte(scheme_rational_t a, scheme_rational_t b);
+
+scheme_rational_t integer_to_rational(scheme_integer_t n);
 
 void rational_release(scheme_rational_t x);
 scheme_rational_t rational_copy(scheme_rational_t obj);

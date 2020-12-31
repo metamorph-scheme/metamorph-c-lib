@@ -153,6 +153,97 @@ scheme_integer_t rational_numerator(scheme_rational_t x) {
 	return x.numerator;
 }
 
+scheme_ord_t rational_cmp(scheme_rational_t a, scheme_rational_t b) {
+	scheme_rational_sign_t a_sign = rational_sign(a);
+	scheme_rational_sign_t b_sign = rational_sign(b);
+	if (rational_sign_negative(a_sign) == rational_sign_negative(b_sign)) {
+		// signs are equal - compare absolute values
+		mp_int lcm, factor_a, factor_b;
+
+		CATCH_MP_ERROR(mp_init_multi(&lcm, &factor_a, &factor_b, NULL));
+
+		CATCH_MP_ERROR(mp_lcm(&a.denominator, &b.denominator, &lcm));
+
+		CATCH_MP_ERROR(mp_div(&lcm, &a.denominator, &factor_a, NULL));
+		CATCH_MP_ERROR(mp_div(&lcm, &b.denominator, &factor_b, NULL));
+
+		// reuse factor variables instead of clearing and reallocating new mp_ints
+		CATCH_MP_ERROR(mp_mul(&a.numerator, &factor_a, &factor_a));
+		CATCH_MP_ERROR(mp_mul(&b.numerator, &factor_b, &factor_b));
+		
+		mp_ord res = mp_cmp_mag(&factor_a, &factor_b);
+
+		mp_clear_multi(&lcm, &factor_a, &factor_b, NULL);
+
+		return from_mp_ord(res);
+	}
+	else {
+		if (rational_sign_negative(a_sign)) {
+			// a is negative and b must be positive
+			return SCHEME_LT;
+		}
+		else {
+			// a is positive and b must be negative
+			return SCHEME_GT;
+		}
+		// return based on sign
+	}
+}
+
+scheme_boolean_t rational_eq(scheme_rational_t a, scheme_rational_t b) {
+	if (rational_cmp(a, b) == SCHEME_EQ) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+scheme_boolean_t rational_lt(scheme_rational_t a, scheme_rational_t b) {
+	if (rational_cmp(a, b) == SCHEME_LT) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+scheme_boolean_t rational_gt(scheme_rational_t a, scheme_rational_t b) {
+	if (rational_cmp(a, b) == SCHEME_GT) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+scheme_boolean_t rational_lte(scheme_rational_t a, scheme_rational_t b) {
+	scheme_ord_t ord = rational_cmp(a, b);
+	if (ord == SCHEME_LT || ord == SCHEME_EQ) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+scheme_boolean_t rational_gte(scheme_rational_t a, scheme_rational_t b) {
+	scheme_ord_t ord = rational_cmp(a, b);
+	if (ord == SCHEME_GT || ord == SCHEME_EQ) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+scheme_rational_t integer_to_rational(scheme_integer_t n) {
+	mp_int denom, num;
+	CATCH_MP_ERROR(mp_init_copy(&num, &n));
+	CATCH_MP_ERROR(mp_init_u32(&denom, 1));
+	return rational_create(denom, n);
+}
+
 void rational_release(scheme_rational_t x) {
 	mp_clear(&x.denominator);
 	mp_clear(&x.numerator);

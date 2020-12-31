@@ -6,6 +6,7 @@
 #include "../lambda.h"
 #include "../primf.h"
 #include <malloc.h>
+#include "../tommath/tommath.h"
 
 
 OBJ_CREATION_FUNCS(boolean, SCHEME_TYPE_BOOLEAN)
@@ -53,6 +54,14 @@ scheme_number_t scheme_inexact_real(scheme_real_t obj) {
         .type = SCHEME_NUMERICAL_TYPE_INEXACT_REAL,
             .data.inexact_real_val = ptr
     };
+}
+
+scheme_ord_t from_mp_ord(mp_ord ord) {
+    switch (ord) {
+    case MP_GT: return SCHEME_GT;
+    case MP_LT: return SCHEME_LT;
+    case MP_EQ: return SCHEME_EQ;
+    }
 }
 
 void release_dyntype(dyntype_t dyntype){

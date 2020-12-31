@@ -236,3 +236,58 @@ scheme_real_t rational_to_real(scheme_rational_t a) {
 scheme_real_t real_create(double fp) {
 	return fp;
 }
+
+scheme_ord_t real_cmp(scheme_real_t a, scheme_real_t b) {
+	if (a == b) {
+		return SCHEME_EQ;
+	} else if (a < b) {
+		return SCHEME_LT;
+	} else {
+		return SCHEME_GT;
+	}
+}
+
+scheme_boolean_t real_eq(scheme_real_t a, scheme_real_t b) {
+	if (a == b) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+scheme_boolean_t real_lt(scheme_real_t a, scheme_real_t b) {
+	if (a < b) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+scheme_boolean_t real_lte(scheme_real_t a, scheme_real_t b) {
+	if (a <= b) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+scheme_boolean_t real_gt(scheme_real_t a, scheme_real_t b) {
+	if (a > b) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+scheme_boolean_t real_gte(scheme_real_t a, scheme_real_t b) {
+	if (a > b) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}

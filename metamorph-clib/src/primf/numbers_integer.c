@@ -118,6 +118,57 @@ scheme_integer_t integer_create(char* bytes, size_t len) {
 	return x;
 }
 
+scheme_ord_t integer_cmp(scheme_integer_t a, scheme_integer_t b) {
+	return from_mp_ord(mp_cmp(&a, &b));
+}
+
+scheme_boolean_t integer_eq(scheme_integer_t a, scheme_integer_t b) {
+	if (integer_cmp(a, b) == SCHEME_EQ) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+scheme_boolean_t integer_lt(scheme_integer_t a, scheme_integer_t b) {
+	if (integer_cmp(a, b) == SCHEME_LT) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+scheme_boolean_t integer_gt(scheme_integer_t a, scheme_integer_t b) {
+	if (integer_cmp(a, b) == SCHEME_GT) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+scheme_boolean_t integer_lte(scheme_integer_t a, scheme_integer_t b) {
+	scheme_ord_t ord = integer_cmp(a, b);
+	if (ord == SCHEME_LT || ord == SCHEME_EQ) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+scheme_boolean_t integer_gte(scheme_integer_t a, scheme_integer_t b) {
+	scheme_ord_t ord = integer_cmp(a, b);
+	if (ord == SCHEME_GT || ord == SCHEME_EQ) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
 void integer_release(scheme_integer_t x) {
 	mp_clear(&x);
 }

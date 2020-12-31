@@ -32,6 +32,10 @@
 #define SCHEME_RATIONAL_D_NEG 3
 #define SCHEME_RATIONAL_N_NEG 4
 
+#define SCHEME_GT 1
+#define SCHEME_EQ 0
+#define SCHEME_LT -1
+
 #define INTERNAL_TYPE_TYPE_EXCEPTION 0
 #define INTERNAL_TYPE_BAD_ARGUMENT_EXCEPTION 1
 #define INTERNAL_TYPE_SETTING_IMMUTABLE_LOCATION 2
@@ -43,6 +47,7 @@ typedef char scheme_type_t;
 typedef char internal_exception_type_t;
 typedef char scheme_numerical_type_t;
 typedef char scheme_rational_sign_t;
+typedef char scheme_ord_t;
 
 // Value Structs
 
@@ -229,6 +234,7 @@ scheme_number_t scheme_inexact_rational(scheme_real_t obj);
 scheme_number_t scheme_inexact_integer(scheme_real_t obj);
 scheme_number_t scheme_inexact_real(scheme_real_t obj);
 
+scheme_ord_t from_mp_ord(mp_ord ord);
 
 #define SCHEME_UNSPECIFIED (dyntype_t) {\
   .type = SCHEME_TYPE_UNSPECIFIED,\
