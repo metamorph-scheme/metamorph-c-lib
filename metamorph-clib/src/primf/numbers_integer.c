@@ -68,36 +68,36 @@ scheme_integer_t integer_truncate_quotient(scheme_integer_t a, scheme_integer_t 
 	return c;
 }
 
-dyntype_t integer_gcd(ELLIPSIS_PARAM(n)) {
+scheme_integer_t integer_gcd(scheme_integer_t* n, size_t len) {
 	mp_int result;
 	CATCH_MP_ERROR(mp_init(&result))
 	
 	mp_set_u32(&result, 0u);
 
-	for (int i = 0; i < len; i++) {
-		dyntype_t elem = n[i];	
-		REQUIRE_SCHEME_EXACT_INTEGER(elem, i)
+	for (unsigned int i = 0; i < len; i++) {
+		scheme_integer_t elem = n[i];	
+		//REQUIRE_SCHEME_EXACT_INTEGER(elem, i)
 
-		CATCH_MP_ERROR(mp_gcd(&result, &cn_elem, &result))
+		CATCH_MP_ERROR(mp_gcd(&result, &elem, &result))
 	}
 
-	return scheme_new_number(scheme_exact_integer(result));
+	return result;
 }
 
-dyntype_t integer_lcm(ELLIPSIS_PARAM(n)) {
+scheme_integer_t integer_lcm(scheme_integer_t * n, size_t len) {
 	mp_int result;
-	CATCH_MP_ERROR(mp_init(&result))
+	CATCH_MP_ERROR(mp_init(&result));
 
-		mp_set_u32(&result, 1u);
+	mp_set_u32(&result, 1u);
 
-	for (int i = 0; i < len; i++) {
-		dyntype_t elem = n[i];
-		REQUIRE_SCHEME_EXACT_INTEGER(elem, i)
+	for (unsigned int i = 0; i < len; i++) {
+		scheme_integer_t elem = n[i];
+		//REQUIRE_SCHEME_EXACT_INTEGER(elem, i)
 
-		CATCH_MP_ERROR(mp_lcm(&result, &cn_elem, &result))
+		CATCH_MP_ERROR(mp_lcm(&result, &elem, &result))
 	}
 
-	return scheme_new_number(scheme_exact_integer(result));
+	return result;
 }
 
 scheme_integer_t integer_neg(scheme_integer_t a) {
@@ -107,4 +107,23 @@ scheme_integer_t integer_neg(scheme_integer_t a) {
 	CATCH_MP_ERROR(mp_neg(&a, &result))
 
 	return result;
+}
+
+scheme_integer_t integer_create(char* bytes, size_t len) {
+	mp_int x;
+	CATCH_MP_ERROR(mp_init(&x));
+
+	CATCH_MP_ERROR(mp_from_sbin(&x, bytes, len));
+
+	return x;
+}
+
+void integer_release(scheme_integer_t x) {
+	mp_clear(&x);
+}
+
+scheme_integer_t integer_copy(scheme_integer_t obj) {
+	mp_int copied;
+	CATCH_MP_ERROR(mp_init_copy(&copied, &obj));
+	return copied;
 }

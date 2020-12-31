@@ -13,6 +13,7 @@
 #define BITS_SUB_ZERO 1024
 
 mp_bool s_mp_get_bit(const mp_int* a, unsigned int b);
+// produces zero bits when index is negative - adapted/copied from the deprecated mp_get_bit
 mp_bool cust_mp_get_bit(const mp_int* a, unsigned int b) {
 	if (b < 0) return MP_NO;
 
@@ -230,4 +231,8 @@ scheme_real_t rational_to_real(scheme_rational_t a) {
 		return -result;
 	else
 		return result;
+}
+
+scheme_real_t real_create(double fp) {
+	return fp;
 }

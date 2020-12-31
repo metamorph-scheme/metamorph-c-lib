@@ -4,6 +4,7 @@
 #include "dyntypes_internal.h"
 #include "../functions.h"
 #include "../lambda.h"
+#include "../primf.h"
 #include <malloc.h>
 
 
@@ -24,9 +25,33 @@ scheme_number_t scheme_exact_integer(scheme_integer_t obj) {
 
 scheme_number_t scheme_exact_rational(scheme_rational_t obj) {
     SIMPLE_MALLOC(scheme_rational_t, obj)
-        return (scheme_number_t) {
+    return (scheme_number_t) {
         .type = SCHEME_NUMERICAL_TYPE_EXACT_RATIONAL,
-            .data.exact_integer_val = ptr
+        .data.exact_rational_val = ptr
+    };
+}
+
+scheme_number_t scheme_inexact_rational(scheme_real_t obj) {
+    SIMPLE_MALLOC(scheme_real_t, obj)
+        return (scheme_number_t) {
+        .type = SCHEME_NUMERICAL_TYPE_INEXACT_RATIONAL,
+            .data.inexact_real_val = ptr
+    };
+}
+
+scheme_number_t scheme_inexact_integer(scheme_real_t obj) {
+    SIMPLE_MALLOC(scheme_real_t, obj)
+        return (scheme_number_t) {
+        .type = SCHEME_NUMERICAL_TYPE_INEXACT_INTEGER,
+        .data.inexact_real_val = ptr
+    };
+}
+
+scheme_number_t scheme_inexact_real(scheme_real_t obj) {
+    SIMPLE_MALLOC(scheme_real_t, obj)
+        return (scheme_number_t) {
+        .type = SCHEME_NUMERICAL_TYPE_INEXACT_REAL,
+            .data.inexact_real_val = ptr
     };
 }
 
@@ -67,10 +92,19 @@ void release_dyntype(dyntype_t dyntype){
             RELEASE(scheme_symbol_t, dyntype.data.symbol_val)
             break;
         }
+        case(SCHEME_TYPE_NUMBER): {
+            scheme_number_t number;
+            number = *dyntype.data.number_val;
+            release_number(number);
+            RELEASE(scheme_number_t, dyntype.data.number_val)
+            break;
+        }
         default: break;
     }
 }
 
+
+// TODO copy mutable flag correctly
 dyntype_t copy_dyntype(dyntype_t dyntype) {
     switch (dyntype.type) {
     case(SCHEME_TYPE_PROCEDURE): {
@@ -101,6 +135,11 @@ dyntype_t copy_dyntype(dyntype_t dyntype) {
         symbol = *dyntype.data.symbol_val;
         //return copy_symbol(symbol);
         return scheme_new_symbol(symbol);
+    }
+    case(SCHEME_TYPE_NUMBER): {
+        scheme_number_t number;
+        number = *dyntype.data.number_val;
+        return copy_number(number);
     }
     default: break;
     }

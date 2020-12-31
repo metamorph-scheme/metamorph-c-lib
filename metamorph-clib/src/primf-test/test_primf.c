@@ -580,8 +580,8 @@ TEST(tommath_negative_division) {
     char c_str[200];
     char d_str[200];
 
-    mp_to_radix(&c, &c_str, 200, NULL, 10);
-    mp_to_radix(&d, &d_str, 200, NULL, 10);
+    mp_to_radix(&c, c_str, 200, NULL, 10);
+    mp_to_radix(&d, d_str, 200, NULL, 10);
 
     printf("c: %s, d: %s\n", c_str, d_str);
 
@@ -802,6 +802,43 @@ TEST(rational_div) {
     return 0;
 }
 
+TEST(integer_import) {
+    mp_int a;
+    if (mp_init(&a) != MP_OKAY) {
+        MU_ASSERT("Number initialisation failed", FALSE);
+    }
+
+    char inp[] = { 0, 0b01011001, 0b00100000 };
+    mp_from_sbin(&a, inp, 3);
+
+    char out[200];
+
+    mp_to_radix(&a, out, 200, NULL, 10);
+
+    ASSERT_EQ("number was not imported correctly", 0, strcmp(out, "22816"));
+
+    return 0;
+}
+
+
+TEST(integer_import_negative) {
+    mp_int a;
+    if (mp_init(&a) != MP_OKAY) {
+        MU_ASSERT("Number initialisation failed", FALSE);
+    }
+
+    char inp[] = { 1, 0b01011001, 0b00100000 };
+    mp_from_sbin(&a, inp, 3);
+
+    char out[200];
+
+    mp_to_radix(&a, out, 200, NULL, 10);
+
+    ASSERT_EQ("number was not imported correctly", 0, strcmp(out, "-22816"));
+
+    return 0;
+}
+
 static char* all_tests() {
     MU_RUN_TEST(string_to_symbol);
     MU_RUN_TEST(string_to_symbol_wrong_type);
@@ -852,6 +889,8 @@ static char* all_tests() {
     MU_RUN_TEST(rational_sub);
     MU_RUN_TEST(rational_mul);
     MU_RUN_TEST(rational_div);
+    MU_RUN_TEST(integer_import);
+    MU_RUN_TEST(integer_import_negative);
     return 0;
 }
 

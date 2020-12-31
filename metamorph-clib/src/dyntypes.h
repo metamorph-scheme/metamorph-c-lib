@@ -224,6 +224,11 @@ dyntype_t scheme_new_number(scheme_number_t obj);
 dyntype_t scheme_literal_number(scheme_number_t obj);
 
 scheme_number_t scheme_exact_integer(scheme_integer_t obj);
+scheme_number_t scheme_exact_rational(scheme_rational_t obj);
+scheme_number_t scheme_inexact_rational(scheme_real_t obj);
+scheme_number_t scheme_inexact_integer(scheme_real_t obj);
+scheme_number_t scheme_inexact_real(scheme_real_t obj);
+
 
 #define SCHEME_UNSPECIFIED (dyntype_t) {\
   .type = SCHEME_TYPE_UNSPECIFIED,\

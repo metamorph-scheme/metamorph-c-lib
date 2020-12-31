@@ -127,3 +127,36 @@ bool_t i_exact_q(dyntype_t z) {
 dyntype_t exact_q(dyntype_t z) {
 	return scheme_new_boolean(i_exact_q(z));
 }
+
+void release_number(scheme_number_t number) {
+	char type = number.type;
+	switch (type) {
+		case SCHEME_NUMERICAL_TYPE_EXACT_INTEGER:
+			integer_release(*number.data.exact_integer_val);
+			RELEASE(scheme_integer_t, number.data.exact_integer_val)
+			break;
+		case SCHEME_NUMERICAL_TYPE_EXACT_RATIONAL:
+			rational_release(*number.data.exact_rational_val);
+			RELEASE(scheme_rational_t, number.data.exact_rational_val)
+			break;
+		default:
+			RELEASE(scheme_real_t, number.data.inexact_real_val)
+			break;
+	}
+}
+
+dyntype_t copy_number(scheme_number_t number) {
+	char type = number.type;
+	switch (type) {
+	case SCHEME_NUMERICAL_TYPE_EXACT_INTEGER:
+		return scheme_new_number(scheme_exact_integer(integer_copy(*number.data.exact_integer_val)));
+	case SCHEME_NUMERICAL_TYPE_EXACT_RATIONAL:
+		return scheme_new_number(scheme_exact_rational(rational_copy(*number.data.exact_rational_val)));
+	case SCHEME_NUMERICAL_TYPE_INEXACT_INTEGER:
+		return scheme_new_number(scheme_inexact_integer(*number.data.inexact_real_val));
+	case SCHEME_NUMERICAL_TYPE_INEXACT_RATIONAL:
+		return scheme_new_number(scheme_inexact_rational(*number.data.inexact_real_val));
+	case SCHEME_NUMERICAL_TYPE_INEXACT_REAL:
+		return scheme_new_number(scheme_inexact_real(*number.data.inexact_real_val));
+	}
+}

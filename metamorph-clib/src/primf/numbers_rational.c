@@ -129,3 +129,39 @@ scheme_rational_t rational_neg(scheme_rational_t a) {
 		.denominator = new_denominator
 	};
 }
+
+// no copy and no initialization
+scheme_rational_t rational_create(scheme_integer_t a, scheme_integer_t b) {
+	return (scheme_rational_t) {
+		.numerator = a,
+		.denominator = b
+	};
+}
+
+scheme_rational_t rational_create_raw(char * a_bytes, size_t alen, char * b_bytes, size_t blen) {
+	return (scheme_rational_t) {
+		.numerator = integer_create(a_bytes, alen),
+		.denominator = integer_create(b_bytes, blen)
+	};
+}
+
+scheme_integer_t rational_denominator(scheme_rational_t x) {
+	return x.denominator;
+}
+
+scheme_integer_t rational_numerator(scheme_rational_t x) {
+	return x.numerator;
+}
+
+void rational_release(scheme_rational_t x) {
+	mp_clear(&x.denominator);
+	mp_clear(&x.numerator);
+}
+
+scheme_rational_t rational_copy(scheme_rational_t obj) {
+	mp_int a_copied, b_copied;
+	CATCH_MP_ERROR(mp_init_copy(&a_copied, &obj.numerator));
+	CATCH_MP_ERROR(mp_init_copy(&b_copied, &obj.denominator));
+
+	return rational_create(a_copied, b_copied);
+}
