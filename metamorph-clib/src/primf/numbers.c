@@ -151,11 +151,17 @@ scheme_ord_t i_num_cmp(scheme_number_t a, scheme_number_t b) {
 		}
 		else if (i_integer_q(a)) {
 			// b is the rational
-			return rational_cmp(integer_to_rational(*a.data.exact_integer_val), *b.data.exact_rational_val);
+			scheme_rational_t q_a = integer_to_rational(*a.data.exact_integer_val);
+			scheme_ord_t res = rational_cmp(q_a, *b.data.exact_rational_val);
+			rational_release(q_a);
+			return res;
 		}
 		else if (i_integer_q(b)) {
 			// a is the rational
-			return rational_cmp(integer_to_rational(*b.data.exact_integer_val), *a.data.exact_rational_val);
+			scheme_rational_t q_b = integer_to_rational(*b.data.exact_integer_val);
+			scheme_ord_t res = rational_cmp(*a.data.exact_rational_val, q_b);
+			rational_release(q_b);
+			return res;
 		}
 		else {
 			// both are rational
@@ -170,12 +176,18 @@ scheme_ord_t i_num_cmp(scheme_number_t a, scheme_number_t b) {
 			cnv_exact = real_to_rational(*a.data.inexact_real_val);
 			if (i_integer_q(b)) {
 				// b exact integer
-				return rational_cmp(cnv_exact, integer_to_rational(*b.data.exact_integer_val));
+				scheme_rational_t q_b = integer_to_rational(*b.data.exact_integer_val);
+				scheme_ord_t res = rational_cmp(cnv_exact, q_b);
+				rational_release(cnv_exact);
+				rational_release(q_b);
+				return res;
 			}
 			else
 			{
 				// b exact rational
-				return rational_cmp(cnv_exact, *b.data.exact_rational_val);
+				scheme_ord_t res = rational_cmp(cnv_exact, *b.data.exact_rational_val);
+				rational_release(cnv_exact);
+				return res;
 			}
 		}
 		else {
@@ -183,12 +195,18 @@ scheme_ord_t i_num_cmp(scheme_number_t a, scheme_number_t b) {
 			cnv_exact = real_to_rational(*b.data.inexact_real_val);
 			if (i_integer_q(a)) {
 				// a exact integer
-				return rational_cmp(cnv_exact, integer_to_rational(*a.data.exact_integer_val));
+				scheme_rational_t q_a = integer_to_rational(*a.data.exact_integer_val);
+				scheme_ord_t res = rational_cmp(q_a, cnv_exact);
+				rational_release(cnv_exact);
+				rational_release(q_a);
+				return res;
 			}
 			else
 			{
 				// a exact rational
-				return rational_cmp(cnv_exact, *a.data.exact_rational_val);
+				scheme_ord_t res = rational_cmp(*a.data.exact_rational_val, cnv_exact);
+				rational_release(cnv_exact);
+				return res;
 			}
 		}
 	}
@@ -268,11 +286,17 @@ scheme_number_t i_add(scheme_number_t a, scheme_number_t b) {
 		}
 		else if (i_integer_q(a)) {
 			// b is the rational
-			return scheme_exact_rational(rational_add(integer_to_rational(*a.data.exact_integer_val), *b.data.exact_rational_val));
+			scheme_rational_t q_a = integer_to_rational(*a.data.exact_integer_val);
+			scheme_number_t res = scheme_exact_rational(rational_add(q_a, *b.data.exact_rational_val));
+			rational_release(q_a);
+			return res;
 		}
 		else if (i_integer_q(b)) {
 			// a is the rational
-			return scheme_exact_rational(rational_add(integer_to_rational(*b.data.exact_integer_val), *a.data.exact_rational_val));
+			scheme_rational_t q_b = integer_to_rational(*b.data.exact_integer_val);
+			scheme_number_t res = scheme_exact_rational(rational_add(*a.data.exact_rational_val, q_b));
+			rational_release(q_b);
+			return res;
 		}
 		else {
 			// both are rational
@@ -287,12 +311,22 @@ scheme_number_t i_add(scheme_number_t a, scheme_number_t b) {
 			cnv_exact = real_to_rational(*a.data.inexact_real_val);
 			if (i_integer_q(b)) {
 				// b exact integer
-				return scheme_inexact_real(rational_to_real(rational_add(cnv_exact, integer_to_rational(*b.data.exact_integer_val))));
+				scheme_rational_t q_b = integer_to_rational(*b.data.exact_integer_val);
+				scheme_rational_t sum = rational_add(cnv_exact, q_b);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(sum));
+				rational_release(q_b);
+				rational_release(sum);
+				rational_release(cnv_exact);
+				return res;
 			}
 			else
 			{
 				// b exact rational
-				return scheme_inexact_real(rational_to_real(rational_add(cnv_exact, *b.data.exact_rational_val)));
+				scheme_rational_t sum = rational_add(cnv_exact, *b.data.exact_rational_val);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(sum));
+				rational_release(sum);
+				rational_release(cnv_exact);
+				return res;
 			}
 		}
 		else {
@@ -300,12 +334,22 @@ scheme_number_t i_add(scheme_number_t a, scheme_number_t b) {
 			cnv_exact = real_to_rational(*b.data.inexact_real_val);
 			if (i_integer_q(a)) {
 				// a exact integer
-				return scheme_inexact_real(rational_to_real(rational_add(cnv_exact, integer_to_rational(*a.data.exact_integer_val))));
+				scheme_rational_t q_a = integer_to_rational(*a.data.exact_integer_val);
+				scheme_rational_t sum = rational_add(q_a, cnv_exact);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(sum));
+				rational_release(q_a);
+				rational_release(sum);
+				rational_release(cnv_exact);
+				return res;
 			}
 			else
 			{
 				// a exact rational
-				return scheme_inexact_real(rational_to_real(rational_add(cnv_exact, *a.data.exact_rational_val)));
+				scheme_rational_t sum = rational_add(*a.data.exact_rational_val, cnv_exact);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(sum));
+				rational_release(sum);
+				rational_release(cnv_exact);
+				return res;
 			}
 		}
 	}
@@ -336,9 +380,10 @@ dyntype_t add(ELLIPSIS_PARAM(x)) {
 
 
 scheme_number_t i_mul(scheme_number_t a, scheme_number_t b) {
+	// TODO return exact zero if either a or b are exact zero
+	
 	if (i_inexact_q(a) && i_inexact_q(b)) {
 		// only inexact => inexact real comparison
-
 		return scheme_inexact_real(real_mul(*a.data.inexact_real_val, *b.data.inexact_real_val));
 	}
 	else if (i_exact_q(a) && i_exact_q(b)) {
@@ -349,11 +394,17 @@ scheme_number_t i_mul(scheme_number_t a, scheme_number_t b) {
 		}
 		else if (i_integer_q(a)) {
 			// b is the rational
-			return scheme_exact_rational(rational_mul(integer_to_rational(*a.data.exact_integer_val), *b.data.exact_rational_val));
+			scheme_rational_t q_a = integer_to_rational(*a.data.exact_integer_val);
+			scheme_number_t res = scheme_exact_rational(rational_mul(q_a, *b.data.exact_rational_val));
+			rational_release(q_a);
+			return res;
 		}
 		else if (i_integer_q(b)) {
 			// a is the rational
-			return scheme_exact_rational(rational_mul(integer_to_rational(*b.data.exact_integer_val), *a.data.exact_rational_val));
+			scheme_rational_t q_b = integer_to_rational(*b.data.exact_integer_val);
+			scheme_number_t res = scheme_exact_rational(rational_mul(*a.data.exact_rational_val, q_b));
+			rational_release(q_b);
+			return res;
 		}
 		else {
 			// both are rational
@@ -368,12 +419,22 @@ scheme_number_t i_mul(scheme_number_t a, scheme_number_t b) {
 			cnv_exact = real_to_rational(*a.data.inexact_real_val);
 			if (i_integer_q(b)) {
 				// b exact integer
-				return scheme_inexact_real(rational_to_real(rational_mul(cnv_exact, integer_to_rational(*b.data.exact_integer_val))));
+				scheme_rational_t q_b = integer_to_rational(*b.data.exact_integer_val);
+				scheme_rational_t mult = rational_mul(cnv_exact, q_b);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(mult));
+				rational_release(q_b);
+				rational_release(mult);
+				rational_release(cnv_exact);
+				return res;
 			}
 			else
 			{
 				// b exact rational
-				return scheme_inexact_real(rational_to_real(rational_mul(cnv_exact, *b.data.exact_rational_val)));
+				scheme_rational_t mult = rational_mul(cnv_exact, *b.data.exact_rational_val);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(mult));
+				rational_release(mult);
+				rational_release(cnv_exact);
+				return res;
 			}
 		}
 		else {
@@ -381,12 +442,22 @@ scheme_number_t i_mul(scheme_number_t a, scheme_number_t b) {
 			cnv_exact = real_to_rational(*b.data.inexact_real_val);
 			if (i_integer_q(a)) {
 				// a exact integer
-				return scheme_inexact_real(rational_to_real(rational_mul(cnv_exact, integer_to_rational(*a.data.exact_integer_val))));
+				scheme_rational_t q_a = integer_to_rational(*a.data.exact_integer_val);
+				scheme_rational_t mult = rational_mul(q_a, cnv_exact);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(mult));
+				rational_release(q_a);
+				rational_release(mult);
+				rational_release(cnv_exact);
+				return res;
 			}
 			else
 			{
 				// a exact rational
-				return scheme_inexact_real(rational_to_real(rational_mul(cnv_exact, *a.data.exact_rational_val)));
+				scheme_rational_t mult = rational_mul(*a.data.exact_rational_val, cnv_exact);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(mult));
+				rational_release(mult);
+				rational_release(cnv_exact);
+				return res;
 			}
 		}
 	}
@@ -429,11 +500,17 @@ scheme_number_t i_sub(scheme_number_t a, scheme_number_t b) {
 		}
 		else if (i_integer_q(a)) {
 			// b is the rational
-			return scheme_exact_rational(rational_sub(integer_to_rational(*a.data.exact_integer_val), *b.data.exact_rational_val));
+			scheme_rational_t q_a = integer_to_rational(*a.data.exact_integer_val);
+			scheme_number_t res = scheme_exact_rational(rational_sub(q_a, *b.data.exact_rational_val));
+			rational_release(q_a);
+			return res;
 		}
 		else if (i_integer_q(b)) {
 			// a is the rational
-			return scheme_exact_rational(rational_sub(integer_to_rational(*b.data.exact_integer_val), *a.data.exact_rational_val));
+			scheme_rational_t q_b = integer_to_rational(*b.data.exact_integer_val);
+			scheme_number_t res = scheme_exact_rational(rational_sub(*a.data.exact_rational_val, q_b));
+			rational_release(q_b);
+			return res;
 		}
 		else {
 			// both are rational
@@ -448,12 +525,22 @@ scheme_number_t i_sub(scheme_number_t a, scheme_number_t b) {
 			cnv_exact = real_to_rational(*a.data.inexact_real_val);
 			if (i_integer_q(b)) {
 				// b exact integer
-				return scheme_inexact_real(rational_to_real(rational_sub(cnv_exact, integer_to_rational(*b.data.exact_integer_val))));
+				scheme_rational_t q_b = integer_to_rational(*b.data.exact_integer_val);
+				scheme_rational_t sub = rational_sub(cnv_exact, q_b);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(sub));
+				rational_release(q_b);
+				rational_release(sub);
+				rational_release(cnv_exact);
+				return res;
 			}
 			else
 			{
 				// b exact rational
-				return scheme_inexact_real(rational_to_real(rational_sub(cnv_exact, *b.data.exact_rational_val)));
+				scheme_rational_t sub = rational_sub(cnv_exact, *b.data.exact_rational_val);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(sub));
+				rational_release(sub);
+				rational_release(cnv_exact);
+				return res;
 			}
 		}
 		else {
@@ -461,12 +548,22 @@ scheme_number_t i_sub(scheme_number_t a, scheme_number_t b) {
 			cnv_exact = real_to_rational(*b.data.inexact_real_val);
 			if (i_integer_q(a)) {
 				// a exact integer
-				return scheme_inexact_real(rational_to_real(rational_sub(cnv_exact, integer_to_rational(*a.data.exact_integer_val))));
+				scheme_rational_t q_a = integer_to_rational(*a.data.exact_integer_val);
+				scheme_rational_t sub = rational_sub(q_a, cnv_exact);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(sub));
+				rational_release(q_a);
+				rational_release(sub);
+				rational_release(cnv_exact);
+				return res;
 			}
 			else
 			{
 				// a exact rational
-				return scheme_inexact_real(rational_to_real(rational_sub(cnv_exact, *a.data.exact_rational_val)));
+				scheme_rational_t sub = rational_sub(*a.data.exact_rational_val, cnv_exact);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(sub));
+				rational_release(sub);
+				rational_release(cnv_exact);
+				return res;
 			}
 		}
 	}
@@ -548,11 +645,17 @@ scheme_number_t i_div(scheme_number_t a, scheme_number_t b) {
 		}
 		else if (i_integer_q(a)) {
 			// b is the rational
-			return scheme_exact_rational(rational_div(integer_to_rational(*a.data.exact_integer_val), *b.data.exact_rational_val));
+			scheme_rational_t q_a = integer_to_rational(*a.data.exact_integer_val);
+			scheme_number_t res = scheme_exact_rational(rational_div(q_a, *b.data.exact_rational_val));
+			rational_release(q_a);
+			return res;
 		}
 		else if (i_integer_q(b)) {
 			// a is the rational
-			return scheme_exact_rational(rational_div(integer_to_rational(*b.data.exact_integer_val), *a.data.exact_rational_val));
+			scheme_rational_t q_b = integer_to_rational(*b.data.exact_integer_val);
+			scheme_number_t res = scheme_exact_rational(rational_div(*a.data.exact_rational_val, q_b));
+			rational_release(q_b);
+			return res;
 		}
 		else {
 			// both are rational
@@ -567,12 +670,22 @@ scheme_number_t i_div(scheme_number_t a, scheme_number_t b) {
 			cnv_exact = real_to_rational(*a.data.inexact_real_val);
 			if (i_integer_q(b)) {
 				// b exact integer
-				return scheme_inexact_real(rational_to_real(rational_div(cnv_exact, integer_to_rational(*b.data.exact_integer_val))));
+				scheme_rational_t q_b = integer_to_rational(*b.data.exact_integer_val);
+				scheme_rational_t quot = rational_div(cnv_exact, q_b);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(quot));
+				rational_release(q_b);
+				rational_release(quot);
+				rational_release(cnv_exact);
+				return res;
 			}
 			else
 			{
 				// b exact rational
-				return scheme_inexact_real(rational_to_real(rational_div(cnv_exact, *b.data.exact_rational_val)));
+				scheme_rational_t quot = rational_div(cnv_exact, *b.data.exact_rational_val);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(quot));
+				rational_release(quot);
+				rational_release(cnv_exact);
+				return res;
 			}
 		}
 		else {
@@ -580,12 +693,22 @@ scheme_number_t i_div(scheme_number_t a, scheme_number_t b) {
 			cnv_exact = real_to_rational(*b.data.inexact_real_val);
 			if (i_integer_q(a)) {
 				// a exact integer
-				return scheme_inexact_real(rational_to_real(rational_div(cnv_exact, integer_to_rational(*a.data.exact_integer_val))));
+				scheme_rational_t q_a = integer_to_rational(*a.data.exact_integer_val);
+				scheme_rational_t quot = rational_div(q_a, cnv_exact);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(quot));
+				rational_release(q_a);
+				rational_release(quot);
+				rational_release(cnv_exact);
+				return res;
 			}
 			else
 			{
 				// a exact rational
-				return scheme_inexact_real(rational_to_real(rational_div(cnv_exact, *a.data.exact_rational_val)));
+				scheme_rational_t quot = rational_div(*a.data.exact_rational_val, cnv_exact);
+				scheme_number_t res = scheme_inexact_real(rational_to_real(quot));
+				rational_release(quot);
+				rational_release(cnv_exact);
+				return res;
 			}
 		}
 	}

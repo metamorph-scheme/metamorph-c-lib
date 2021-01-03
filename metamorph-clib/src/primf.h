@@ -201,6 +201,8 @@ dyntype_t exact_q(dyntype_t z);
 
 // this API should also not differentiate between inexact or exact variants
 
+// Metamorph Number API
+
 scheme_integer_t integer_add(scheme_integer_t a, scheme_integer_t b);
 scheme_integer_t integer_sub(scheme_integer_t a, scheme_integer_t b);
 scheme_integer_t integer_mul(scheme_integer_t a, scheme_integer_t b);
@@ -266,6 +268,8 @@ scheme_rational_t integer_to_rational(scheme_integer_t n);
 
 void rational_release(scheme_rational_t x);
 scheme_rational_t rational_copy(scheme_rational_t obj);
+
+// End Metamorph Number API
 
 /*
 (define quotient truncate-quotient)
