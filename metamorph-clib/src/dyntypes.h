@@ -20,12 +20,13 @@
 #define SCHEME_TYPE_EOF_OBJECT 10
 #define SCHEME_TYPE_PORT 11
 #define SCHEME_TYPE_UNSPECIFIED 12
+#define SCHEME_TYPE_CONTINUATION 13
 
-#define SCHEME_NUMERICAL_TYPE_EXACT_INTEGER 13
-#define SCHEME_NUMERICAL_TYPE_INEXACT_INTEGER 14
-#define SCHEME_NUMERICAL_TYPE_EXACT_RATIONAL 15
-#define SCHEME_NUMERICAL_TYPE_INEXACT_RATIONAL 16
-#define SCHEME_NUMERICAL_TYPE_INEXACT_REAL 17
+#define SCHEME_NUMERICAL_TYPE_EXACT_INTEGER 0
+#define SCHEME_NUMERICAL_TYPE_INEXACT_INTEGER 1
+#define SCHEME_NUMERICAL_TYPE_EXACT_RATIONAL 2
+#define SCHEME_NUMERICAL_TYPE_INEXACT_RATIONAL 3
+#define SCHEME_NUMERICAL_TYPE_INEXACT_REAL 4
 
 #define SCHEME_RATIONAL_B_POS 1
 #define SCHEME_RATIONAL_B_NEG 2
@@ -59,7 +60,14 @@ typedef bool_t scheme_boolean_t;
 typedef char* scheme_string_t;
 
 typedef struct {
+    int continuation_id;
+    struct activation_struct_t* activation;
+} scheme_continuation_t;
+
+typedef struct {
   int function_id;
+  int formal_parameters;
+  int variadic;
   struct activation_struct_t* activation;
 } scheme_procedure_t;
 
@@ -120,6 +128,7 @@ typedef struct dyntype_t_struct {
     scheme_string_t* string_val;
     scheme_procedure_t* procedure_val;
     struct scheme_pair_struct_t* pair_val;
+    scheme_continuation_t* continuation_val;
     scheme_number_t* number_val;
   } data;
 } dyntype_t;
@@ -211,7 +220,14 @@ typedef struct scheme_pair_struct_t {
   if (PARAM.type == SCHEME_TYPE_PROCEDURE) { \
     c_##PARAM = *PARAM.data.procedure_val;\
   } else {\
-    SET_TYPE_EXCEPTION(SCHEME_TYPE_STRING, PARAM.type, POS);\
+    SET_TYPE_EXCEPTION(SCHEME_TYPE_PROCEDURE, PARAM.type, POS);\
+  }
+
+#define REQUIRE_SCHEME_CONTINUATION(PARAM, POS) scheme_continuation_t c_##PARAM;\
+  if (PARAM.type == SCHEME_TYPE_CONTINUATION) { \
+    c_##PARAM = *PARAM.data.continuation_val;\
+  } else {\
+    SET_TYPE_EXCEPTION(SCHEME_TYPE_CONTINUATION, PARAM.type, POS);\
   }
 
 // Value constructors
@@ -225,6 +241,7 @@ dyntype_t scheme_literal_pair(scheme_pair_t obj);
 dyntype_t scheme_new_symbol(scheme_symbol_t obj);
 dyntype_t scheme_literal_symbol(scheme_symbol_t obj);
 dyntype_t scheme_literal_procedure(scheme_procedure_t obj);
+dyntype_t scheme_literal_continuation(scheme_continuation_t obj);
 dyntype_t scheme_new_number(scheme_number_t obj);
 dyntype_t scheme_literal_number(scheme_number_t obj);
 

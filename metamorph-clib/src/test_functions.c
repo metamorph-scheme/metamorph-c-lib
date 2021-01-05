@@ -6,56 +6,60 @@
 #include "functions.h"
 #include "dyntypes.h"
 #include "lambda.h"
+#include "continuation.h"
 #include "common.h"
 
-#ifdef _TEST_PRIMF
-#else
+#ifdef _TEST_FUNCTIONS
 struct X{
    int x;
    int y;
    char str[100];
 };
 
-START(3)           
+START(7)           
    clock_t c0 = clock();
    clock_t c1;
 
-   GLOBAL_BOUND(0) = LAMBDA(90);
-   GLOBAL_BOUND(1) = LAMBDA(89);
-   GLOBAL_BOUND(2) = LAMBDA(70);
-   
+   SET_GLOBAL_BOUND_LITERAL(0, LAMBDA(90, 2))
+   SET_GLOBAL_BOUND_LITERAL(1, LAMBDA(89,1))
+   SET_GLOBAL_BOUND_LITERAL(2, LAMBDA(70,1))
+   SET_GLOBAL_BOUND_LITERAL(3, LAMBDA(456,1))
+   SET_GLOBAL_BOUND_LITERAL(4, scheme_new_boolean(3))
+   SET_GLOBAL_BOUND_LITERAL(5, LAMBDA(864,1))
+   SET_GLOBAL_BOUND_LITERAL(6, LAMBDA_VARIADIC(54,1))
 
-   CALL(2)
-       PARAMETER_LITERAL(scheme_new_boolean(5))
-       PARAMETER_LITERAL(scheme_new_boolean(5))
-       APPLICATE(GLOBAL_BOUND(2), 345)
+    CALL(1)
+        PARAMETER_LITERAL(scheme_new_boolean(9000000))
+        APPLICATE(GLOBAL_BOUND(3), 9683)
 
-   CALL(1)
-       PARAMETER_LITERAL(scheme_new_boolean(5));
-       APPLICATE(GLOBAL_BOUND(1), 3);
+    if (*return_value.data.boolean_val == 10) {
+        CALL(1)
+            PARAMETER_LITERAL(scheme_new_boolean(54))
+            APPLICATE(GLOBAL_BOUND(4),803423)
+    }
 
-    CALL(2)
-        PARAMETER_LITERAL(scheme_new_boolean(100))
-        PARAMETER_LITERAL(scheme_new_boolean(10))
-        APPLICATE(GLOBAL_BOUND(0), 2)
+   //CALL(4)
+   //    PARAMETER_LITERAL(scheme_new_boolean(1))
+   //    PARAMETER_LITERAL(scheme_new_boolean(2))
+   //    PARAMETER_LITERAL(scheme_new_boolean(3))
+   //    PARAMETER_LITERAL(scheme_new_boolean(4))
+   //    APPLICATE(GLOBAL_BOUND(6), 93452)
 
-   CALL(1)
-       PARAMETER_LITERAL(scheme_new_boolean(5))
-       APPLICATE(GLOBAL_BOUND(1), 98)
+    SET_GLOBAL_BOUND_LITERAL(4, scheme_new_boolean(3))
+    c1 = clock();
+    double runtime_diff_ms = (c1 - c0) * 1000. / CLOCKS_PER_SEC;
+    printf("%f \n", runtime_diff_ms);
+    printf("%d \n", *return_value.data.boolean_val);
+    EXIT
 
+FUNCTION(54)
+    RETURN(BOUND(0,1))
 
-
-   c1 = clock();
-   double runtime_diff_ms = (c1 - c0) * 1000. / CLOCKS_PER_SEC;
-   printf("%f \n", runtime_diff_ms);
-   printf("%d \n", *return_value.data.boolean_val);
-   EXIT
-
- FUNCTION(70)
+FUNCTION(70)
     SET_BOUND(0,1, BOUND(0, 0));
     CALL(1)
        PARAMETER_LITERAL(scheme_new_boolean(5))
-       APPLICATE_LITERAL(LAMBDA(89),683)
+       APPLICATE_LITERAL(LAMBDA(89,1),683)
     RETURN_LITERAL(scheme_new_boolean(3))
 
 FUNCTION(89)
@@ -86,6 +90,60 @@ FUNCTION(90)
       }
    }
    RETURN_LITERAL(scheme_new_boolean(9));
-END
 
+
+/*
+    (define (f x) (if (= (- x 1) 0) 0 (f (- x 1))))
+*/
+FUNCTION(456)
+    PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
+    PUSH_LITERAL(scheme_new_boolean(*(POP.data.boolean_val) == 5))
+    POP_FORCE_GC
+    if (*(POP.data.boolean_val)) {
+        POP_FORCE_GC
+        CALL(1)
+            PARAMETER_LITERAL(CONTINUATION(9508))
+            APPLICATE_LITERAL(LAMBDA(4869,1), 9508)
+        printf("%d \n", *return_value.data.boolean_val);
+        RETURN(return_value);
+
+    }
+    else {
+        POP_FORCE_GC
+        PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
+        CALL(1)
+            PARAMETER_LITERAL(POP)
+            TAIL_APPLICATE(GLOBAL_BOUND(3))
+        RETURN(return_value)
+    }
+
+
+FUNCTION(4869)
+    SET_GLOBAL_BOUND(4, BOUND(0, 0))
+    //CONTINUATION_RESULT_LITERAL(scheme_new_boolean(99))
+    //APPLICATE_CONTINUATION(BOUND(0,0))
+    RETURN_LITERAL(scheme_new_boolean(10))
+
+FUNCTION(8984)
+    RETURN_LITERAL(scheme_new_boolean(5))
+
+FUNCTION(864)
+    PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
+    PUSH_LITERAL(scheme_new_boolean(*(POP.data.boolean_val) == 5))
+    POP_FORCE_GC
+    if (*(POP.data.boolean_val)) {
+        POP_FORCE_GC
+        RETURN_LITERAL(scheme_new_boolean(0));
+
+    }
+    else {
+        POP_FORCE_GC
+        PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
+        CALL(1)
+            PARAMETER_LITERAL(POP)
+            TAIL_APPLICATE(GLOBAL_BOUND(5))
+        RETURN(return_value)
+    }
+    
+END
 #endif

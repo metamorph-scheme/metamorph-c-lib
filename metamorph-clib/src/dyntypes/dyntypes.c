@@ -4,6 +4,7 @@
 #include "dyntypes_internal.h"
 #include "../functions.h"
 #include "../lambda.h"
+#include "../continuation.h"
 #include "../primf.h"
 #include <malloc.h>
 #include "../tommath/tommath.h"
@@ -14,6 +15,7 @@ OBJ_CREATION_FUNCS(symbol, SCHEME_TYPE_SYMBOL)
 OBJ_CREATION_FUNCS(string, SCHEME_TYPE_STRING)
 OBJ_CREATION_FUNCS(pair, SCHEME_TYPE_PAIR)
 OBJ_CREATION_FUNCS(procedure, SCHEME_TYPE_PROCEDURE)
+OBJ_CREATION_FUNCS(continuation, SCHEME_TYPE_CONTINUATION)
 OBJ_CREATION_FUNCS(number, SCHEME_TYPE_NUMBER)
 
 scheme_number_t scheme_exact_integer(scheme_integer_t obj) {
@@ -101,6 +103,13 @@ void release_dyntype(dyntype_t dyntype){
             RELEASE(scheme_symbol_t, dyntype.data.symbol_val)
             break;
         }
+        case(SCHEME_TYPE_CONTINUATION): {
+            scheme_continuation_t cont;
+            cont = *dyntype.data.continuation_val;
+            release_continuation(cont);
+            RELEASE(scheme_continuation_t, dyntype.data.continuation_val)
+            break;
+        }
         case(SCHEME_TYPE_NUMBER): {
             scheme_number_t number;
             number = *dyntype.data.number_val;
@@ -120,6 +129,11 @@ dyntype_t copy_dyntype(dyntype_t dyntype) {
         scheme_procedure_t procedure;
         procedure = *dyntype.data.procedure_val;
         return copy_procedure(dyntype);
+    }
+    case(SCHEME_TYPE_CONTINUATION): {
+        scheme_continuation_t cont;
+        cont = *dyntype.data.continuation_val;
+        return copy_continuation(dyntype);
     }
     case(SCHEME_TYPE_BOOLEAN): {
         scheme_boolean_t boolean;
@@ -152,14 +166,21 @@ dyntype_t copy_dyntype(dyntype_t dyntype) {
     }
     default: break;
     }
+
+    //Assume not mentioned dyntypes are valuetypes
+    return dyntype;
 }
 
-int count_references_dyntype(dyntype_t dyntype, activation_t* activation) {
+int count_references_dyntype(dyntype_t dyntype, struct activation_struct_t* activation) {
     switch (dyntype.type)
     {
     case(SCHEME_TYPE_PROCEDURE): {
         scheme_procedure_t procedure = *dyntype.data.procedure_val;
         return count_references_procedure(procedure,activation);
+    }
+    case(SCHEME_TYPE_CONTINUATION): {
+        scheme_continuation_t cont = *dyntype.data.continuation_val;
+        return count_references_continuation(cont,activation);
     }
     default:
         return 0;
