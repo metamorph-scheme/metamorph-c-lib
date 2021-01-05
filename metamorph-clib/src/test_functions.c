@@ -9,7 +9,7 @@
 #include "continuation.h"
 #include "common.h"
 
-#ifdef _TEST_FUNCTIONS
+#ifndef _TEST_PRIMF
 struct X{
    int x;
    int y;

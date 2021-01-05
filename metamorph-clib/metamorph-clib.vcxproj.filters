@@ -52,6 +52,7 @@
     </ClInclude>
     <ClInclude Include="src\continuation.h">
       <Filter>Header Files\Public</Filter>
+    </ClInclude>
     <ClInclude Include="src\tommath\tommath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
