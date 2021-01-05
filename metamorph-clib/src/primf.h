@@ -4,6 +4,7 @@
 #define ELLIPSIS_PARAM(NAME) dyntype_t* NAME, int len
 #define NONSTANDARD
 #define STANDARD(NAME)
+#define CATCH_MP_ERROR(EXPR) if((EXPR) != MP_OKAY) { SET_TOMMATH_NUMBER_EXCEPTION } 
 
 // Symbols
 
@@ -178,5 +179,105 @@ dyntype_t list_set(dyntype_t list, int k, dyntype_t obj);
 
 // list-copy
 dyntype_t list_copy(dyntype_t list);
+
+
+dyntype_t number_q(dyntype_t obj);
+
+dyntype_t complex_q(dyntype_t obj);
+dyntype_t real_q(dyntype_t obj);
+dyntype_t rational_q(dyntype_t obj);
+dyntype_t integer_q(dyntype_t obj);
+
+dyntype_t inexact_q(dyntype_t z);
+dyntype_t exact_q(dyntype_t z);
+
+/*
+(define exact-integer?
+    (lambda (z) (and (integer? z) (exact? z))))
+*/
+
+// the following internal number operations only build an API for usage by the standard-library functions in numbers.c
+// functions in numbers.c should only use these internal functions and no tommathlib functions or low-level struct initialization at all.
+
+// this API should also not differentiate between inexact or exact variants
+
+// Metamorph Number API
+
+scheme_integer_t integer_add(scheme_integer_t a, scheme_integer_t b);
+scheme_integer_t integer_sub(scheme_integer_t a, scheme_integer_t b);
+scheme_integer_t integer_mul(scheme_integer_t a, scheme_integer_t b);
+scheme_integer_t integer_truncate_div(scheme_integer_t a, scheme_integer_t b);
+scheme_integer_t integer_truncate_remainder(scheme_integer_t a, scheme_integer_t b);
+scheme_integer_t integer_truncate_quotient(scheme_integer_t a, scheme_integer_t b);
+
+scheme_integer_t integer_lcm(scheme_integer_t* n, size_t len);
+scheme_integer_t integer_lcm(scheme_integer_t* n, size_t len);
+
+scheme_integer_t integer_neg(scheme_integer_t a);
+scheme_integer_t integer_create(char* bytes, size_t len);
+
+scheme_ord_t integer_cmp(scheme_integer_t a, scheme_integer_t b);
+scheme_boolean_t integer_eq(scheme_integer_t a, scheme_integer_t b);
+scheme_boolean_t integer_lt(scheme_integer_t a, scheme_integer_t b);
+scheme_boolean_t integer_gt(scheme_integer_t a, scheme_integer_t b);
+scheme_boolean_t integer_gte(scheme_integer_t a, scheme_integer_t b);
+scheme_boolean_t integer_lte(scheme_integer_t a, scheme_integer_t b);
+
+void integer_release(scheme_integer_t);
+scheme_integer_t integer_copy(scheme_integer_t obj);
+
+scheme_real_t real_add(scheme_real_t a, scheme_real_t b);
+scheme_real_t real_sub(scheme_real_t a, scheme_real_t b);
+scheme_real_t real_mul(scheme_real_t a, scheme_real_t b);
+scheme_real_t real_div(scheme_real_t a, scheme_real_t b);
+scheme_real_t real_neg(scheme_real_t a);
+scheme_rational_t real_to_rational(scheme_real_t a);
+scheme_real_t rational_to_real(scheme_rational_t a);
+scheme_real_t real_create(double fp);
+
+scheme_ord_t real_cmp(scheme_real_t a, scheme_real_t b);
+scheme_boolean_t real_eq(scheme_real_t a, scheme_real_t b);
+scheme_boolean_t real_lt(scheme_real_t a, scheme_real_t b);
+scheme_boolean_t real_lte(scheme_real_t a, scheme_real_t b);
+scheme_boolean_t real_gt(scheme_real_t a, scheme_real_t b);
+scheme_boolean_t real_gte(scheme_real_t a, scheme_real_t b);
+
+void rational_min(scheme_rational_t * q);
+scheme_rational_sign_t rational_sign(scheme_rational_t a);
+scheme_boolean_t rational_sign_negative(scheme_rational_sign_t sign);
+scheme_rational_t rational_add(scheme_rational_t a, scheme_rational_t b);
+scheme_rational_t rational_sub(scheme_rational_t a, scheme_rational_t b);
+scheme_rational_t rational_mul(scheme_rational_t a, scheme_rational_t b);
+scheme_rational_t rational_div(scheme_rational_t a, scheme_rational_t b);
+scheme_rational_t rational_neg(scheme_rational_t a);
+
+scheme_rational_t rational_create(scheme_integer_t a, scheme_integer_t b);
+scheme_rational_t rational_create_raw(char* a_bytes, size_t alen, char* b_bytes, size_t blen);
+
+scheme_integer_t rational_numerator(scheme_rational_t x);
+scheme_integer_t rational_denominator(scheme_rational_t x);
+
+scheme_ord_t rational_cmp(scheme_rational_t a, scheme_rational_t b);
+scheme_boolean_t rational_eq(scheme_rational_t a, scheme_rational_t b);
+scheme_boolean_t rational_lt(scheme_rational_t a, scheme_rational_t b);
+scheme_boolean_t rational_lte(scheme_rational_t a, scheme_rational_t b);
+scheme_boolean_t rational_gt(scheme_rational_t a, scheme_rational_t b);
+scheme_boolean_t rational_gte(scheme_rational_t a, scheme_rational_t b);
+
+scheme_rational_t integer_to_rational(scheme_integer_t n);
+
+void rational_release(scheme_rational_t x);
+scheme_rational_t rational_copy(scheme_rational_t obj);
+
+// End Metamorph Number API
+
+/*
+(define quotient truncate-quotient)
+(define remainder truncate-remainder)
+(define modulo floor-remainder)
+*/
+
+void release_number(scheme_number_t number);
+dyntype_t copy_number(scheme_number_t number);
 
 #endif

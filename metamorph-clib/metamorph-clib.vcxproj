@@ -176,8 +176,13 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_TEST_PRIMF;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MinimalRebuild>true</MinimalRebuild>
+      <CompileAs>CompileAsC</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <AdditionalOptions>/wd4146 /wd4127 /wd4668 /wd4710 /wd4711 /wd4820 /wd5045 /D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_DEPRECATE /D__STDC_WANT_SECURE_LIB__=1 /D_CRT_HAS_CXX17=0</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -271,6 +276,11 @@
     <ClInclude Include="src\lambda.h" />
     <ClInclude Include="src\primf.h" />
     <ClInclude Include="src\primf\primf_internal.h" />
+    <ClInclude Include="src\tommath\tommath.h" />
+    <ClInclude Include="src\tommath\tommath_class.h" />
+    <ClInclude Include="src\tommath\tommath_cutoffs.h" />
+    <ClInclude Include="src\tommath\tommath_private.h" />
+    <ClInclude Include="src\tommath\tommath_superclass.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\cache\cache.c" />
@@ -280,10 +290,170 @@
     <ClCompile Include="src\primf\continuation.c" />
     <ClCompile Include="src\primf\lambda.c" />
     <ClCompile Include="src\primf\numbers.c" />
+    <ClCompile Include="src\primf\numbers_integer.c" />
+    <ClCompile Include="src\primf\numbers_rational.c" />
+    <ClCompile Include="src\primf\numbers_real.c" />
     <ClCompile Include="src\primf\pairs.c" />
     <ClCompile Include="src\primf\symbols.c" />
     <ClCompile Include="src\primf-test\test_primf.c" />
     <ClCompile Include="src\test_functions.c" />
+    <ClCompile Include="src\tommath\bn_cutoffs.c" />
+    <ClCompile Include="src\tommath\bn_deprecated.c" />
+    <ClCompile Include="src\tommath\bn_mp_2expt.c" />
+    <ClCompile Include="src\tommath\bn_mp_abs.c" />
+    <ClCompile Include="src\tommath\bn_mp_add.c" />
+    <ClCompile Include="src\tommath\bn_mp_addmod.c" />
+    <ClCompile Include="src\tommath\bn_mp_add_d.c" />
+    <ClCompile Include="src\tommath\bn_mp_and.c" />
+    <ClCompile Include="src\tommath\bn_mp_clamp.c" />
+    <ClCompile Include="src\tommath\bn_mp_clear.c" />
+    <ClCompile Include="src\tommath\bn_mp_clear_multi.c" />
+    <ClCompile Include="src\tommath\bn_mp_cmp.c" />
+    <ClCompile Include="src\tommath\bn_mp_cmp_d.c" />
+    <ClCompile Include="src\tommath\bn_mp_cmp_mag.c" />
+    <ClCompile Include="src\tommath\bn_mp_cnt_lsb.c" />
+    <ClCompile Include="src\tommath\bn_mp_complement.c" />
+    <ClCompile Include="src\tommath\bn_mp_copy.c" />
+    <ClCompile Include="src\tommath\bn_mp_count_bits.c" />
+    <ClCompile Include="src\tommath\bn_mp_decr.c" />
+    <ClCompile Include="src\tommath\bn_mp_div.c" />
+    <ClCompile Include="src\tommath\bn_mp_div_2.c" />
+    <ClCompile Include="src\tommath\bn_mp_div_2d.c" />
+    <ClCompile Include="src\tommath\bn_mp_div_3.c" />
+    <ClCompile Include="src\tommath\bn_mp_div_d.c" />
+    <ClCompile Include="src\tommath\bn_mp_dr_is_modulus.c" />
+    <ClCompile Include="src\tommath\bn_mp_dr_reduce.c" />
+    <ClCompile Include="src\tommath\bn_mp_dr_setup.c" />
+    <ClCompile Include="src\tommath\bn_mp_error_to_string.c" />
+    <ClCompile Include="src\tommath\bn_mp_exch.c" />
+    <ClCompile Include="src\tommath\bn_mp_exptmod.c" />
+    <ClCompile Include="src\tommath\bn_mp_expt_u32.c" />
+    <ClCompile Include="src\tommath\bn_mp_exteuclid.c" />
+    <ClCompile Include="src\tommath\bn_mp_fread.c" />
+    <ClCompile Include="src\tommath\bn_mp_from_sbin.c" />
+    <ClCompile Include="src\tommath\bn_mp_from_ubin.c" />
+    <ClCompile Include="src\tommath\bn_mp_fwrite.c" />
+    <ClCompile Include="src\tommath\bn_mp_gcd.c" />
+    <ClCompile Include="src\tommath\bn_mp_get_double.c" />
+    <ClCompile Include="src\tommath\bn_mp_get_i32.c" />
+    <ClCompile Include="src\tommath\bn_mp_get_i64.c" />
+    <ClCompile Include="src\tommath\bn_mp_get_l.c" />
+    <ClCompile Include="src\tommath\bn_mp_get_ll.c" />
+    <ClCompile Include="src\tommath\bn_mp_get_mag_u32.c" />
+    <ClCompile Include="src\tommath\bn_mp_get_mag_u64.c" />
+    <ClCompile Include="src\tommath\bn_mp_get_mag_ul.c" />
+    <ClCompile Include="src\tommath\bn_mp_get_mag_ull.c" />
+    <ClCompile Include="src\tommath\bn_mp_grow.c" />
+    <ClCompile Include="src\tommath\bn_mp_incr.c" />
+    <ClCompile Include="src\tommath\bn_mp_init.c" />
+    <ClCompile Include="src\tommath\bn_mp_init_copy.c" />
+    <ClCompile Include="src\tommath\bn_mp_init_i32.c" />
+    <ClCompile Include="src\tommath\bn_mp_init_i64.c" />
+    <ClCompile Include="src\tommath\bn_mp_init_l.c" />
+    <ClCompile Include="src\tommath\bn_mp_init_ll.c" />
+    <ClCompile Include="src\tommath\bn_mp_init_multi.c" />
+    <ClCompile Include="src\tommath\bn_mp_init_set.c" />
+    <ClCompile Include="src\tommath\bn_mp_init_size.c" />
+    <ClCompile Include="src\tommath\bn_mp_init_u32.c" />
+    <ClCompile Include="src\tommath\bn_mp_init_u64.c" />
+    <ClCompile Include="src\tommath\bn_mp_init_ul.c" />
+    <ClCompile Include="src\tommath\bn_mp_init_ull.c" />
+    <ClCompile Include="src\tommath\bn_mp_invmod.c" />
+    <ClCompile Include="src\tommath\bn_mp_iseven.c" />
+    <ClCompile Include="src\tommath\bn_mp_isodd.c" />
+    <ClCompile Include="src\tommath\bn_mp_is_square.c" />
+    <ClCompile Include="src\tommath\bn_mp_kronecker.c" />
+    <ClCompile Include="src\tommath\bn_mp_lcm.c" />
+    <ClCompile Include="src\tommath\bn_mp_log_u32.c" />
+    <ClCompile Include="src\tommath\bn_mp_lshd.c" />
+    <ClCompile Include="src\tommath\bn_mp_mod.c" />
+    <ClCompile Include="src\tommath\bn_mp_mod_2d.c" />
+    <ClCompile Include="src\tommath\bn_mp_mod_d.c" />
+    <ClCompile Include="src\tommath\bn_mp_montgomery_calc_normalization.c" />
+    <ClCompile Include="src\tommath\bn_mp_montgomery_reduce.c" />
+    <ClCompile Include="src\tommath\bn_mp_montgomery_setup.c" />
+    <ClCompile Include="src\tommath\bn_mp_mul.c" />
+    <ClCompile Include="src\tommath\bn_mp_mulmod.c" />
+    <ClCompile Include="src\tommath\bn_mp_mul_2.c" />
+    <ClCompile Include="src\tommath\bn_mp_mul_2d.c" />
+    <ClCompile Include="src\tommath\bn_mp_mul_d.c" />
+    <ClCompile Include="src\tommath\bn_mp_neg.c" />
+    <ClCompile Include="src\tommath\bn_mp_or.c" />
+    <ClCompile Include="src\tommath\bn_mp_pack.c" />
+    <ClCompile Include="src\tommath\bn_mp_pack_count.c" />
+    <ClCompile Include="src\tommath\bn_mp_prime_fermat.c" />
+    <ClCompile Include="src\tommath\bn_mp_prime_frobenius_underwood.c" />
+    <ClCompile Include="src\tommath\bn_mp_prime_is_prime.c" />
+    <ClCompile Include="src\tommath\bn_mp_prime_miller_rabin.c" />
+    <ClCompile Include="src\tommath\bn_mp_prime_next_prime.c" />
+    <ClCompile Include="src\tommath\bn_mp_prime_rabin_miller_trials.c" />
+    <ClCompile Include="src\tommath\bn_mp_prime_rand.c" />
+    <ClCompile Include="src\tommath\bn_mp_prime_strong_lucas_selfridge.c" />
+    <ClCompile Include="src\tommath\bn_mp_radix_size.c" />
+    <ClCompile Include="src\tommath\bn_mp_radix_smap.c" />
+    <ClCompile Include="src\tommath\bn_mp_rand.c" />
+    <ClCompile Include="src\tommath\bn_mp_read_radix.c" />
+    <ClCompile Include="src\tommath\bn_mp_reduce.c" />
+    <ClCompile Include="src\tommath\bn_mp_reduce_2k.c" />
+    <ClCompile Include="src\tommath\bn_mp_reduce_2k_l.c" />
+    <ClCompile Include="src\tommath\bn_mp_reduce_2k_setup.c" />
+    <ClCompile Include="src\tommath\bn_mp_reduce_2k_setup_l.c" />
+    <ClCompile Include="src\tommath\bn_mp_reduce_is_2k.c" />
+    <ClCompile Include="src\tommath\bn_mp_reduce_is_2k_l.c" />
+    <ClCompile Include="src\tommath\bn_mp_reduce_setup.c" />
+    <ClCompile Include="src\tommath\bn_mp_root_u32.c" />
+    <ClCompile Include="src\tommath\bn_mp_rshd.c" />
+    <ClCompile Include="src\tommath\bn_mp_sbin_size.c" />
+    <ClCompile Include="src\tommath\bn_mp_set.c" />
+    <ClCompile Include="src\tommath\bn_mp_set_double.c" />
+    <ClCompile Include="src\tommath\bn_mp_set_i32.c" />
+    <ClCompile Include="src\tommath\bn_mp_set_i64.c" />
+    <ClCompile Include="src\tommath\bn_mp_set_l.c" />
+    <ClCompile Include="src\tommath\bn_mp_set_ll.c" />
+    <ClCompile Include="src\tommath\bn_mp_set_u32.c" />
+    <ClCompile Include="src\tommath\bn_mp_set_u64.c" />
+    <ClCompile Include="src\tommath\bn_mp_set_ul.c" />
+    <ClCompile Include="src\tommath\bn_mp_set_ull.c" />
+    <ClCompile Include="src\tommath\bn_mp_shrink.c" />
+    <ClCompile Include="src\tommath\bn_mp_signed_rsh.c" />
+    <ClCompile Include="src\tommath\bn_mp_sqr.c" />
+    <ClCompile Include="src\tommath\bn_mp_sqrmod.c" />
+    <ClCompile Include="src\tommath\bn_mp_sqrt.c" />
+    <ClCompile Include="src\tommath\bn_mp_sqrtmod_prime.c" />
+    <ClCompile Include="src\tommath\bn_mp_sub.c" />
+    <ClCompile Include="src\tommath\bn_mp_submod.c" />
+    <ClCompile Include="src\tommath\bn_mp_sub_d.c" />
+    <ClCompile Include="src\tommath\bn_mp_to_radix.c" />
+    <ClCompile Include="src\tommath\bn_mp_to_sbin.c" />
+    <ClCompile Include="src\tommath\bn_mp_to_ubin.c" />
+    <ClCompile Include="src\tommath\bn_mp_ubin_size.c" />
+    <ClCompile Include="src\tommath\bn_mp_unpack.c" />
+    <ClCompile Include="src\tommath\bn_mp_xor.c" />
+    <ClCompile Include="src\tommath\bn_mp_zero.c" />
+    <ClCompile Include="src\tommath\bn_prime_tab.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_add.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_balance_mul.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_exptmod.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_exptmod_fast.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_get_bit.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_invmod_fast.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_invmod_slow.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_karatsuba_mul.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_karatsuba_sqr.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_montgomery_reduce_fast.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_mul_digs.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_mul_digs_fast.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_mul_high_digs.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_mul_high_digs_fast.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_prime_is_divisible.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_rand_jenkins.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_rand_platform.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_reverse.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_sqr.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_sqr_fast.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_sub.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_toom_mul.c" />
+    <ClCompile Include="src\tommath\bn_s_mp_toom_sqr.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
