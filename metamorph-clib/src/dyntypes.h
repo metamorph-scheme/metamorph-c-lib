@@ -42,6 +42,8 @@ typedef struct {
 
 typedef struct {
   int function_id;
+  int formal_parameters;
+  int variadic;
   struct activation_struct_t* activation;
 } scheme_procedure_t;
 

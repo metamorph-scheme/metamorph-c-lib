@@ -6,28 +6,14 @@
 dyntype_t* bound(int, int);
 void set_bound(dyntype_t*, dyntype_t);
 void set_bound_literal(dyntype_t*, dyntype_t);
-dyntype_t create_lambda(int);
+dyntype_t create_lambda(int,int,int);
 dyntype_t copy_procedure(dyntype_t);
-void preapplication(dyntype_t, int);
-void preapplication_literal(dyntype_t lambda, int id);
+void applicate_lambda(dyntype_t, int);
 int count_references_procedure(scheme_procedure_t procedure, activation_t* activation);
 void release_procedure(scheme_procedure_t);
 
-#define LAMBDA(FUNCTION_ID)  create_lambda(FUNCTION_ID)
-                   
-#define APPLICATE(LAMBDA, ID)  preapplication(LAMBDA, ID);\
-                    goto table;\
-                    case(ID):;}
-
-#define APPLICATE_LITERAL(LAMBDA, ID) preapplication_literal(LAMBDA, ID);\
-                    goto table;\
-                    case(ID):;}
-
-#define TAIL_APPLICATE(LAMBDA)  preapplication(LAMBDA, -1);\
-                    goto table;}
-
-#define TAIL_APPLICATE_LITERAL(LAMBDA) preapplication_literal(LAMBDA, -1);\
-                    goto table;}
+#define LAMBDA(FUNCTION_ID, FORMAL_PARAMETERS)  create_lambda(FUNCTION_ID, FORMAL_PARAMETERS, 0)
+#define LAMBDA_VARIADIC(FUNCTION_ID, FORMAL_PARAMETERS)  create_lambda(FUNCTION_ID, FORMAL_PARAMETERS, 1)
 
 #define BOUND(PARENT, NUMBER) (*(bound(PARENT, NUMBER)))
 #define GLOBAL_BOUND(NUMBER) (root_activation->formal_parameters[NUMBER])

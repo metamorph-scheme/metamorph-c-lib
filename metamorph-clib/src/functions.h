@@ -44,6 +44,8 @@ void create_activation(int parameters);
 activation_t* copy_activation(activation_t* src);
 int count_references_activation(activation_t* src, activation_t* target);
 void cleanup();
+void applicate(dyntype_t,int);
+void applicate_literal(dyntype_t,int);
 void error(int);
 void discard_computation(activation_t* activation);
 void release_activation(activation_t*);
@@ -53,9 +55,12 @@ void stack_push_literal(activation_t*, dyntype_t);
 dyntype_t stack_pop(activation_t*);
 
 auxillary_stack_t* copy_stack(auxillary_stack_t* src);
+extern int balance;
 
 #define POP_EMPTY_STACK 7
-
+#define INVALID_NUMBER_ARGUMENTS 8
+#define METAMORPH_C_SYNTAX_VIOLATION 9
+#define APPLICATION_OF_NON_PROCEDURE_TYPE 10
 
 
 /*
@@ -75,7 +80,7 @@ void postjump();
 #define END     }}}
 #define EXIT    return;
 
-#define FUNCTION(ID)  CRASH(1)\
+#define FUNCTION(ID)  CRASH(METAMORPH_C_SYNTAX_VIOLATION)\
                     }case(ID):{
 #define ARGUMENT(number)    (current_activation->formal_parameters[number])
 #define RETURN(VALUE)   {\
@@ -96,7 +101,21 @@ void postjump();
 
 #define PARAMETER_LITERAL(VALUE)    bind_literal(i, VALUE);\
                                     i++;
-                                
+
+#define APPLICATE(PROC, ID)  applicate(PROC, ID);\
+                    goto table;\
+                    case(ID):;}
+
+#define APPLICATE_LITERAL(PROC, ID) applicate_literal(PROC, ID);\
+                    goto table;\
+                    case(ID):;}
+
+#define TAIL_APPLICATE(PROC)  applicate(PROC, -1);\
+                    goto table;}
+
+#define TAIL_APPLICATE_LITERAL(PROC) applicate_literal(PROC, -1);\
+                    goto table;}
+
 #define PUSH(dyntype)           stack_push(current_activation, dyntype);
 #define PUSH_LITERAL(dyntype)   stack_push_literal(current_activation, dyntype);
 #define POP                     stack_pop(current_activation)

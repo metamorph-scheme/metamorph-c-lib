@@ -16,25 +16,34 @@ struct X{
    char str[100];
 };
 
-START(6)           
+START(7)           
    clock_t c0 = clock();
    clock_t c1;
 
-   GLOBAL_BOUND(0) = LAMBDA(90);
-   GLOBAL_BOUND(1) = LAMBDA(89);
-   GLOBAL_BOUND(2) = LAMBDA(70);
-   GLOBAL_BOUND(3) = LAMBDA(456);
-   GLOBAL_BOUND(4) = scheme_new_boolean(3);
-   GLOBAL_BOUND(5) = LAMBDA(864);
+   SET_GLOBAL_BOUND_LITERAL(0, LAMBDA(90, 2))
+   SET_GLOBAL_BOUND_LITERAL(1, LAMBDA(89,1))
+   SET_GLOBAL_BOUND_LITERAL(2, LAMBDA(70,1))
+   SET_GLOBAL_BOUND_LITERAL(3, LAMBDA(456,1))
+   SET_GLOBAL_BOUND_LITERAL(4, scheme_new_boolean(3))
+   SET_GLOBAL_BOUND_LITERAL(5, LAMBDA(864,1))
+   SET_GLOBAL_BOUND_LITERAL(6, LAMBDA_VARIADIC(54,1))
 
     CALL(1)
         PARAMETER_LITERAL(scheme_new_boolean(9000000))
         APPLICATE(GLOBAL_BOUND(3), 9683)
 
     if (*return_value.data.boolean_val == 10) {
-        CONTINUATION_RESULT_LITERAL(scheme_new_boolean(54))
-        APPLICATE_CONTINUATION(GLOBAL_BOUND(4))
+        CALL(1)
+            PARAMETER_LITERAL(scheme_new_boolean(54))
+            APPLICATE(GLOBAL_BOUND(4),803423)
     }
+
+   //CALL(4)
+   //    PARAMETER_LITERAL(scheme_new_boolean(1))
+   //    PARAMETER_LITERAL(scheme_new_boolean(2))
+   //    PARAMETER_LITERAL(scheme_new_boolean(3))
+   //    PARAMETER_LITERAL(scheme_new_boolean(4))
+   //    APPLICATE(GLOBAL_BOUND(6), 93452)
 
     SET_GLOBAL_BOUND_LITERAL(4, scheme_new_boolean(3))
     c1 = clock();
@@ -43,11 +52,14 @@ START(6)
     printf("%d \n", *return_value.data.boolean_val);
     EXIT
 
+FUNCTION(54)
+    RETURN(BOUND(0,1))
+
 FUNCTION(70)
     SET_BOUND(0,1, BOUND(0, 0));
     CALL(1)
        PARAMETER_LITERAL(scheme_new_boolean(5))
-       APPLICATE_LITERAL(LAMBDA(89),683)
+       APPLICATE_LITERAL(LAMBDA(89,1),683)
     RETURN_LITERAL(scheme_new_boolean(3))
 
 FUNCTION(89)
@@ -91,7 +103,7 @@ FUNCTION(456)
         POP_FORCE_GC
         CALL(1)
             PARAMETER_LITERAL(CONTINUATION(9508))
-            APPLICATE_LITERAL(LAMBDA(4869), 9508)
+            APPLICATE_LITERAL(LAMBDA(4869,1), 9508)
         printf("%d \n", *return_value.data.boolean_val);
         RETURN(return_value);
 

@@ -1,5 +1,7 @@
 #include "functions_internal.h"
 #include "../functions.h"
+#include "../continuation.h"
+#include "../lambda.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -30,6 +32,10 @@ void initprog(int globals){
 
     root_activation->number_parameters=globals;
     root_activation->formal_parameters=REQUEST_ARRAY(dyntype_t, globals);
+    //Initalize parameters to UNSPECIFIED, that GC can collect them, even if not used
+    int i;
+    for (i = 0; i < root_activation->number_parameters; i++)
+        root_activation->formal_parameters[i] = (dyntype_t){ SCHEME_TYPE_UNSPECIFIED, 0, 0 };
     current_activation=root_activation;
 }
 
@@ -65,6 +71,10 @@ void create_activation(int parameters) {
     temporary_activation->computations = 1;
     temporary_activation->number_parameters = parameters;
     temporary_activation->formal_parameters = REQUEST_ARRAY(dyntype_t, parameters);
+    //Initalize parameters to UNSPECIFIED, so GC can collect them even if not set
+    int i;
+    for (i = 0; i < temporary_activation->number_parameters; i++)
+        temporary_activation->formal_parameters[i] = (dyntype_t){ SCHEME_TYPE_UNSPECIFIED, 0, 0 };
     temporary_activation->stack = NULL;
 }
 
@@ -219,7 +229,31 @@ void cleanup(){
     root_activation->references--;
     release_root_activation(root_activation);
 
-    exit(0);
+    //exit(0);
+}
+
+void applicate(dyntype_t proc, int id)
+{
+    switch (proc.type)
+    {
+    case(SCHEME_TYPE_PROCEDURE): {
+        applicate_lambda(proc, id);
+        break;
+    }
+    case(SCHEME_TYPE_CONTINUATION): {
+        applicate_continuation(proc);
+        break;
+    }
+    default:
+        CRASH(APPLICATION_OF_NON_PROCEDURE_TYPE)
+        break;
+    }
+}
+
+void applicate_literal(dyntype_t proc, int id)
+{
+    applicate(proc, id);
+    release_dyntype(proc);
 }
 
 void error(int code){
@@ -227,6 +261,15 @@ void error(int code){
     {
     case(POP_EMPTY_STACK): 
         printf("Attempted to perfrom a pop operation on an empty stack");
+        break;
+    case(INVALID_NUMBER_ARGUMENTS):
+        printf("Attempted to call function with incorrect number of arguments");
+        break;
+    case(METAMORPH_C_SYNTAX_VIOLATION):
+        printf("Attempted execution of a non wellformed Metamorph C program");
+        break;
+    case(APPLICATION_OF_NON_PROCEDURE_TYPE):
+        printf("Attempted to perfom function application on non procedure type");
         break;
     case(INTERNAL_GLOBAL_EXCEPTION):
         break;

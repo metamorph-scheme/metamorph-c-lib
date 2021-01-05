@@ -101,6 +101,9 @@ dyntype_t copy_dyntype(dyntype_t dyntype) {
     }
     default: break;
     }
+
+    //Assume not mentioned dyntypes are valuetypes
+    return dyntype;
 }
 
 int count_references_dyntype(dyntype_t dyntype, struct activation_struct_t* activation) {
