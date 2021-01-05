@@ -55,8 +55,9 @@ void applicate_lambda(dyntype_t lambda, int id){
             //Wrap up variadic arguments
             dyntype_t* ptr = REQUEST_ARRAY(dyntype_t, c_lambda.formal_parameters + 1);
             int i = 0;
-            for (i = 0; i < c_lambda.formal_parameters; i++)
+            for (i = 0; i < c_lambda.formal_parameters; i++) {
                 ptr[i] = temporary_activation->formal_parameters[i];
+            }
             ptr[i] = list(temporary_activation->formal_parameters + i, temporary_activation->number_parameters - c_lambda.formal_parameters);
             RELEASE_ARRAY(dyntype_t, temporary_activation->number_parameters, temporary_activation->formal_parameters)
             temporary_activation->number_parameters = i;
