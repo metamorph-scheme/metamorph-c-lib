@@ -57,13 +57,9 @@ scheme_integer_t integer_truncate_remainder(scheme_integer_t a, scheme_integer_t
 
 scheme_integer_t integer_truncate_quotient(scheme_integer_t a, scheme_integer_t b) {
 	mp_int c, d;
-	CATCH_MP_ERROR(mp_init_multi(&c, &d, NULL) != MP_OKAY) {
-		SET_TOMMATH_NUMBER_EXCEPTION
-	}
+	CATCH_MP_ERROR(mp_init_multi(&c, &d, NULL));
 
-	CATCH_MP_ERROR(mp_div(&a, &b, &c, &d) != MP_OKAY) {
-		SET_TOMMATH_NUMBER_EXCEPTION
-	}
+	CATCH_MP_ERROR(mp_div(&a, &b, &c, &d));
 
 	return c;
 }

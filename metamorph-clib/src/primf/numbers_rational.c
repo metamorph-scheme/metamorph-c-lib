@@ -103,7 +103,6 @@ scheme_rational_t rational_mul(scheme_rational_t a, scheme_rational_t b) {
 	return res;
 }
 
-// TODO: multiple return values, derive floor division from mp_div result
 scheme_rational_t rational_div(scheme_rational_t a, scheme_rational_t b) {
 	mp_int new_numerator, new_denominator;
 
