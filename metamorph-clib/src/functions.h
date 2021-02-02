@@ -51,6 +51,8 @@ void discard_computation(activation_t* activation);
 void release_activation(activation_t*);
 int count_cycle_references(activation_t* activation);
 void stack_push(activation_t*, dyntype_t);
+void body_enter(int);
+void body_exit();
 void stack_push_literal(activation_t*, dyntype_t);
 dyntype_t stack_pop(activation_t*);
 
@@ -119,6 +121,9 @@ void postjump();
 #define PUSH(dyntype)           stack_push(current_activation, dyntype);
 #define PUSH_LITERAL(dyntype)   stack_push_literal(current_activation, dyntype);
 #define POP                     stack_pop(current_activation)
+
+#define BODY_ENTER(NUMBER_OF_DEFINES)   body_enter(NUMBER_OF_DEFINES);
+#define BODY_EXIT                       body_exit();
 
 //POP produces a literal, only if a manual destruction of said literal is necessary this directive is legal to use
 #define POP_FORCE_GC            release_dyntype(current_activation->last_pop);

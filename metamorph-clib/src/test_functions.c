@@ -19,7 +19,7 @@ struct X{
 START(7)           
    clock_t c0 = clock();
    clock_t c1;
-
+   printf("sdf\n");
    SET_GLOBAL_BOUND_LITERAL(0, LAMBDA(90, 2))
    SET_GLOBAL_BOUND_LITERAL(1, LAMBDA(89,1))
    SET_GLOBAL_BOUND_LITERAL(2, LAMBDA(70,1))

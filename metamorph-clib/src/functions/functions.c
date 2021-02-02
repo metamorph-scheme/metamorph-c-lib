@@ -121,6 +121,29 @@ void bind_literal(int number, dyntype_t src) {
 void stack_push(activation_t* activation, dyntype_t value) {
     stack_push_literal(activation, copy_dyntype(value));
 }
+
+void body_enter(int defines)
+{
+    create_activation(defines);
+    temporary_activation->parent_activation = current_activation;
+    //Not necessary as parent activation will be in current computation
+    temporary_activation->parent_activation->references++;
+    //Dummy previous activation for later release
+    temporary_activation->previous_activation = 1;
+    temporary_activation->stack = current_activation->stack;
+    current_activation = temporary_activation;
+}
+
+void body_exit()
+{
+    temporary_activation = current_activation;
+    current_activation = temporary_activation->parent_activation;
+    temporary_activation->stack = NULL;
+    //body activation no longer part of this computation
+    temporary_activation->computations--;
+    release_activation(temporary_activation);
+}
+
 void stack_push_literal(activation_t* activation, dyntype_t value) {
     auxillary_stack_t* elem = REQUEST(auxillary_stack_t);
     elem->next = activation->stack;
@@ -230,6 +253,7 @@ void cleanup(){
     release_root_activation(root_activation);
 
     //exit(0);
+
 }
 
 void applicate(dyntype_t proc, int id)

@@ -23,6 +23,4 @@ void release_procedure(scheme_procedure_t);
 
 #define SET_BOUND_LITERAL(PARENT, NUMBER, DYNTYPE) set_bound_literal(bound(PARENT, NUMBER), DYNTYPE);
 #define SET_GLOBAL_BOUND_LITERAL(NUMBER, DYNTYPE) set_bound_literal(&root_activation->formal_parameters[NUMBER], DYNTYPE);
-
-
 #endif
