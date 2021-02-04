@@ -5,6 +5,10 @@
 #include "cache.h"
 #include <setjmp.h>
 
+#define ACTIVATION_BASE 0
+#define ACTIVATION_EXTENSION 1
+#define ACTIVATION_ROOT 2
+
 typedef struct auxillary_stack_struct_t {
     dyntype_t value;
     struct auxillary_stack_struct_t* next;
@@ -14,15 +18,16 @@ typedef struct activation_struct_t{
     int return_address;
     //References which can be used to access data directly
     int references;
-    int number_parameters;
     //Count how many activations have the ability to make activation current activation 
     //Basically one called activation and all continuations
     int computations;
     struct activation_struct_t* previous_activation;
     struct activation_struct_t* parent_activation;
+    int number_parameters;
     dyntype_t* formal_parameters;
     dyntype_t last_pop;
     auxillary_stack_t* stack;
+    int activation_type;
 } activation_t;
 
 extern activation_t* current_activation;
@@ -51,8 +56,8 @@ void discard_computation(activation_t* activation);
 void release_activation(activation_t*);
 int count_cycle_references(activation_t* activation);
 void stack_push(activation_t*, dyntype_t);
-void body_enter(int);
-void body_exit();
+void body(int);
+void body_close();
 void stack_push_literal(activation_t*, dyntype_t);
 dyntype_t stack_pop(activation_t*);
 
@@ -122,8 +127,8 @@ void postjump();
 #define PUSH_LITERAL(dyntype)   stack_push_literal(current_activation, dyntype);
 #define POP                     stack_pop(current_activation)
 
-#define BODY_ENTER(NUMBER_OF_DEFINES)   body_enter(NUMBER_OF_DEFINES);
-#define BODY_EXIT                       body_exit();
+#define BODY(NUMBER_OF_DEFINES)   body(NUMBER_OF_DEFINES);
+#define BODY_CLOSE                       body_close();
 
 //POP produces a literal, only if a manual destruction of said literal is necessary this directive is legal to use
 #define POP_FORCE_GC            release_dyntype(current_activation->last_pop);

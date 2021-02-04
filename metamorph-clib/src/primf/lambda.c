@@ -9,7 +9,7 @@ dyntype_t* bound(int parent, int number){
     int i;
     activation_t* activation = current_activation;
     for(i=parent;i!=0;i--)
-        activation = current_activation->parent_activation;
+        activation = activation->parent_activation;
     return (activation->formal_parameters+number);
 }
 
@@ -74,6 +74,14 @@ void applicate_lambda(dyntype_t lambda, int id){
         
     }
     else {
+        //Discard extension activations get to base activation
+        while (current_activation->activation_type == ACTIVATION_EXTENSION) {
+            activation_t* next = current_activation->previous_activation;
+            current_activation->computations--;
+            release_activation(current_activation);
+            current_activation = next;
+        }
+
         temporary_activation->return_address = current_activation->return_address;
         //Previous activation of current activation will be previous activation of temp activation
         //Current activation is still part of the compuatation, therefore no reference needed
@@ -84,8 +92,6 @@ void applicate_lambda(dyntype_t lambda, int id){
         current_activation->computations--;
         //Discard computation would throw away whole computation, instead of excluding one activation from it
         release_activation(current_activation);
-
-
     }
 
     current_activation = temporary_activation;
