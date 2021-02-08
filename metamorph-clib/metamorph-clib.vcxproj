@@ -227,6 +227,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_TEST_FUNCTIONS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/wd4146 /wd4127 /wd4668 /wd4710 /wd4711 /wd4820 /wd5045 /D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_DEPRECATE /D__STDC_WANT_SECURE_LIB__=1 /D_CRT_HAS_CXX17=0 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

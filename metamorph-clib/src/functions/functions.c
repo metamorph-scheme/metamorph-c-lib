@@ -27,6 +27,8 @@ void initprog(int globals){
     root_activation->references=0;
     root_activation->computations = 1;
 
+    root_activation->activation_type = ACTIVATION_ROOT;
+
     //Semantically correct, but additionaly protects from accidental release
     root_activation->previous_activation = NULL;
 
@@ -69,6 +71,7 @@ void create_activation(int parameters) {
     temporary_activation->references = 0;
     //1 as every activation is created as part of the current computation
     temporary_activation->computations = 1;
+    temporary_activation->activation_type = ACTIVATION_BASE;
     temporary_activation->number_parameters = parameters;
     temporary_activation->formal_parameters = REQUEST_ARRAY(dyntype_t, parameters);
     //Initalize parameters to UNSPECIFIED, so GC can collect them even if not set
@@ -89,6 +92,8 @@ activation_t* copy_activation(activation_t* src) {
     
     dest->parent_activation = src->parent_activation;
     dest->parent_activation->references++;
+
+    dest->activation_type = src->activation_type;
 
     //Weak reference to previous activation
     dest->previous_activation = src->previous_activation;
@@ -121,6 +126,43 @@ void bind_literal(int number, dyntype_t src) {
 void stack_push(activation_t* activation, dyntype_t value) {
     stack_push_literal(activation, copy_dyntype(value));
 }
+
+void body(int defines)
+{
+    create_activation(defines);
+    temporary_activation->parent_activation = current_activation;
+    temporary_activation->parent_activation->references++;
+
+    temporary_activation->activation_type = ACTIVATION_EXTENSION;
+
+    //previous activation for later release
+    temporary_activation->previous_activation = current_activation;
+    temporary_activation->return_address = 0;
+    //activation and extension SHARE stack
+    temporary_activation->last_pop = current_activation->last_pop;    
+    temporary_activation->stack = current_activation->stack;
+    current_activation->stack = NULL;
+
+    current_activation = temporary_activation;
+}
+
+void body_close()
+{
+    temporary_activation = current_activation;
+    current_activation = temporary_activation->parent_activation;
+    //synchronize stack
+    current_activation->stack = temporary_activation->stack;
+    current_activation->last_pop = temporary_activation->last_pop;
+    temporary_activation->stack = NULL;
+    //body activation no longer part of this computation
+    temporary_activation->computations--;
+
+    if (temporary_activation->computations)
+        current_activation->computations++;
+
+    release_activation(temporary_activation);
+}
+
 void stack_push_literal(activation_t* activation, dyntype_t value) {
     auxillary_stack_t* elem = REQUEST(auxillary_stack_t);
     elem->next = activation->stack;
@@ -260,7 +302,7 @@ void error(int code){
     switch (code)
     {
     case(POP_EMPTY_STACK): 
-        printf("Attempted to perfrom a pop operation on an empty stack");
+        printf("Attempted to perform a pop operation on an empty stack");
         break;
     case(INVALID_NUMBER_ARGUMENTS):
         printf("Attempted to call function with incorrect number of arguments");

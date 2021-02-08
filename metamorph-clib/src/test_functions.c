@@ -19,7 +19,7 @@ struct X{
 START(7)           
    clock_t c0 = clock();
    clock_t c1;
-
+   printf("start\n");
    SET_GLOBAL_BOUND_LITERAL(0, LAMBDA(90, 2))
    SET_GLOBAL_BOUND_LITERAL(1, LAMBDA(89,1))
    SET_GLOBAL_BOUND_LITERAL(2, LAMBDA(70,1))
@@ -100,20 +100,31 @@ FUNCTION(456)
     PUSH_LITERAL(scheme_new_boolean(*(POP.data.boolean_val) == 5))
     POP_FORCE_GC
     if (*(POP.data.boolean_val)) {
+        BODY(6)
         POP_FORCE_GC
         CALL(1)
             PARAMETER_LITERAL(CONTINUATION(9508))
             APPLICATE_LITERAL(LAMBDA(4869,1), 9508)
         printf("%d \n", *return_value.data.boolean_val);
+        BODY_CLOSE
         RETURN(return_value);
 
     }
     else {
+        BODY(3)
+        BODY(3)
+
         POP_FORCE_GC
-        PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
+        PUSH_LITERAL(scheme_new_boolean(*(BOUND(2, 0).data.boolean_val) - 1))
+
         CALL(1)
             PARAMETER_LITERAL(POP)
             TAIL_APPLICATE(GLOBAL_BOUND(3))
+
+
+        BODY_CLOSE
+        BODY_CLOSE
+
         RETURN(return_value)
     }
 
