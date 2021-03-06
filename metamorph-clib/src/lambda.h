@@ -8,7 +8,7 @@ void set_bound(dyntype_t*, dyntype_t);
 void set_bound_literal(dyntype_t*, dyntype_t);
 dyntype_t create_lambda(int,int,int);
 dyntype_t copy_procedure(dyntype_t);
-void applicate_lambda(dyntype_t, int);
+void applicate_lambda(dyntype_t, int, activation_t*);
 int count_references_procedure(scheme_procedure_t procedure, activation_t* activation);
 void release_procedure(scheme_procedure_t);
 

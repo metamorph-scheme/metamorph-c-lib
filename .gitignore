@@ -338,3 +338,7 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/metamorph-clib/Test-Primf/metamorph-clib.tlog
+/metamorph-clib/Test-Primf/metamorph-clib.exe.recipe
+/metamorph-clib/Test-Primf
+/Test-Primf

@@ -74,6 +74,9 @@
     <ClInclude Include="src\tommath\tommath_superclass.h">
       <Filter>Header Files\Tommath</Filter>
     </ClInclude>
+    <ClInclude Include="src\activations.h">
+      <Filter>Header Files\Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dyntypes\dyntypes.c">
@@ -588,6 +591,9 @@
     </ClCompile>
     <ClCompile Include="src\tommath\bn_s_mp_toom_sqr.c">
       <Filter>Source Files\Tommath</Filter>
+    </ClCompile>
+    <ClCompile Include="src\functions\activations.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

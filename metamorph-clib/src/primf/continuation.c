@@ -1,5 +1,6 @@
 #include "../continuation.h"
 #include "../functions.h"
+#include "../activations.h"
 #include <math.h>
 
 dyntype_t create_continuation(int id)
@@ -51,21 +52,21 @@ dyntype_t copy_continuation(dyntype_t cont_src)
 	return scheme_literal_continuation(cont);
 }
 
-void applicate_continuation(dyntype_t cont)
+void applicate_continuation(dyntype_t cont, activation_t* new_activation)
 {
 	REQUIRE_SCHEME_CONTINUATION(cont, 0);
 
 	//Check number of arguments
-	if (temporary_activation->number_parameters!=1) CRASH(INVALID_NUMBER_ARGUMENTS)
+	if (new_activation->number_parameters!=1) CRASH(INVALID_NUMBER_ARGUMENTS)
 	
 	//Set continuation result
 	release_dyntype(return_value);
-	return_value = temporary_activation->formal_parameters[0];
+	return_value = new_activation->formal_parameters[0];
 
 	//Destroy partially constructed activation
 	balance--;
-	RELEASE_ARRAY(dyntype_t,temporary_activation->number_parameters,temporary_activation->formal_parameters)
-	RELEASE(activation_t,temporary_activation)
+	RELEASE_ARRAY(dyntype_t, new_activation->number_parameters, new_activation->formal_parameters)
+	RELEASE(activation_t, new_activation)
 
 	//activation is now part of the current computation and the computation represented by the continuation
 	//previous activation will be made part of the current computation at RETURN, it is already part of the continuation computation

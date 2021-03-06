@@ -266,6 +266,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\activations.h" />
     <ClInclude Include="src\cache.h" />
     <ClInclude Include="src\cache\cache_internal.h" />
     <ClInclude Include="src\common.h" />
@@ -287,6 +288,7 @@
   <ItemGroup>
     <ClCompile Include="src\cache\cache.c" />
     <ClCompile Include="src\dyntypes\dyntypes.c" />
+    <ClCompile Include="src\functions\activations.c" />
     <ClCompile Include="src\functions\functions.c" />
     <ClCompile Include="src\primf\booleans.c" />
     <ClCompile Include="src\primf\continuation.c" />
