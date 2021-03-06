@@ -39,7 +39,11 @@ START(7)
             PARAMETER_LITERAL(scheme_new_boolean(54))
             APPLICATE(GLOBAL_BOUND(4),803423)
     }
-
+   if (*return_value.data.boolean_val == 54) {
+       CALL(1)
+           PARAMETER_LITERAL(scheme_new_boolean(22))
+           APPLICATE(GLOBAL_BOUND(4), 352345)
+   }
    //CALL(4)
    //    PARAMETER_LITERAL(scheme_new_boolean(1))
    //    PARAMETER_LITERAL(scheme_new_boolean(2))

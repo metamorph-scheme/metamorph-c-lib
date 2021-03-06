@@ -6,10 +6,6 @@
 #include "activations.h"
 #include <setjmp.h>
 
-#define ACTIVATION_BASE 0
-#define ACTIVATION_EXTENSION 1
-#define ACTIVATION_ROOT 2
-
 extern activation_t* current_activation;
 extern activation_t* root_activation;
 extern dyntype_t return_value;
@@ -22,14 +18,13 @@ void prog();
 void initprog(int);
 void prereturn(dyntype_t );
 void prereturn_literal(dyntype_t );
-int count_references_activation(activation_t* src, activation_t* target);
 void cleanup();
 void applicate(int n_params, dyntype_t params[], dyntype_t proc, int id);
 void applicate_literal(int n_params, dyntype_t params[], dyntype_t proc, int id);
 void error(int);
-void discard_computation(activation_t* activation);
-void release_root_activation(activation_t* activation);
-int count_cycle_references(activation_t* activation);
+void body(int);
+void close_body();
+
 extern int balance;
 
 #define POP_EMPTY_STACK 7
@@ -87,8 +82,8 @@ void postjump();
 #define PUSH_LITERAL(dyntype)   stack_push_literal(current_activation, dyntype);
 #define POP                     stack_pop(current_activation)
 
-#define BODY(NUMBER_OF_DEFINES)   body(NUMBER_OF_DEFINES);
-#define BODY_CLOSE                       body_close();
+#define BODY(NUMBER_OF_DEFINES)   add_extension(NUMBER_OF_DEFINES);
+#define BODY_CLOSE                remove_extension();
 
 //POP produces a literal, only if a manual destruction of said literal is necessary this directive is legal to use
 #define POP_FORCE_GC            release_dyntype(current_activation->last_pop);
