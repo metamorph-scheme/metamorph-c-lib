@@ -56,8 +56,11 @@ void prereturn(dyntype_t value){
 }
 
 void prereturn_literal(dyntype_t value) {
+    finalize_call();
+
     release_dyntype(return_value);
     return_value = value;
+
     return_address = current_activation->return_address;
 
     activation_t* returning_activation = current_activation;
@@ -100,10 +103,21 @@ void error(int code){
 
 void body(int defines)
 {
-    current_activation=add_extension(current_activation, defines);
+    activation_t* extension = add_extension(current_activation, defines);
+    current_activation=add_to_current_computation(extension);
 }
 
-void close_body()
+int close_body()
 {
-    current_activation = remove_extension(current_activation);
+    if (!remove_extension(current_activation))
+        return 1;
+    activation_t* extension = current_activation;
+    current_activation = remove_extension(extension);
+    remove_from_current_computation(extension);
+    return 0;
+}
+
+
+void finalize_call() {
+    while (!close_body());
 }

@@ -53,7 +53,7 @@ void applicate_continuation(dyntype_t cont, activation_t* new_activation)
 
 	//activation is now part of the current computation and the computation represented by the continuation
     //previous activation will be made part of the current computation at RETURN, it is already part of the continuation computation
-	current_activation = create_computation(c_cont.activation);;
+	current_activation = create_computation(c_cont.activation);
 }
 
 int count_references_continuation(scheme_continuation_t cont, activation_t* activation)

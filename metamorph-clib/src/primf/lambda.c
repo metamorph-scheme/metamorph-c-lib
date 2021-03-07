@@ -71,8 +71,10 @@ void applicate_lambda(dyntype_t lambda, int id, activation_t* new_activation){
         
     }
     else {
-        new_activation->return_address = current_activation->return_address;
-        //Previous activation of current activation will be previous activation of new activation
+        finalize_call();
+
+        //new activation will replace base activation
+        new_activation->return_address =current_activation->return_address;
         new_activation->previous_activation = current_activation->previous_activation;
 
         //Release current activation for constant memory

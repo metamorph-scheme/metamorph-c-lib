@@ -5,6 +5,7 @@
 #define CHUNK_SIZE 4
 #define INIT_CACHE 4
 #define CACHE_GROW 4
+#define CACHE_OFF
 
 typedef struct {
 	void** pointers;

@@ -23,7 +23,9 @@ void applicate(int n_params, dyntype_t params[], dyntype_t proc, int id);
 void applicate_literal(int n_params, dyntype_t params[], dyntype_t proc, int id);
 void error(int);
 void body(int);
-void close_body();
+int close_body();
+void finalize_call();
+
 
 extern int balance;
 
@@ -82,11 +84,8 @@ void postjump();
 #define PUSH_LITERAL(dyntype)   stack_push_literal(current_activation, dyntype);
 #define POP                     stack_pop(current_activation)
 
-#define BODY(NUMBER_OF_DEFINES)   add_extension(NUMBER_OF_DEFINES);
-#define BODY_CLOSE                remove_extension();
-
-//POP produces a literal, only if a manual destruction of said literal is necessary this directive is legal to use
-#define POP_FORCE_GC            release_dyntype(current_activation->last_pop);
+#define BODY(NUMBER_OF_DEFINES)   body(NUMBER_OF_DEFINES);
+#define BODY_CLOSE                close_body();
 
 //ACHTUNG JUMP allokiert keine Parentactivation kann zu SEGFAULT führen
 /*

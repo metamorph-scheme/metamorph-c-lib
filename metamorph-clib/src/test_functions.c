@@ -9,7 +9,7 @@
 #include "continuation.h"
 #include "common.h"
 #include "activations.h"
-
+#define _TEST_FUNCTIONS
 #ifdef _TEST_FUNCTIONS
 struct X{
    int x;
@@ -31,7 +31,7 @@ START(7)
    SET_GLOBAL_BOUND_LITERAL(6, LAMBDA_VARIADIC(54,1))
 
     CALL(1)
-        PARAMETER_LITERAL(scheme_new_boolean(9000000))
+        PARAMETER_LITERAL(scheme_new_boolean(9000))
         APPLICATE(GLOBAL_BOUND(3), 9683)
 
     if (*return_value.data.boolean_val == 10) {
@@ -54,8 +54,8 @@ START(7)
     SET_GLOBAL_BOUND_LITERAL(4, scheme_new_boolean(3))
     c1 = clock();
     double runtime_diff_ms = (c1 - c0) * 1000. / CLOCKS_PER_SEC;
-    printf("%f \n", runtime_diff_ms);
-    printf("%d \n", *return_value.data.boolean_val);
+    printf("Runtime: %f \n", runtime_diff_ms);
+    printf("Last return value: %d \n", *return_value.data.boolean_val);
     EXIT
 
 FUNCTION(54)
@@ -104,32 +104,36 @@ FUNCTION(90)
 FUNCTION(456)
     PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
     PUSH_LITERAL(scheme_new_boolean(*(POP.data.boolean_val) == 5))
-    POP_FORCE_GC
+    
     if (*(POP.data.boolean_val)) {
-        /*BODY(6)*/
-        POP_FORCE_GC
+        
+        BODY(6)
+        SET_BOUND_LITERAL(0, 0, scheme_new_boolean( 4 ))
+        PUSH(BOUND(0,0))
         CALL_LITERAL(1)
             PARAMETER_LITERAL(CONTINUATION(9508))
             APPLICATE(LAMBDA(4869,1), 9508)
-        printf("%d \n", *return_value.data.boolean_val);
-      /*  BODY_CLOSE*/
+        printf("return value of call/cc: %d \n", *return_value.data.boolean_val);
+        printf("value of internal define: %d \n", *(BOUND(0,0).data.boolean_val));
+        printf("pop stack: %d \n", *(POP.data.boolean_val));
+        PUSH_LITERAL(scheme_new_boolean(3))
+        BODY_CLOSE
         RETURN(return_value);
-
     }
     else {
-        //BODY(3)
-        //BODY(3)
+        
+        BODY(3)
+        BODY(3)
 
-        POP_FORCE_GC
-        PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
+        PUSH_LITERAL(scheme_new_boolean(*(BOUND(2, 0).data.boolean_val) - 1))
 
         CALL(1)
-            PARAMETER_LITERAL(POP)
+            PARAMETER(POP)
             TAIL_APPLICATE(GLOBAL_BOUND(3))
 
 
-        //BODY_CLOSE
-        //BODY_CLOSE
+        BODY_CLOSE
+        BODY_CLOSE
 
         RETURN(return_value)
     }
@@ -147,17 +151,17 @@ FUNCTION(8984)
 FUNCTION(864)
     PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
     PUSH_LITERAL(scheme_new_boolean(*(POP.data.boolean_val) == 5))
-    POP_FORCE_GC
+    
     if (*(POP.data.boolean_val)) {
-        POP_FORCE_GC
+        
         RETURN_LITERAL(scheme_new_boolean(0));
 
     }
     else {
-        POP_FORCE_GC
+        
         PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
         CALL(1)
-            PARAMETER_LITERAL(POP)
+            PARAMETER(POP)
             TAIL_APPLICATE(GLOBAL_BOUND(5))
         RETURN(return_value)
     }

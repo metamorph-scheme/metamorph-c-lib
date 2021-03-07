@@ -6,8 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void gc_activation(activation_t*);
-activation_t* base_activation(activation_t*);
+
 
 activation_t* create_activation(int parameters) {
     balance++;
@@ -33,8 +32,7 @@ activation_t* copy_activation(activation_t* src) {
 
     if (src->activation_type == ACTIVATION_EXTENSION) {
         dest->previous_activation = copy_activation(src->previous_activation);
-        //A extension activation does not capture the base activation, it is a part of it
-        dest->parent_activation = dest->previous_activation;
+        dest->parent_activation = capture_activation(dest->previous_activation);
     }
     else {
         dest->parent_activation = capture_activation(src->parent_activation);
@@ -49,7 +47,7 @@ activation_t* copy_activation(activation_t* src) {
         dest->formal_parameters[i] = copy_dyntype(src->formal_parameters[i]);
     }
     dest->stack = copy_stack(src->stack);
-
+    dest->stack_garbage = NULL;
     return dest;
 }
 
@@ -61,27 +59,26 @@ activation_t* base_activation(activation_t* activation) {
 
 activation_t* capture_activation(activation_t* activation)
 {
-    base_activation(activation)->n_captures++;
+    activation->n_captures++;
     return activation;
 }
 
 void free_activation(activation_t* activation)
 {
-    base_activation(activation)->n_captures--;
-    //Always gc extension activation
+    activation->n_captures--;
+    //GC from top down via parent
     gc_activation(activation);
 }
 
 activation_t* add_to_current_computation(activation_t* activation)
 {
-    base_activation(activation)->n_computations++;
+    activation->n_computations++;
     return activation;
 }
 
 void remove_from_current_computation(activation_t* activation)
 {
-    base_activation(activation)->n_computations--;
-    //Always gc extension activation
+    activation->n_computations--;
     gc_activation(activation);
 }
 
@@ -89,11 +86,10 @@ activation_t* create_computation(activation_t* activation)
 {
     activation_t* head_of_comp=activation;
     while (activation) {
-        activation_t* b_activation = base_activation(activation);
         //Activation is now part of the new computation
-        b_activation->n_computations++;
+        activation->n_computations++;
 
-        activation = b_activation->previous_activation;
+        activation = activation->previous_activation;
     }
     return head_of_comp;
 }
@@ -101,12 +97,9 @@ activation_t* create_computation(activation_t* activation)
 void discard_computation(activation_t* activation)
 {
     while (activation) {
-        activation_t* b_activation = base_activation(activation);
-
         //Activation is no longer part of discarded computation
-        b_activation->n_computations--;
-        activation_t* next = b_activation->previous_activation;
-        //Always release extension activation
+        activation->n_computations--;
+        activation_t* next = activation->previous_activation;
         gc_activation(activation); 
         activation = next;
     }
@@ -114,7 +107,7 @@ void discard_computation(activation_t* activation)
 
 void stack_push_literal(activation_t* activation, dyntype_t value) {
     activation = base_activation(activation);
-    auxillary_stack_t* elem = REQUEST(auxillary_stack_t);
+    dyntype_stack_t* elem = REQUEST(dyntype_stack_t);
     elem->next = activation->stack;
     activation->stack = elem;
     activation->stack->value = value;
@@ -130,18 +123,20 @@ dyntype_t stack_pop(activation_t* activation) {
     if (!activation->stack) {
         CRASH(POP_EMPTY_STACK)
     }
-    dyntype_t value = activation->stack->value;
-    activation->last_pop = value;
-    auxillary_stack_t* tmp = activation->stack;
+    dyntype_stack_t* tmp = activation->stack;
+    dyntype_t value = tmp->value;
     activation->stack = activation->stack->next;
-    RELEASE(auxillary_stack_t, tmp);
+
+    tmp->next = activation->stack_garbage;
+    activation->stack_garbage = tmp;
+
     return value;
 }
 
-auxillary_stack_t* copy_stack(auxillary_stack_t* src) {
+dyntype_stack_t* copy_stack(dyntype_stack_t* src) {
     if (!src)
         return NULL;
-    auxillary_stack_t* dest = REQUEST(auxillary_stack_t);
+    dyntype_stack_t* dest = REQUEST(dyntype_stack_t);
     dest->value = copy_dyntype(src->value);
 
     //Not a tailcall, stack is usually small
@@ -151,37 +146,36 @@ auxillary_stack_t* copy_stack(auxillary_stack_t* src) {
 
 void release_stack(activation_t* activation) {
     while (activation->stack != NULL) {
-        release_dyntype(stack_pop(activation));
+        stack_pop(activation);
+    }
+    while (activation->stack_garbage != NULL) {
+        dyntype_stack_t* tmp = activation->stack_garbage;
+        release_dyntype(activation->stack_garbage->value);
+        activation->stack_garbage = tmp->next;
+        RELEASE(dyntype_stack_t,tmp)
     }
 }
 
 //Does not release previous activation, because previous_activation is a weak reference
 void gc_activation(activation_t* activation) {
-    activation_t* b_activation = base_activation(activation);
     //Never release activation when in computation or in ongoing release 
-    if (b_activation->n_computations || !b_activation->previous_activation)
+    if (activation->n_computations || !activation->previous_activation)
         return;
 
     //Release activation only if all references to it are cycle refernces
-    if (b_activation->n_captures) {
+    if (activation->n_captures) {
         int ref = 0;
-        ref = count_references_activation(activation, b_activation);
-        if (ref < b_activation->n_captures)
+        ref = count_references_activation(activation, activation);
+        if (ref < activation->n_captures)
             return;
     }
 
     //Mark as ongoing release
-    b_activation->previous_activation = NULL;
+    activation->previous_activation = NULL;
     //Save parent activation
-    activation_t* parent_activation = b_activation->parent_activation;
+    activation_t* parent_activation = activation->parent_activation;
 
-    //Release all extension activations
-    activation_t* next=activation;
-    while (next->activation_type == ACTIVATION_EXTENSION) {
-        next = activation->previous_activation;
-        release_activation(activation);
-    }
-    release_activation(b_activation);
+    release_activation(activation);
     //Parent activation is no longer captured
     if(parent_activation)
         free_activation(parent_activation);
@@ -214,21 +208,22 @@ int count_references_activation(activation_t* src, activation_t* target) {
 activation_t* add_extension(activation_t* activation, int defines)
 {
     activation_t* new_extension = create_activation(defines);
-    new_extension->parent_activation = activation;
+    new_extension->parent_activation = capture_activation(activation);
     new_extension->activation_type = ACTIVATION_EXTENSION;
 
-    //previous activation for later release
     new_extension->previous_activation = activation;
     new_extension->return_address = 0;
     new_extension->stack = NULL;
+
     return new_extension;
 }
 
 activation_t* remove_extension(activation_t* activation)
 {
+    if (activation->activation_type == ACTIVATION_BASE)
+        return NULL;
     activation_t* extension = activation;
     activation = extension->parent_activation;
-
-    release_activation(extension);
+    gc_activation(extension);
     return activation;
 }

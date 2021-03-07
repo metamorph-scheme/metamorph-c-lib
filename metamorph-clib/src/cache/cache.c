@@ -2,7 +2,7 @@
 #include "../cache.h"
 #include <stddef.h>
 #include <stdlib.h>
-#define CACHE_OFF
+
 allocator_t glob_alloc[MAX_CHUNKS];
 //DEBUG
 int cbalance = 0;
