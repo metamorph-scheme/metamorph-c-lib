@@ -36,21 +36,21 @@ START(4)
    //SET_GLOBAL_BOUND_LITERAL(5, LAMBDA(864,1))
    //SET_GLOBAL_BOUND_LITERAL(6, LAMBDA_VARIADIC(54,1))
 
-        PUSH_LITERAL(scheme_new_boolean(9000))
-        PUSH(GLOBAL_BOUND(1))
-        APPLICATE(1, 9683)
-
-    if (*return_value.data.boolean_val == 10) {
+    PUSH_LITERAL(scheme_new_boolean(9000000))
+    PUSH(GLOBAL_BOUND(1))
+    APPLICATE(1, 9683)
+    SET_BOUND(0,3)
+    if (*(BOUND(0, 3)).data.boolean_val == 10) {
          PUSH_LITERAL(scheme_new_boolean(54))
          PUSH(GLOBAL_BOUND(2))
          APPLICATE(1, 803423)
     }
-   if (*return_value.data.boolean_val == 54) {
+   if (*(BOUND(0,3)).data.boolean_val == 54) {
         PUSH_LITERAL(scheme_new_boolean(22))
         PUSH(GLOBAL_BOUND(2))
         APPLICATE(1, 352345)
    }
-   if (*return_value.data.boolean_val == 22) {
+   if (*(BOUND(0, 3)).data.boolean_val == 22) {
        PUSH_LITERAL(scheme_new_boolean(33))
        PUSH(GLOBAL_BOUND(2))
        APPLICATE(1, 345345)
@@ -65,7 +65,7 @@ START(4)
     c1 = clock();
     double runtime_diff_ms = (c1 - c0) * 1000. / CLOCKS_PER_SEC;
     printf("Runtime: %f \n", runtime_diff_ms);
-    printf("Last return value: %d \n", *return_value.data.boolean_val);
+    printf("Last return value: %d \n", *(BOUND(0, 3)).data.boolean_val);
     EXIT
 
 FUNCTION(54)
@@ -80,7 +80,7 @@ if (*(ARGUMENT(0).data.boolean_val) == 0) {
    PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
    PUSH(GLOBAL_BOUND(1))
     APPLICATE(1, 55)
-   PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val)* (*return_value.data.boolean_val)))
+   PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val)* (*POP.data.boolean_val)))
    RETURN
 
 
@@ -102,12 +102,13 @@ FUNCTION(456)
         PUSH_LITERAL(CONTINUATION(9508))
         PUSH_LITERAL(LAMBDA(4869,1))
         APPLICATE(1, 9508)
-        printf("return value of call/cc: %d \n", *return_value.data.boolean_val);
         printf("value of internal define: %d \n", *(BOUND(0,0).data.boolean_val));
+        SET_BOUND(0,0)
+        printf("return value of call/cc: %d \n", *(BOUND(0, 0).data.boolean_val));
         printf("pop stack: %d \n", *(POP.data.boolean_val));
         PUSH_LITERAL(scheme_new_boolean(3))
 
-        PUSH(return_value)
+        PUSH(BOUND(0, 0))
         RETURN
         BODY_CLOSE
     }
@@ -120,11 +121,11 @@ FUNCTION(456)
          PUSH(GLOBAL_BOUND(1))
          TAIL_APPLICATE(1)
 
-
+        SET_BOUND(2,0)
         BODY_CLOSE
         BODY_CLOSE
 
-        PUSH(return_value)
+        PUSH(BOUND(0,0))
         RETURN
     }
 
@@ -155,7 +156,6 @@ FUNCTION(864)
         PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
         PUSH(GLOBAL_BOUND(5))
         TAIL_APPLICATE(1)
-        PUSH(return_value)
         RETURN
     }
     

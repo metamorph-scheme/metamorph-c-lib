@@ -36,11 +36,9 @@ void applicate_continuation(dyntype_t cont, activation_t* new_activation)
 	REQUIRE_SCHEME_CONTINUATION(cont, 0);
 
 	//Check number of arguments
-	if (new_activation->number_parameters!=1) CRASH(INVALID_NUMBER_ARGUMENTS)
-	
-	//Set continuation result
-	release_dyntype(return_value);
-	return_value = new_activation->formal_parameters[0];
+	if (new_activation->number_parameters != 1) CRASH(INVALID_NUMBER_ARGUMENTS)
+
+	dyntype_t return_value = new_activation->formal_parameters[0];
 
 	//Destroy partially constructed activation
 	new_activation->number_parameters = 0;
@@ -54,6 +52,9 @@ void applicate_continuation(dyntype_t cont, activation_t* new_activation)
 	//activation is now part of the current computation and the computation represented by the continuation
     //previous activation will be made part of the current computation at RETURN, it is already part of the continuation computation
 	current_activation = create_computation(c_cont.activation);
+
+	//set return value
+	PUSH_LITERAL(return_value);
 }
 
 int count_references_continuation(scheme_continuation_t cont, activation_t* activation)

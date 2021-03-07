@@ -10,14 +10,12 @@
 activation_t* current_activation;
 activation_t* root_activation;
 jmp_buf error_buffer;
-dyntype_t return_value;
 int return_address = 0;
 int balance=0;
 exception_t global_exception;
 
 void initprog(int globals){
     initalize_allocator();
-    return_value.type = SCHEME_TYPE_UNSPECIFIED;
     root_activation = create_activation(globals);
     root_activation->previous_activation = NULL;
     root_activation = add_to_current_computation(root_activation);
@@ -49,8 +47,7 @@ void applicate(int n_params, int id)
 
 
 void prereturn() {
-    release_dyntype(return_value);
-    return_value = POP_LITERAL;
+    dyntype_t return_value = POP_LITERAL;
 
     finalize_call();
 
@@ -60,11 +57,13 @@ void prereturn() {
     current_activation = returning_activation->previous_activation;
 
     remove_from_current_computation(returning_activation);
+
+    //set return value
+    PUSH_LITERAL(return_value);
 }
 
 
 void cleanup(){
-    release_dyntype(return_value);
     root_activation->previous_activation = root_activation;
     release_activation(root_activation);
     //exit(0);

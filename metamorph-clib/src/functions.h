@@ -8,7 +8,6 @@
 
 extern activation_t* current_activation;
 extern activation_t* root_activation;
-extern dyntype_t return_value;
 extern dyntype_t bound_value;
 extern jmp_buf error_buffer;
 extern exception_t global_exception;
