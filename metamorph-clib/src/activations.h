@@ -42,5 +42,6 @@ void discard_computation(activation_t* activation);
 int count_references_activation(activation_t* src, activation_t* target);
 void gc_activation(activation_t*);
 void release_activation(activation_t* activation);
+dyntype_t stack_peek(activation_t* activation, int num);
 
 #endif

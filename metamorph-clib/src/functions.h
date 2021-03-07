@@ -83,7 +83,7 @@ void postjump();
 #define PUSH(dyntype)           stack_push(current_activation, dyntype);
 #define PUSH_LITERAL(dyntype)   stack_push_literal(current_activation, dyntype);
 #define POP                     stack_pop(current_activation)
-
+#define PEEK(NUM)               stack_peek(current_activation, NUM)
 #define BODY(NUMBER_OF_DEFINES)   body(NUMBER_OF_DEFINES);
 #define BODY_CLOSE                close_body();
 

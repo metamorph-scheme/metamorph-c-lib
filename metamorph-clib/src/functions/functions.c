@@ -74,7 +74,6 @@ void cleanup(){
     root_activation->previous_activation = root_activation;
     remove_from_current_computation(root_activation);
     //exit(0);
-
 }
 
 void error(int code){

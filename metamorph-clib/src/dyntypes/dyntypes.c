@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "../dyntypes.h"
 #include "../common.h"
 #include "dyntypes_internal.h"
@@ -17,6 +18,8 @@ OBJ_CREATION_FUNCS(pair, SCHEME_TYPE_PAIR)
 OBJ_CREATION_FUNCS(procedure, SCHEME_TYPE_PROCEDURE)
 OBJ_CREATION_FUNCS(continuation, SCHEME_TYPE_CONTINUATION)
 OBJ_CREATION_FUNCS(number, SCHEME_TYPE_NUMBER)
+OBJ_CREATION_FUNCS(char, SCHEME_TYPE_CHAR)
+OBJ_CREATION_FUNCS(port, SCHEME_TYPE_PORT)
 
 scheme_number_t scheme_exact_integer(scheme_integer_t obj) {
   SIMPLE_MALLOC(scheme_integer_t, obj)
@@ -85,7 +88,8 @@ void release_dyntype(dyntype_t dyntype){
         case(SCHEME_TYPE_STRING): {
             scheme_string_t string;
             string = *dyntype.data.string_val;
-            //release_string(string);
+            if (dyntype._mutable)
+                RELEASE_ARRAY(char, strlen(string), string);
             RELEASE(scheme_string_t, dyntype.data.string_val)
             break;
         }
@@ -117,6 +121,18 @@ void release_dyntype(dyntype_t dyntype){
             RELEASE(scheme_number_t, dyntype.data.number_val)
             break;
         }
+        case(SCHEME_TYPE_CHAR): {
+            scheme_char_t c;
+            c = *dyntype.data.char_val;
+            RELEASE(scheme_char_t, dyntype.data.char_val)
+            break;
+        }
+        case(SCHEME_TYPE_PORT): {
+            scheme_port_t port;
+            port = *dyntype.data.port_val;
+            RELEASE(scheme_char_t, dyntype.data.port_val)
+                break;
+        }
         default: break;
     }
 }
@@ -142,9 +158,8 @@ dyntype_t copy_dyntype(dyntype_t dyntype) {
         return scheme_new_boolean(boolean);
     }
     case(SCHEME_TYPE_STRING): {
-        scheme_string_t string;
-        string = *dyntype.data.string_val;
-        //return copy_string(string);
+        scheme_string_t string = REQUEST_ARRAY(char, strlen(*dyntype.data.string_val));
+        strcpy(string, *dyntype.data.string_val);
         return scheme_new_string(string);
     }
     case(SCHEME_TYPE_PAIR): {
@@ -163,6 +178,16 @@ dyntype_t copy_dyntype(dyntype_t dyntype) {
         scheme_number_t number;
         number = *dyntype.data.number_val;
         return copy_number(number);
+    }
+    case(SCHEME_TYPE_CHAR): {
+        scheme_char_t c;
+        c = *dyntype.data.char_val;
+        return scheme_new_char(c);
+    }
+    case(SCHEME_TYPE_PORT): {
+        scheme_port_t port;
+        port = *dyntype.data.port_val;
+        return scheme_new_port(port);
     }
     default: break;
     }

@@ -99,6 +99,16 @@ dyntype_t stack_pop(activation_t* activation) {
     return value;
 }
 
+dyntype_t stack_peek(activation_t* activation, int num) {
+    if (!activation->stack) {
+        CRASH(POP_EMPTY_STACK)
+    }
+    dyntype_stack_t* tmp = activation->stack;
+    for(int i=0; i<num; i++)
+        tmp = tmp->next;
+    return tmp->value;
+}
+
 dyntype_stack_t* copy_stack(dyntype_stack_t* src) {
     if (!src)
         return NULL;

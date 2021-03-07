@@ -58,6 +58,8 @@ struct activation_struct_t;
 typedef bool_t scheme_boolean_t;
 
 typedef char* scheme_string_t;
+typedef FILE* scheme_port_t;
+typedef char scheme_char_t;
 
 typedef struct {
     int continuation_id;
@@ -130,6 +132,8 @@ typedef struct dyntype_t_struct {
     struct scheme_pair_struct_t* pair_val;
     scheme_continuation_t* continuation_val;
     scheme_number_t* number_val;
+    scheme_port_t* port_val;
+    scheme_char_t* char_val;
   } data;
 } dyntype_t;
 
@@ -230,6 +234,20 @@ typedef struct scheme_pair_struct_t {
     SET_TYPE_EXCEPTION(SCHEME_TYPE_CONTINUATION, PARAM.type, POS);\
   }
 
+#define REQUIRE_SCHEME_PORT(PARAM, POS) scheme_port_t c_##PARAM;\
+  if (PARAM.type == SCHEME_TYPE_PORT) { \
+    c_##PARAM = *PARAM.data.port_val;\
+  } else {\
+    SET_TYPE_EXCEPTION(SCHEME_TYPE_PORT, PARAM.type, POS);\
+  }
+
+#define REQUIRE_SCHEME_CHAR(PARAM, POS) scheme_char_t c_##PARAM;\
+  if (PARAM.type == SCHEME_TYPE_CHAR) { \
+    c_##PARAM = *PARAM.data.char_val;\
+  } else {\
+    SET_TYPE_EXCEPTION(SCHEME_TYPE_CHAR, PARAM.type, POS);\
+  }
+
 // Value constructors
 
 dyntype_t scheme_new_boolean(scheme_boolean_t obj);
@@ -244,6 +262,9 @@ dyntype_t scheme_literal_procedure(scheme_procedure_t obj);
 dyntype_t scheme_literal_continuation(scheme_continuation_t obj);
 dyntype_t scheme_new_number(scheme_number_t obj);
 dyntype_t scheme_literal_number(scheme_number_t obj);
+dyntype_t scheme_literal_port(scheme_port_t obj);
+dyntype_t scheme_new_char(scheme_char_t obj);
+dyntype_t scheme_literal_char(scheme_char_t obj);
 
 scheme_number_t scheme_exact_integer(scheme_integer_t obj);
 scheme_number_t scheme_exact_rational(scheme_rational_t obj);

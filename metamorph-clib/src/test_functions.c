@@ -8,8 +8,9 @@
 #include "lambda.h"
 #include "continuation.h"
 #include "common.h"
+#include "primf.h"
 #include "activations.h"
-#define _TEST_FUNCTIONS
+
 #ifdef _TEST_FUNCTIONS
 struct X{
    int x;
@@ -21,6 +22,10 @@ START(7)
    printf("start\n");
    clock_t c0 = clock();
    clock_t c1;
+   PUSH_LITERAL(current_output_port())
+   PUSH_LITERAL(scheme_literal_string("DAS IST EIN TEST\n"))
+   write_string(PEEK(0), PEEK(1));
+   POP; POP;
 
    SET_GLOBAL_BOUND_LITERAL(0, LAMBDA(90, 2))
    SET_GLOBAL_BOUND_LITERAL(1, LAMBDA(89,1))
@@ -117,8 +122,8 @@ FUNCTION(456)
         printf("value of internal define: %d \n", *(BOUND(0,0).data.boolean_val));
         printf("pop stack: %d \n", *(POP.data.boolean_val));
         PUSH_LITERAL(scheme_new_boolean(3))
-        BODY_CLOSE
         RETURN(return_value);
+        BODY_CLOSE
     }
     else {
         
