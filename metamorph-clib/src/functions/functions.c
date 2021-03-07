@@ -21,7 +21,6 @@ void initprog(int globals){
     root_activation = create_activation(globals);
     root_activation->previous_activation = NULL;
     root_activation = add_to_current_computation(root_activation);
-    root_activation->activation_type = ACTIVATION_BASE;
     current_activation=root_activation;
 }
 
@@ -103,17 +102,23 @@ void error(int code){
 
 void body(int defines)
 {
-    activation_t* extension = add_extension(current_activation, defines);
-    current_activation=add_to_current_computation(extension);
+    activation_t* body = create_activation(defines);
+    body->parent_activation = capture_activation(current_activation);
+
+    body->previous_activation = current_activation;
+    body->return_address = -1;
+    body->stack = NULL;
+
+    current_activation=add_to_current_computation(body);
 }
 
 int close_body()
 {
-    if (!remove_extension(current_activation))
+    if (current_activation->return_address != -1)
         return 1;
-    activation_t* extension = current_activation;
-    current_activation = remove_extension(extension);
-    remove_from_current_computation(extension);
+    activation_t* body = current_activation;
+    current_activation = body->parent_activation;
+    remove_from_current_computation(body);
     return 0;
 }
 

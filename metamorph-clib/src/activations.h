@@ -2,8 +2,6 @@
 #define ACTIVATIONS_GLOB
 #include "dyntypes.h"
 
-#define ACTIVATION_BASE 0
-#define ACTIVATION_EXTENSION 1
 
 typedef struct dyntype_stack_struct_t {
     dyntype_t value;
@@ -19,11 +17,9 @@ typedef struct activation_struct_t {
     int n_computations;
     struct activation_struct_t* previous_activation;
     struct activation_struct_t* parent_activation;
-    struct activation_struct_t* extension_activation;
     int number_parameters;
     dyntype_t* formal_parameters;
     dyntype_stack_t* stack;
-    int activation_type;
     dyntype_stack_t* stack_garbage;
 } activation_t;
 
@@ -46,5 +42,5 @@ void discard_computation(activation_t* activation);
 int count_references_activation(activation_t* src, activation_t* target);
 void gc_activation(activation_t*);
 void release_activation(activation_t* activation);
-activation_t* base_activation(activation_t*);
+
 #endif

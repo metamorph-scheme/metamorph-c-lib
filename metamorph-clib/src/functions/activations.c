@@ -15,7 +15,6 @@ activation_t* create_activation(int parameters) {
     new_activation->n_captures = 0;
     //0 as a new activation is not part of any computation
     new_activation->n_computations = 0;
-    new_activation->activation_type = ACTIVATION_BASE;
     new_activation->number_parameters = parameters;
     new_activation->formal_parameters = REQUEST_ARRAY(dyntype_t, parameters);
     //Initalize parameters to UNSPECIFIED, so GC can collect them even if not set
@@ -24,37 +23,6 @@ activation_t* create_activation(int parameters) {
         new_activation->formal_parameters[i] = (dyntype_t){ SCHEME_TYPE_UNSPECIFIED, 0, 0 };
     new_activation->stack = NULL;
     return new_activation;
-}
-
-
-activation_t* copy_activation(activation_t* src) {
-    activation_t* dest = create_activation(src->number_parameters);
-
-    if (src->activation_type == ACTIVATION_EXTENSION) {
-        dest->previous_activation = copy_activation(src->previous_activation);
-        dest->parent_activation = capture_activation(dest->previous_activation);
-    }
-    else {
-        dest->parent_activation = capture_activation(src->parent_activation);
-        dest->previous_activation = src->previous_activation;
-    }
-
-    dest->activation_type = src->activation_type;
-    dest->return_address = src->return_address;
-
-    int i = 0;
-    for (i = 0; i < src->number_parameters; i++) {
-        dest->formal_parameters[i] = copy_dyntype(src->formal_parameters[i]);
-    }
-    dest->stack = copy_stack(src->stack);
-    dest->stack_garbage = NULL;
-    return dest;
-}
-
-activation_t* base_activation(activation_t* activation) {
-    while (activation->activation_type == ACTIVATION_EXTENSION)
-        activation = activation->previous_activation;
-    return activation;
 }
 
 activation_t* capture_activation(activation_t* activation)
@@ -106,7 +74,6 @@ void discard_computation(activation_t* activation)
 }
 
 void stack_push_literal(activation_t* activation, dyntype_t value) {
-    activation = base_activation(activation);
     dyntype_stack_t* elem = REQUEST(dyntype_stack_t);
     elem->next = activation->stack;
     activation->stack = elem;
@@ -119,7 +86,6 @@ void stack_push(activation_t* activation, dyntype_t value) {
 }
 
 dyntype_t stack_pop(activation_t* activation) {
-    activation = base_activation(activation);
     if (!activation->stack) {
         CRASH(POP_EMPTY_STACK)
     }
@@ -203,27 +169,4 @@ int count_references_activation(activation_t* src, activation_t* target) {
     if (src->parent_activation == target)
         sum++;
     return sum;
-}
-
-activation_t* add_extension(activation_t* activation, int defines)
-{
-    activation_t* new_extension = create_activation(defines);
-    new_extension->parent_activation = capture_activation(activation);
-    new_extension->activation_type = ACTIVATION_EXTENSION;
-
-    new_extension->previous_activation = activation;
-    new_extension->return_address = 0;
-    new_extension->stack = NULL;
-
-    return new_extension;
-}
-
-activation_t* remove_extension(activation_t* activation)
-{
-    if (activation->activation_type == ACTIVATION_BASE)
-        return NULL;
-    activation_t* extension = activation;
-    activation = extension->parent_activation;
-    gc_activation(extension);
-    return activation;
 }

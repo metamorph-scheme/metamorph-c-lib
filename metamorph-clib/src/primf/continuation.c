@@ -7,7 +7,7 @@ dyntype_t create_continuation(int id)
 {
 	scheme_continuation_t cont;
 	//Only current activation is copied, tail of computation (previous activations) is shared among compuations 
-	cont.activation = create_computation(copy_activation(current_activation));
+	cont.activation = create_computation(current_activation);
 	cont.continuation_id = id;
 	
 	return scheme_literal_continuation(cont);
@@ -24,7 +24,7 @@ dyntype_t copy_continuation(dyntype_t cont_src)
 	REQUIRE_SCHEME_CONTINUATION(cont_src,0)
 	scheme_continuation_t cont;
 	//Only current activation is copied, tail of computation (previous activations) is shared among compuations 
-	cont.activation = create_computation(copy_activation(c_cont_src.activation));
+	cont.activation = create_computation(c_cont_src.activation);
 	cont.continuation_id = c_cont_src.continuation_id;
 
 
