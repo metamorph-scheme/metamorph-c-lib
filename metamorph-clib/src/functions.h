@@ -16,11 +16,9 @@ extern exception_t global_exception;
 extern int return_address;
 void prog();
 void initprog(int);
-void prereturn(dyntype_t );
-void prereturn_literal(dyntype_t );
+void prereturn();
 void cleanup();
-void applicate(int n_params,  dyntype_t proc, int id);
-void applicate_literal(int n_params,  dyntype_t proc, int id);
+void applicate(int n_params, int id);
 void error(int);
 void body(int);
 int close_body();
@@ -55,13 +53,8 @@ void postjump();
 #define FUNCTION(ID)  CRASH(METAMORPH_C_SYNTAX_VIOLATION)\
                     }case(ID):{
 #define ARGUMENT(number)    (current_activation->formal_parameters[number])
-#define RETURN(VALUE)   {\
-                            prereturn(VALUE);\
-                            goto table;\
-                        }
-
-#define RETURN_LITERAL(VALUE) {\
-                            prereturn_literal(VALUE);\
+#define RETURN {\
+                            prereturn();\
                             goto table;\
                         }
 
@@ -71,19 +64,13 @@ void postjump();
 
 //#define PARAMETER_LITERAL(VALUE)   VALUE,
 
-#define APPLICATE(PARAMS, PROC, ID) applicate(PARAMS,  PROC, ID);\
+#define APPLICATE(PARAMS, ID) applicate(PARAMS, ID);\
                     goto table;\
                     case(ID):;
 
-#define TAIL_APPLICATE(PARAMS, PROC) applicate(PARAMS, PROC, -1);\
+#define TAIL_APPLICATE(PARAMS) applicate(PARAMS, -1);\
                     goto table;
 
-#define APPLICATE_LITERAL(PARAMS, PROC, ID) applicate_literal(PARAMS,  PROC, ID);\
-                    goto table;\
-                    case(ID):;
-
-#define TAIL_APPLICATE_LITERAL(PARAMS, PROC) applicate_literal(PARAMS, PROC, -1);\
-                    goto table;
 
 #define PARAMETER(name)         dyntype_t name = POP;
 #define PUSH(dyntype)           stack_push(current_activation, dyntype);

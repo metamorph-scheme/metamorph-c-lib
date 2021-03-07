@@ -24,8 +24,9 @@ void initprog(int globals){
     current_activation=root_activation;
 }
 
-void applicate(int n_params, dyntype_t proc, int id)
+void applicate(int n_params, int id)
 {
+    dyntype_t proc = POP_LITERAL;
     activation_t* new_activation = create_activation(n_params);
     for (int i = 0; i < n_params; i++)
         new_activation->formal_parameters[i] = POP_LITERAL;
@@ -43,23 +44,15 @@ void applicate(int n_params, dyntype_t proc, int id)
         CRASH(APPLICATION_OF_NON_PROCEDURE_TYPE)
             break;
     }
-}
-
-void applicate_literal(int n_params, dyntype_t proc, int id)
-{
-    applicate(n_params, proc, id);
     release_dyntype(proc);
 }
 
-void prereturn(dyntype_t value){
-    prereturn_literal(copy_dyntype(value));
-}
 
-void prereturn_literal(dyntype_t value) {
-    finalize_call();
-
+void prereturn() {
     release_dyntype(return_value);
-    return_value = value;
+    return_value = POP_LITERAL;
+
+    finalize_call();
 
     return_address = current_activation->return_address;
 
@@ -73,8 +66,9 @@ void prereturn_literal(dyntype_t value) {
 void cleanup(){
     release_dyntype(return_value);
     root_activation->previous_activation = root_activation;
-    remove_from_current_computation(root_activation);
+    release_activation(root_activation);
     //exit(0);
+
 }
 
 void error(int code){

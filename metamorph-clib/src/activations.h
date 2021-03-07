@@ -24,7 +24,6 @@ typedef struct activation_struct_t {
 } activation_t;
 
 activation_t* create_activation(int parameters);
-activation_t* copy_activation(activation_t* src);
 activation_t* capture_activation(activation_t* activation);
 //free as opposite to capture
 void free_activation(activation_t* activation);

@@ -151,10 +151,11 @@ void gc_activation(activation_t* activation) {
 
     //Release activation only if all references to it are cycle refernces
     if (activation->n_captures) {
-        int ref = 0;
-        ref = count_references_activation(activation, activation);
-        if (ref < activation->n_captures)
-            return;
+        //int ref = 0;
+        //ref = count_references_activation(activation, activation);
+        //if (ref < activation->n_captures)
+        //    return;
+        return;
     }
 
     //Mark as ongoing release

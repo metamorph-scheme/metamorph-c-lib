@@ -14,10 +14,6 @@ dyntype_t* bound(int parent, int number){
 }
 
 void set_bound(dyntype_t* target, dyntype_t src) {
-    set_bound_literal(target, copy_dyntype(src));
-}
-
-void set_bound_literal(dyntype_t* target, dyntype_t src) {
     release_dyntype(*target);
     *target = src;
 }
