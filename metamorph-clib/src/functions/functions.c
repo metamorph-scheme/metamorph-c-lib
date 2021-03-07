@@ -24,10 +24,11 @@ void initprog(int globals){
     current_activation=root_activation;
 }
 
-void applicate(int n_params, dyntype_t params[], dyntype_t proc, int id)
+void applicate(int n_params, dyntype_t proc, int id)
 {
     activation_t* new_activation = create_activation(n_params);
-    memcpy(new_activation->formal_parameters, params, new_activation->number_parameters * sizeof(dyntype_t));
+    for (int i = 0; i < n_params; i++)
+        new_activation->formal_parameters[i] = POP_LITERAL;
     switch (proc.type)
     {
     case(SCHEME_TYPE_PROCEDURE): {
@@ -44,9 +45,9 @@ void applicate(int n_params, dyntype_t params[], dyntype_t proc, int id)
     }
 }
 
-void applicate_literal(int n_params, dyntype_t params[], dyntype_t proc, int id)
+void applicate_literal(int n_params, dyntype_t proc, int id)
 {
-    applicate(n_params, params, proc, id);
+    applicate(n_params, proc, id);
     release_dyntype(proc);
 }
 

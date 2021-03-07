@@ -35,6 +35,7 @@ void discard_computation(activation_t* activation);
 void stack_push(activation_t*, dyntype_t);
 void stack_push_literal(activation_t*, dyntype_t);
 dyntype_t stack_pop(activation_t*);
+dyntype_t stack_pop_literal(activation_t*);
 dyntype_stack_t* copy_stack(dyntype_stack_t* src);
 activation_t* add_extension(activation_t* activation, int);
 activation_t* remove_extension(activation_t* activation);

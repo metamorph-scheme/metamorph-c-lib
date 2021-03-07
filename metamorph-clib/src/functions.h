@@ -19,8 +19,8 @@ void initprog(int);
 void prereturn(dyntype_t );
 void prereturn_literal(dyntype_t );
 void cleanup();
-void applicate(int n_params, dyntype_t params[], dyntype_t proc, int id);
-void applicate_literal(int n_params, dyntype_t params[], dyntype_t proc, int id);
+void applicate(int n_params,  dyntype_t proc, int id);
+void applicate_literal(int n_params,  dyntype_t proc, int id);
 void error(int);
 void body(int);
 int close_body();
@@ -65,24 +65,31 @@ void postjump();
                             goto table;\
                         }
 
-#define CALL(PARAMETERS) applicate(PARAMETERS, (dyntype_t[PARAMETERS]){
-#define CALL_LITERAL(PARAMETERS) applicate_literal(PARAMETERS, (dyntype_t[PARAMETERS]){
 
-#define PARAMETER(VALUE) copy_dyntype(VALUE),
 
-#define PARAMETER_LITERAL(VALUE)   VALUE,
+//#define PARAMETER(VALUE) copy_dyntype(VALUE),
 
-#define APPLICATE(PROC, ID)  }, PROC, ID);\
+//#define PARAMETER_LITERAL(VALUE)   VALUE,
+
+#define APPLICATE(PARAMS, PROC, ID) applicate(PARAMS,  PROC, ID);\
                     goto table;\
                     case(ID):;
 
-#define TAIL_APPLICATE(PROC)  }, PROC, -1);\
+#define TAIL_APPLICATE(PARAMS, PROC) applicate(PARAMS, PROC, -1);\
                     goto table;
 
+#define APPLICATE_LITERAL(PARAMS, PROC, ID) applicate_literal(PARAMS,  PROC, ID);\
+                    goto table;\
+                    case(ID):;
 
+#define TAIL_APPLICATE_LITERAL(PARAMS, PROC) applicate_literal(PARAMS, PROC, -1);\
+                    goto table;
+
+#define PARAMETER(name)         dyntype_t name = POP;
 #define PUSH(dyntype)           stack_push(current_activation, dyntype);
 #define PUSH_LITERAL(dyntype)   stack_push_literal(current_activation, dyntype);
 #define POP                     stack_pop(current_activation)
+#define POP_LITERAL             stack_pop_literal(current_activation)
 #define PEEK(NUM)               stack_peek(current_activation, NUM)
 #define BODY(NUMBER_OF_DEFINES)   body(NUMBER_OF_DEFINES);
 #define BODY_CLOSE                close_body();

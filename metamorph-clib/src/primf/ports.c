@@ -51,6 +51,16 @@ dyntype_t write_string(dyntype_t string, dyntype_t port) {
 		SCHEME_TYPE_UNSPECIFIED, 0, 0
 	};
 }
+dyntype_t write_string_stack() {
+	PARAMETER(string)
+	PARAMETER(port)
+	REQUIRE_SCHEME_PORT(port, 0);
+	REQUIRE_SCHEME_STRING(string, 0)
+		fprintf(c_port, "%s", c_string);
+	(dyntype_t) {
+		SCHEME_TYPE_UNSPECIFIED, 0, 0
+	};
+}
 dyntype_t flush_output_port(dyntype_t port) {
 	REQUIRE_SCHEME_PORT(port, 0);
 	fflush(c_port);
