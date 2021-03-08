@@ -31,17 +31,15 @@ activation_t* add_to_current_computation(activation_t* activation);
 void remove_from_current_computation(activation_t* activation);
 activation_t* create_computation(activation_t* activation);
 void discard_computation(activation_t* activation);
+dyntype_t* stack_ellipsis(activation_t*, int);
+void release_dyntypes(dyntype_t* dyn, int n);
 void stack_push(activation_t*, dyntype_t);
 void stack_push_literal(activation_t*, dyntype_t);
 dyntype_t stack_pop(activation_t*);
 dyntype_t stack_pop_literal(activation_t*);
-dyntype_stack_t* copy_stack(dyntype_stack_t* src);
-activation_t* add_extension(activation_t* activation, int);
-activation_t* remove_extension(activation_t* activation);
 void discard_computation(activation_t* activation);
 int count_references_activation(activation_t* src, activation_t* target);
 void gc_activation(activation_t*);
 void release_activation(activation_t* activation);
-dyntype_t stack_peek(activation_t* activation, int num);
 
 #endif

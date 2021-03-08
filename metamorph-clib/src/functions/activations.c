@@ -73,6 +73,13 @@ void discard_computation(activation_t* activation)
     }
 }
 
+dyntype_t* stack_ellipsis(activation_t* activation, int n) {
+    dyntype_t* ellipsis = REQUEST_ARRAY(dyntype_t, n);
+    for (int i = 0; i < n; i++)
+        ellipsis[i] = POP_LITERAL;
+    return ellipsis;
+}
+
 void stack_push_literal(activation_t* activation, dyntype_t value) {
     dyntype_stack_t* elem = REQUEST(dyntype_stack_t);
     elem->next = activation->stack;
@@ -110,26 +117,6 @@ dyntype_t stack_pop_literal(activation_t* activation) {
     return value;
 }
 
-dyntype_t stack_peek(activation_t* activation, int num) {
-    if (!activation->stack) {
-        CRASH(POP_EMPTY_STACK)
-    }
-    dyntype_stack_t* tmp = activation->stack;
-    for(int i=0; i<num; i++)
-        tmp = tmp->next;
-    return tmp->value;
-}
-
-dyntype_stack_t* copy_stack(dyntype_stack_t* src) {
-    if (!src)
-        return NULL;
-    dyntype_stack_t* dest = REQUEST(dyntype_stack_t);
-    dest->value = copy_dyntype(src->value);
-
-    //Not a tailcall, stack is usually small
-    dest->next = copy_stack(src->next);
-    return dest;
-}
 
 void release_stack(activation_t* activation) {
     while (activation->stack != NULL) {
@@ -174,13 +161,16 @@ void release_activation(activation_t* activation) {
     balance--;
 
     //Release parameters
-    int i = 0;
-    for (i = 1; i <= activation->number_parameters; i++)
-        release_dyntype(activation->formal_parameters[i - 1]);
+    release_dyntypes(activation->formal_parameters, activation->number_parameters);
 
     release_stack(activation);
-    RELEASE_ARRAY(dyntype_t, activation->number_parameters, activation->formal_parameters);
     RELEASE(activation_t, activation);
+}
+
+void release_dyntypes(dyntype_t* dyn, int n) {
+    for (int i = 0; i < n; i++)
+        release_dyntype(dyn[i]);
+    RELEASE_ARRAY(dyntype_t, n, dyn);
 }
 
 int count_references_activation(activation_t* src, activation_t* target) {

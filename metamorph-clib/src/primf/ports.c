@@ -43,23 +43,30 @@ dyntype_t write_char(dyntype_t c, dyntype_t port) {
 		SCHEME_TYPE_UNSPECIFIED, 0, 0
 	};
 }
-dyntype_t write_string(dyntype_t string, dyntype_t port) {
-	REQUIRE_SCHEME_PORT(port, 0);
-	REQUIRE_SCHEME_STRING(string, 0)
-	fprintf(c_port, "%s", c_string);
-	(dyntype_t) {
-		SCHEME_TYPE_UNSPECIFIED, 0, 0
-	};
-}
-dyntype_t write_string_stack() {
+
+BASE_FUNCTION(write_string) {
 	PARAMETER(string) 
-	PARAMETER(port)
-	REQUIRE_SCHEME_PORT(port, 0);
+	ELLIPSIS
+
 	REQUIRE_SCHEME_STRING(string, 0)
+
+	if (n_ellipsis) {
+		dyntype_t port = ellipsis[0];
+		REQUIRE_SCHEME_PORT(port, 0)
 		fprintf(c_port, "%s", c_string);
-	(dyntype_t) {
-		SCHEME_TYPE_UNSPECIFIED, 0, 0
-	};
+	}
+	else {
+		current_output_port();
+		dyntype_t port = POP_LITERAL;
+		REQUIRE_SCHEME_PORT(port, 0)
+		fprintf(c_port, "%s", c_string);
+	    release_dyntype(port);
+	}
+	
+	PUSH_LITERAL((dyntype_t) {SCHEME_TYPE_UNSPECIFIED})
+
+	DESTROY_PARAM(string) 
+	DESTROY_ELLIPSIS
 }
 dyntype_t flush_output_port(dyntype_t port) {
 	REQUIRE_SCHEME_PORT(port, 0);
@@ -70,7 +77,7 @@ dyntype_t current_input_port() {
 	return scheme_literal_port(stdin);
 }
 dyntype_t current_output_port() {
-	return scheme_literal_port(stdout);
+	PUSH_LITERAL (scheme_literal_port(stdout));
 }
 dyntype_t current_error_port() {
 	return scheme_literal_port(stderr);

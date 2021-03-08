@@ -130,7 +130,7 @@ void release_dyntype(dyntype_t dyntype){
         case(SCHEME_TYPE_PORT): {
             scheme_port_t port;
             port = *dyntype.data.port_val;
-            RELEASE(scheme_char_t, dyntype.data.port_val)
+            RELEASE(scheme_port_t, dyntype.data.port_val)
                 break;
         }
         default: break;

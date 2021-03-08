@@ -51,42 +51,21 @@ void postjump();
 
 #define FUNCTION(ID)  CRASH(METAMORPH_C_SYNTAX_VIOLATION)\
                     }case(ID):{
-#define ARGUMENT(number)    (current_activation->formal_parameters[number])
-#define RETURN {\
-                            prereturn();\
-                            goto table;\
-                        }
+#define RETURN                  prereturn(); goto table;
+#define APPLICATE(PARAMS, ID)   applicate(PARAMS, ID); goto table; case(ID):;
+#define TAIL_APPLICATE(PARAMS)  applicate(PARAMS, -1); goto table;
 
-
-
-//#define PARAMETER(VALUE) copy_dyntype(VALUE),
-
-//#define PARAMETER_LITERAL(VALUE)   VALUE,
-
-#define APPLICATE(PARAMS, ID) applicate(PARAMS, ID);\
-                    goto table;\
-                    case(ID):;
-
-#define TAIL_APPLICATE(PARAMS) applicate(PARAMS, -1);\
-                    goto table;
-
-
-#define PARAMETER(name)         dyntype_t name = POP;
-#define PUSH(dyntype)           stack_push(current_activation, dyntype);
-#define PUSH_LITERAL(dyntype)   stack_push_literal(current_activation, dyntype);
+#define PARAMETER(NAME)         dyntype_t NAME = POP_LITERAL; n_ellipsis--;
+#define ELLIPSIS                dyntype_t* ellipsis=stack_ellipsis(current_activation, n_ellipsis);
+#define DESTROY_PARAM(NAME)     release_dyntype(NAME);
+#define DESTROY_ELLIPSIS        release_dyntypes(ellipsis, n_ellipsis); 
+#define PUSH(DYNTYPE)           stack_push(current_activation, DYNTYPE);
+#define PUSH_LITERAL(DYNTYPE)   stack_push_literal(current_activation, DYNTYPE);
 #define POP                     stack_pop(current_activation)
 #define POP_LITERAL             stack_pop_literal(current_activation)
-#define PEEK(NUM)               stack_peek(current_activation, NUM)
 #define BODY(NUMBER_OF_DEFINES)   body(NUMBER_OF_DEFINES);
 #define BODY_CLOSE                close_body();
-
-//ACHTUNG JUMP allokiert keine Parentactivation kann zu SEGFAULT führen
-/*
-#define JUMP(FUNCTION_ID,ID)   prejump(FUNCTION_ID, ID);\
-                    goto table;\
-                    case(ID):\
-                    postjump();}
-*/
+#define BASE_FUNCTION(function)   void function(int n_ellipsis)
                 
 #define CRASH(CODE) longjmp(error_buffer,CODE);
 

@@ -20,7 +20,7 @@ dyntype_t read_string(dyntype_t number, dyntype_t port);
 
 dyntype_t newline(dyntype_t port);
 dyntype_t write_char(dyntype_t c, dyntype_t port);
-dyntype_t write_string(dyntype_t string, dyntype_t port);
+BASE_FUNCTION(write_string);
 
 dyntype_t flush_output_port(dyntype_t port);
 
