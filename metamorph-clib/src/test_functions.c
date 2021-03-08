@@ -26,6 +26,10 @@ START(4)
     PUSH_LITERAL(scheme_literal_string("OUTPUT TEST 1\n"))
     write_string(1);
 
+    current_error_port(0);
+    read_line(0);
+    write_string(2);
+
     PUSH_LITERAL(LAMBDA(89, 1))
     SET_GLOBAL_BOUND(0)
     PUSH_LITERAL(LAMBDA(456, 1))
@@ -33,7 +37,7 @@ START(4)
     PUSH_LITERAL(scheme_new_boolean(3))
     SET_GLOBAL_BOUND(2)
 
-    current_output_port();
+    current_output_port(0);
     PUSH_LITERAL(scheme_literal_string("OUTPUT TEST 2\n"))
     write_string(2);
 
