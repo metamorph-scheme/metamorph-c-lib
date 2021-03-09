@@ -66,7 +66,7 @@ void postjump();
 #define POP_LITERAL             stack_pop_literal(current_activation)
 #define BODY(NUMBER_OF_DEFINES)   body(NUMBER_OF_DEFINES);
 #define BODY_CLOSE                close_body();
-#define BASE_FUNCTION(function)   void function(int n_ellipsis)
+#define BASE_FUNCTION(FUNCTION)   void FUNCTION(int n_ellipsis)
                 
 #define CRASH(CODE) longjmp(error_buffer,CODE);
 

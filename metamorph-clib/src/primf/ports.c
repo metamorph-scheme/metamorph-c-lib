@@ -153,7 +153,7 @@ BASE_FUNCTION(write_string) {
 	
 	PUSH_UNSPECIFIED
 
-	DESTROY_PARAM(string) 
+	DESTROY_PARAM(string)
 	DESTROY_ELLIPSIS
 }
 BASE_FUNCTION(flush_output_port) {

@@ -23,11 +23,13 @@ START(4)
     clock_t c0 = clock();
     clock_t c1;
 
-    PUSH_LITERAL(scheme_literal_string("OUTPUT TEST 1\n"))
-    write_string(1);
+   /* PUSH_LITERAL(scheme_literal_string("OUTPUT TEST 1\n"))
+    write_string(1);*/
 
     current_error_port(0);
-    read_line(0);
+    //PUSH_LITERAL(scheme_literal_string("OUTPUT TEST 1\n"))
+    current_input_port(0);
+    read_line(1);
     write_string(2);
 
     PUSH_LITERAL(LAMBDA(89, 1))
@@ -44,7 +46,7 @@ START(4)
     //SET_GLOBAL_BOUND_LITERAL(5, LAMBDA(864,1))
     //SET_GLOBAL_BOUND_LITERAL(6, LAMBDA_VARIADIC(54,1))
 
-    PUSH_LITERAL(scheme_new_boolean(9000))
+    PUSH_LITERAL(scheme_new_boolean(9000000))
     PUSH(GLOBAL_BOUND(1))
     APPLICATE(1, 9683)
     SET_BOUND(0,3)
