@@ -19,7 +19,9 @@ void* request(allocator_t* a){
     total++;
     
     //DELETE
-    //return calloc(a->chunk_count, CHUNK_SIZE);
+#ifdef CACHE_OFF
+    return calloc(a->chunk_count, CHUNK_SIZE);
+#endif // CACHE_OFF
 
     if (a->index) {
         a->index--;
@@ -33,8 +35,12 @@ void giveback(allocator_t* a, void* ptr) {
     cbalance--;
     
     //DELETE
-    //free(ptr);
-    //return;
+#ifdef CACHE_OFF
+    free(ptr);
+    return;
+#endif // CHACHE_OFF
+
+
 
     int c = a->current_size;
     int i = a->index;

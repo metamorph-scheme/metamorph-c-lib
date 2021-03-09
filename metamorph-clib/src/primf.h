@@ -1,10 +1,29 @@
 #ifndef PRIMF_GLOB
 #define PRIMF_GLOB
 
+#include "dyntypes.h"
+#include "functions.h"
+
 #define ELLIPSIS_PARAM(NAME) dyntype_t* NAME, int len
 #define NONSTANDARD
 #define STANDARD(NAME)
 #define CATCH_MP_ERROR(EXPR) if((EXPR) != MP_OKAY) { SET_TOMMATH_NUMBER_EXCEPTION } 
+
+// Ports
+BASE_FUNCTION(current_input_port);
+BASE_FUNCTION(current_output_port);
+BASE_FUNCTION(current_error_port);
+
+BASE_FUNCTION(read_char);
+BASE_FUNCTION(peek_char);
+BASE_FUNCTION(read_line);
+BASE_FUNCTION(read_string);
+
+BASE_FUNCTION(newline);
+BASE_FUNCTION(write_char);
+BASE_FUNCTION(write_string);
+
+BASE_FUNCTION(flush_output_port);
 
 // Symbols
 

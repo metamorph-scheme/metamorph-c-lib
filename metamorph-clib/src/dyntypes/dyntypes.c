@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "../dyntypes.h"
 #include "../common.h"
 #include "dyntypes_internal.h"
@@ -9,14 +10,34 @@
 #include <malloc.h>
 #include "../tommath/tommath.h"
 
-
 OBJ_CREATION_FUNCS(boolean, SCHEME_TYPE_BOOLEAN)
 OBJ_CREATION_FUNCS(symbol, SCHEME_TYPE_SYMBOL)
-OBJ_CREATION_FUNCS(string, SCHEME_TYPE_STRING)
 OBJ_CREATION_FUNCS(pair, SCHEME_TYPE_PAIR)
 OBJ_CREATION_FUNCS(procedure, SCHEME_TYPE_PROCEDURE)
 OBJ_CREATION_FUNCS(continuation, SCHEME_TYPE_CONTINUATION)
 OBJ_CREATION_FUNCS(number, SCHEME_TYPE_NUMBER)
+OBJ_CREATION_FUNCS(char, SCHEME_TYPE_CHAR)
+OBJ_CREATION_FUNCS(port, SCHEME_TYPE_PORT)
+
+dyntype_t scheme_string(scheme_string_t obj, bool_t _mutable) {
+  char** ptr = REQUEST(char*);
+  (*ptr) = REQUEST_ARRAY(char, strlen(obj));
+  strcpy(*ptr, obj);
+  return (dyntype_t) {
+    .type = SCHEME_TYPE_STRING,
+    ._mutable = _mutable,
+    .data.string_val = ptr
+  };
+}
+
+//Copies from obj, obj needs to be deallocated
+dyntype_t scheme_new_string(scheme_string_t obj) {
+  return scheme_string(obj, TRUE);
+}
+//Copies from obj, obj needs to be deallocated
+dyntype_t scheme_literal_string(scheme_string_t obj) {\
+  return scheme_string(obj, FALSE);
+}
 
 scheme_number_t scheme_exact_integer(scheme_integer_t obj) {
   SIMPLE_MALLOC(scheme_integer_t, obj)
@@ -85,7 +106,7 @@ void release_dyntype(dyntype_t dyntype){
         case(SCHEME_TYPE_STRING): {
             scheme_string_t string;
             string = *dyntype.data.string_val;
-            //release_string(string);
+            RELEASE_ARRAY(char, strlen(string), string);
             RELEASE(scheme_string_t, dyntype.data.string_val)
             break;
         }
@@ -117,6 +138,18 @@ void release_dyntype(dyntype_t dyntype){
             RELEASE(scheme_number_t, dyntype.data.number_val)
             break;
         }
+        case(SCHEME_TYPE_CHAR): {
+            scheme_char_t c;
+            c = *dyntype.data.char_val;
+            RELEASE(scheme_char_t, dyntype.data.char_val)
+            break;
+        }
+        case(SCHEME_TYPE_PORT): {
+            scheme_port_t port;
+            port = *dyntype.data.port_val;
+            RELEASE(scheme_port_t, dyntype.data.port_val)
+            break;
+        }
         default: break;
     }
 }
@@ -142,9 +175,8 @@ dyntype_t copy_dyntype(dyntype_t dyntype) {
         return scheme_new_boolean(boolean);
     }
     case(SCHEME_TYPE_STRING): {
-        scheme_string_t string;
-        string = *dyntype.data.string_val;
-        //return copy_string(string);
+        scheme_string_t string = REQUEST_ARRAY(char, strlen(*dyntype.data.string_val));
+        strcpy(string, *dyntype.data.string_val);
         return scheme_new_string(string);
     }
     case(SCHEME_TYPE_PAIR): {
@@ -163,6 +195,16 @@ dyntype_t copy_dyntype(dyntype_t dyntype) {
         scheme_number_t number;
         number = *dyntype.data.number_val;
         return copy_number(number);
+    }
+    case(SCHEME_TYPE_CHAR): {
+        scheme_char_t c;
+        c = *dyntype.data.char_val;
+        return scheme_new_char(c);
+    }
+    case(SCHEME_TYPE_PORT): {
+        scheme_port_t port;
+        port = *dyntype.data.port_val;
+        return scheme_new_port(port);
     }
     default: break;
     }
