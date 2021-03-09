@@ -10,16 +10,31 @@
 #include <malloc.h>
 #include "../tommath/tommath.h"
 
-
 OBJ_CREATION_FUNCS(boolean, SCHEME_TYPE_BOOLEAN)
 OBJ_CREATION_FUNCS(symbol, SCHEME_TYPE_SYMBOL)
-OBJ_CREATION_FUNCS(string, SCHEME_TYPE_STRING)
 OBJ_CREATION_FUNCS(pair, SCHEME_TYPE_PAIR)
 OBJ_CREATION_FUNCS(procedure, SCHEME_TYPE_PROCEDURE)
 OBJ_CREATION_FUNCS(continuation, SCHEME_TYPE_CONTINUATION)
 OBJ_CREATION_FUNCS(number, SCHEME_TYPE_NUMBER)
 OBJ_CREATION_FUNCS(char, SCHEME_TYPE_CHAR)
 OBJ_CREATION_FUNCS(port, SCHEME_TYPE_PORT)
+
+dyntype_t scheme_string(scheme_string_t obj, bool_t _mutable) {
+  char** ptr = REQUEST(char*);
+  (*ptr) = REQUEST_ARRAY(char, strlen(obj));
+  strcpy(*ptr, obj);
+  return (dyntype_t) {
+    .type = SCHEME_TYPE_STRING,
+    ._mutable = _mutable,
+    .data.string_val = ptr
+  };
+}
+dyntype_t scheme_new_string(scheme_string_t obj) {
+  return scheme_string(obj, TRUE);
+}
+dyntype_t scheme_literal_string(scheme_string_t obj) {\
+  return scheme_string(obj, FALSE);
+}
 
 scheme_number_t scheme_exact_integer(scheme_integer_t obj) {
   SIMPLE_MALLOC(scheme_integer_t, obj)
@@ -88,8 +103,7 @@ void release_dyntype(dyntype_t dyntype){
         case(SCHEME_TYPE_STRING): {
             scheme_string_t string;
             string = *dyntype.data.string_val;
-            if (dyntype._mutable)
-                RELEASE_ARRAY(char, strlen(string), string);
+            RELEASE_ARRAY(char, strlen(string), string);
             RELEASE(scheme_string_t, dyntype.data.string_val)
             break;
         }
@@ -131,7 +145,7 @@ void release_dyntype(dyntype_t dyntype){
             scheme_port_t port;
             port = *dyntype.data.port_val;
             RELEASE(scheme_port_t, dyntype.data.port_val)
-                break;
+            break;
         }
         default: break;
     }

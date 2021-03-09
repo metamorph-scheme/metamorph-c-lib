@@ -53,6 +53,7 @@ BASE_FUNCTION(read_line) {
 		char* buf = REQUEST_ARRAY(char, 200);
 		fgets(buf, 200, c_port);
 		PUSH_LITERAL(scheme_new_string(buf))
+		RELEASE_ARRAY(char, 200, buf);
 	}
 	else {
 		current_input_port(0);
@@ -61,6 +62,7 @@ BASE_FUNCTION(read_line) {
 		char* buf = REQUEST_ARRAY(char, 200);
 		fgets(buf, 200, c_port);
 		PUSH_LITERAL(scheme_new_string(buf))
+		RELEASE_ARRAY(char, 200, buf);
 		release_dyntype(port);
 	}
 	DESTROY_ELLIPSIS
