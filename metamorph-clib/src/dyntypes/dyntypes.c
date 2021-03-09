@@ -29,9 +29,12 @@ dyntype_t scheme_string(scheme_string_t obj, bool_t _mutable) {
     .data.string_val = ptr
   };
 }
+
+//Copies from obj, obj needs to be deallocated
 dyntype_t scheme_new_string(scheme_string_t obj) {
   return scheme_string(obj, TRUE);
 }
+//Copies from obj, obj needs to be deallocated
 dyntype_t scheme_literal_string(scheme_string_t obj) {\
   return scheme_string(obj, FALSE);
 }
