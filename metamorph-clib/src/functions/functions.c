@@ -5,7 +5,6 @@
 #include "../activations.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 activation_t* current_activation;
 activation_t* root_activation;
