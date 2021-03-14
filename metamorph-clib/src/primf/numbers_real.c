@@ -111,7 +111,7 @@ scheme_rational_t real_to_rational(scheme_real_t real) {
 	// result has to be a natural number and can safely be stored in uint64
 	// cannot overflow int64 because mantissa is always just 52 bit long and
 	// the exponent plays no role here
-	uint64_t realm = mantissa * pow(DBL_RADIX, DBL_MANT_DIG);
+	uint64_t realm = mantissa * pow(FLT_RADIX, DBL_MANT_DIG);
 
 	mp_int a, b, bit;
 	CATCH_MP_ERROR(mp_init_multi(&a, &b, &bit, NULL));
