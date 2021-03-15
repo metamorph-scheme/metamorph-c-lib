@@ -34,21 +34,24 @@ START(4)
 
     PUSH_LITERAL(LAMBDA(89, 1))
     SET_GLOBAL_BOUND(0)
+    POP;
     PUSH_LITERAL(LAMBDA(456, 1))
     SET_GLOBAL_BOUND(1)
+    POP;
     PUSH_LITERAL(scheme_new_boolean(3))
     SET_GLOBAL_BOUND(2)
-
+    POP;
     current_output_port(0);
     PUSH_LITERAL(scheme_new_string("OUTPUT TEST 2\n"))
     write_string(2);
     //PUSH_LITERAL(scheme_new_string("OUTPUT TEST 2\n"))
     //PUSH_LITERAL(scheme_new_string("OUTPUT TEST 2\n"))
 
-    PUSH_LITERAL(scheme_new_boolean(9000))
+    PUSH_LITERAL(scheme_new_boolean(9000000))
     PUSH(GLOBAL_BOUND(1))
     APPLICATE(1, 9683)
     SET_BOUND(0,3)
+    POP;
     if (*(BOUND(0, 3)).data.boolean_val == 10) {
         PUSH_LITERAL(scheme_new_boolean(54))
         PUSH(GLOBAL_BOUND(2))
@@ -71,6 +74,7 @@ START(4)
     //APPLICATE(GLOBAL_BOUND(6), 93452)
     PUSH_LITERAL(scheme_new_boolean(3))
     SET_GLOBAL_BOUND(2)
+    POP;
     c1 = clock();
     double runtime_diff_ms = (c1 - c0) * 1000. / CLOCKS_PER_SEC;
     printf("Runtime: %f \n", runtime_diff_ms);
@@ -103,12 +107,14 @@ FUNCTION(456)
         BODY(6)
         PUSH_LITERAL(scheme_new_boolean(4))
         SET_BOUND(0, 0)
+        POP;
         PUSH(BOUND(0,0))
         PUSH_LITERAL(CONTINUATION(9508))
         PUSH_LITERAL(LAMBDA(4869,1))
         APPLICATE(1, 9508)
         printf("value of internal define: %d \n", *(BOUND(0,0).data.boolean_val));
         SET_BOUND(0,0)
+        POP;
         printf("return value of call/cc: %d \n", *(BOUND(0, 0).data.boolean_val));
         printf("pop stack: %d \n", *(POP.data.boolean_val));
         PUSH_LITERAL(scheme_new_boolean(3))
@@ -126,6 +132,7 @@ FUNCTION(456)
             TAIL_APPLICATE(1)
 
         SET_BOUND(2,0)
+        POP;
         BODY_CLOSE
         BODY_CLOSE
 
@@ -136,6 +143,7 @@ FUNCTION(456)
 FUNCTION(4869)
     PUSH(BOUND(0, 0))
     SET_GLOBAL_BOUND(2)
+    POP;
     //CONTINUATION_RESULT_LITERAL(scheme_new_boolean(99))
     //APPLICATE_CONTINUATION(BOUND(0,0))
     PUSH_LITERAL(scheme_new_boolean(10))

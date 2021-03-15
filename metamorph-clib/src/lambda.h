@@ -18,7 +18,7 @@ void release_procedure(scheme_procedure_t);
 #define BOUND(PARENT, NUMBER) (*(bound(PARENT, NUMBER)))
 #define GLOBAL_BOUND(NUMBER) (root_activation->formal_parameters[NUMBER])
 
-#define SET_BOUND(PARENT, NUMBER) set_bound(bound(PARENT, NUMBER), POP_LITERAL);
-#define SET_GLOBAL_BOUND(NUMBER) set_bound(&root_activation->formal_parameters[NUMBER], POP_LITERAL);
+#define SET_BOUND(PARENT, NUMBER) set_bound(bound(PARENT, NUMBER), POP_LITERAL); PUSH_UNSPECIFIED;
+#define SET_GLOBAL_BOUND(NUMBER) set_bound(&root_activation->formal_parameters[NUMBER], POP_LITERAL); PUSH_UNSPECIFIED;
 
 #endif
