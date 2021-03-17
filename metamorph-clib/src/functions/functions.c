@@ -63,7 +63,6 @@ void prereturn() {
 
 
 void cleanup(){
-    root_activation->previous_activation = root_activation;
     release_activation(root_activation);
     exit(0);
 }
