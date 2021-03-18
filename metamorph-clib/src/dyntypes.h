@@ -250,6 +250,9 @@ typedef struct scheme_pair_struct_t {
 
 // Value constructors
 
+dyntype_t scheme_string(scheme_string_t obj, bool_t _mutable);
+dyntype_t scheme_symbol(scheme_symbol_t obj, bool_t _mutable);
+
 dyntype_t scheme_new_boolean(scheme_boolean_t obj);
 dyntype_t scheme_literal_boolean(scheme_boolean_t obj);
 dyntype_t scheme_new_string(scheme_string_t obj);

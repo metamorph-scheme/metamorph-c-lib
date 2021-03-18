@@ -11,13 +11,23 @@
 #include "../tommath/tommath.h"
 
 OBJ_CREATION_FUNCS(boolean, SCHEME_TYPE_BOOLEAN)
-OBJ_CREATION_FUNCS(symbol, SCHEME_TYPE_SYMBOL)
 OBJ_CREATION_FUNCS(pair, SCHEME_TYPE_PAIR)
 OBJ_CREATION_FUNCS(procedure, SCHEME_TYPE_PROCEDURE)
 OBJ_CREATION_FUNCS(continuation, SCHEME_TYPE_CONTINUATION)
 OBJ_CREATION_FUNCS(number, SCHEME_TYPE_NUMBER)
 OBJ_CREATION_FUNCS(char, SCHEME_TYPE_CHAR)
 OBJ_CREATION_FUNCS(port, SCHEME_TYPE_PORT)
+
+dyntype_t scheme_symbol(scheme_symbol_t obj, bool_t _mutable) {
+    scheme_symbol_t *ptr = REQUEST(scheme_symbol_t);
+    ptr->name = REQUEST_ARRAY(char, strlen(obj.name));
+    strcpy(ptr->name, obj.name);
+    return (dyntype_t) {
+        .type = SCHEME_TYPE_SYMBOL,
+            ._mutable = _mutable,
+            .data.symbol_val = ptr
+    };
+}
 
 dyntype_t scheme_string(scheme_string_t obj, bool_t _mutable) {
   char** ptr = REQUEST(char*);
@@ -37,6 +47,15 @@ dyntype_t scheme_new_string(scheme_string_t obj) {
 //Copies from obj, obj needs to be deallocated
 dyntype_t scheme_literal_string(scheme_string_t obj) {\
   return scheme_string(obj, FALSE);
+}
+
+//Copies from obj, obj needs to be deallocated
+dyntype_t scheme_new_symbol(scheme_symbol_t obj) {
+    return scheme_symbol(obj, TRUE);
+}
+//Copies from obj, obj needs to be deallocated
+dyntype_t scheme_literal_symbol(scheme_symbol_t obj) {
+    return scheme_symbol(obj, FALSE);
 }
 
 scheme_number_t scheme_exact_integer(scheme_integer_t obj) {
@@ -110,18 +129,18 @@ void release_dyntype(dyntype_t dyntype){
             RELEASE(scheme_string_t, dyntype.data.string_val)
             break;
         }
+        case(SCHEME_TYPE_SYMBOL): {
+            scheme_symbol_t symbol;
+            symbol = *dyntype.data.symbol_val;
+            RELEASE_ARRAY(char, strlen(symbol.name), symbol.name);
+            RELEASE(scheme_symbol_t, dyntype.data.symbol_val)
+            break;
+        }
         case(SCHEME_TYPE_PAIR): {
             scheme_pair_t pair;
             pair = *dyntype.data.pair_val;
             //release_pair(pair);
             RELEASE(scheme_pair_t, dyntype.data.pair_val)
-            break;
-        }
-        case(SCHEME_TYPE_SYMBOL): {
-            scheme_symbol_t symbol;
-            symbol = *dyntype.data.symbol_val;
-            //release_symbol(symbol);
-            RELEASE(scheme_symbol_t, dyntype.data.symbol_val)
             break;
         }
         case(SCHEME_TYPE_CONTINUATION): {
@@ -179,17 +198,18 @@ dyntype_t copy_dyntype(dyntype_t dyntype) {
         strcpy(string, *dyntype.data.string_val);
         return scheme_new_string(string);
     }
+    case(SCHEME_TYPE_SYMBOL): {
+        scheme_symbol_t symbol;
+        symbol.name = REQUEST_ARRAY(char, strlen(dyntype.data.symbol_val->name));
+        strcpy(symbol.name, dyntype.data.symbol_val->name);
+        //return copy_symbol(symbol);
+        return scheme_new_symbol(symbol);
+    }
     case(SCHEME_TYPE_PAIR): {
         scheme_pair_t pair;
         pair = *dyntype.data.pair_val;
         //return copy_pair(pair);
         return scheme_new_pair(pair);
-    }
-    case(SCHEME_TYPE_SYMBOL): {
-        scheme_symbol_t symbol;
-        symbol = *dyntype.data.symbol_val;
-        //return copy_symbol(symbol);
-        return scheme_new_symbol(symbol);
     }
     case(SCHEME_TYPE_NUMBER): {
         scheme_number_t number;

@@ -292,7 +292,6 @@
     <ClCompile Include="src\dyntypes\dyntypes.c" />
     <ClCompile Include="src\functions\activations.c" />
     <ClCompile Include="src\functions\functions.c" />
-    <ClCompile Include="src\main.c" />
     <ClCompile Include="src\primf\booleans.c" />
     <ClCompile Include="src\primf\continuation.c" />
     <ClCompile Include="src\primf\lambda.c" />
