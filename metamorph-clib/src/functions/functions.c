@@ -67,6 +67,13 @@ void cleanup(){
     exit(0);
 }
 
+int popif() {
+    dyntype_t tmp = POP_LITERAL;
+    REQUIRE_SCHEME_BOOLEAN(tmp, 0);
+    release_dyntype(tmp);
+    return c_tmp;
+}
+
 void error(int code){
     switch (code)
     {

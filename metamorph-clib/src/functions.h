@@ -22,6 +22,7 @@ void error(int);
 void body(int);
 int close_body();
 void finalize_call();
+int popif();
 
 
 extern int balance;
