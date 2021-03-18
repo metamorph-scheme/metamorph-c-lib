@@ -145,7 +145,7 @@ scheme_ord_t i_num_cmp(scheme_number_t a, scheme_number_t b) {
 		return real_cmp(*a.data.inexact_real_val, *b.data.inexact_real_val);
 	} else if (i_exact_q(a) && i_exact_q(b)) {
 		// both exact
-		if (i_integer_q(a) && i_inexact_q(b)) {
+		if (i_integer_q(a) && i_integer_q(b)) {
 			// both exact integer
 			return integer_cmp(*a.data.exact_integer_val, *b.data.exact_integer_val);
 		}
@@ -252,8 +252,10 @@ dyntype_t i_generic_num_cmp_or_equal(scheme_ord_t ord, ELLIPSIS_PARAM(x)) {
 	return scheme_new_boolean(TRUE);
 }
 
-dyntype_t num_eq(ELLIPSIS_PARAM(x)) {
-	return i_generic_num_cmp(SCHEME_EQ, x, len);
+BASE_FUNCTION(num_eq) {
+    ELLIPSIS
+	PUSH_LITERAL((i_generic_num_cmp(SCHEME_EQ, ellipsis, n_ellipsis)));
+    //DESTROY_ELLIPSIS
 }
 
 dyntype_t num_lt(ELLIPSIS_PARAM(x)) {
@@ -280,7 +282,7 @@ scheme_number_t i_add(scheme_number_t a, scheme_number_t b) {
 	}
 	else if (i_exact_q(a) && i_exact_q(b)) {
 		// both exact
-		if (i_integer_q(a) && i_inexact_q(b)) {
+		if (i_integer_q(a) && i_integer_q(b)) {
 			// both exact integer
 			return scheme_exact_integer(integer_add(*a.data.exact_integer_val, *b.data.exact_integer_val));
 		}
@@ -388,7 +390,7 @@ scheme_number_t i_mul(scheme_number_t a, scheme_number_t b) {
 	}
 	else if (i_exact_q(a) && i_exact_q(b)) {
 		// both exact
-		if (i_integer_q(a) && i_inexact_q(b)) {
+		if (i_integer_q(a) && i_integer_q(b)) {
 			// both exact integer
 			return scheme_exact_integer(integer_mul(*a.data.exact_integer_val, *b.data.exact_integer_val));
 		}
@@ -494,7 +496,7 @@ scheme_number_t i_sub(scheme_number_t a, scheme_number_t b) {
 	}
 	else if (i_exact_q(a) && i_exact_q(b)) {
 		// both exact
-		if (i_integer_q(a) && i_inexact_q(b)) {
+		if (i_integer_q(a) && i_integer_q(b)) {
 			// both exact integer
 			return scheme_exact_integer(integer_sub(*a.data.exact_integer_val, *b.data.exact_integer_val));
 		}
@@ -584,29 +586,33 @@ scheme_number_t i_neg(scheme_number_t x) {
 	}
 }
 
-dyntype_t sub(ELLIPSIS_PARAM(x)) {
-	if (len == 1) {
-		dyntype_t f = x[0];
+BASE_FUNCTION(sub) {
+    ELLIPSIS
+
+	if (n_ellipsis == 1) {
+		dyntype_t f = ellipsis[0];
 		REQUIRE_SCHEME_NUMBER(f, 0);
-		return scheme_new_number(i_neg(c_f));
+        PUSH_LITERAL(scheme_new_number(i_neg(c_f)))
+		return;
 	}
 
-	dyntype_t f = x[0];
-	dyntype_t s = x[1];
+	dyntype_t f = ellipsis[0];
+	dyntype_t s = ellipsis[1];
 
 	REQUIRE_SCHEME_NUMBER(f, 0);
 	REQUIRE_SCHEME_NUMBER(s, 1);
-	scheme_number_t acc = i_mul(c_f, c_s);
+	scheme_number_t acc = i_sub(c_f, c_s);
 
-	for (int i = 2; i < len; i++) {
-		dyntype_t elem = x[i];
+	for (int i = 2; i < n_ellipsis; i++) {
+		dyntype_t elem = ellipsis[i];
 		REQUIRE_SCHEME_NUMBER(elem, i);
 
-		scheme_number_t res = i_mul(acc, c_elem);
+		scheme_number_t res = i_sub(acc, c_elem);
 		release_number(acc);
 		acc = res;
 	}
-	return scheme_new_number(acc);
+	PUSH_LITERAL(scheme_new_number(acc))
+	//DESTROY_ELLIPSIS
 }
 
 bool_t i_zero_q(scheme_number_t x) {
@@ -639,7 +645,7 @@ scheme_number_t i_div(scheme_number_t a, scheme_number_t b) {
 	}
 	else if (i_exact_q(a) && i_exact_q(b)) {
 		// both exact
-		if (i_integer_q(a) && i_inexact_q(b)) {
+		if (i_integer_q(a) && i_integer_q(b)) {
 			// both exact integer
 			return scheme_exact_rational(rational_create(*a.data.exact_integer_val, *b.data.exact_integer_val));
 		}

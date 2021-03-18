@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 project(metamorph_clib C)
 
 set(CMAKE_C_STANDARD 99)
@@ -9,6 +10,10 @@ endif()
 if(_TEST_PRIMF)
     add_compile_definitions(_TEST_PRIMF)
 endif()
+IF(CMAKE_COMPILER_IS_GNUCC)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
+ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
 include_directories(metamorph-clib/src)
 include_directories(metamorph-clib/src/cache)
@@ -208,4 +213,4 @@ add_executable(metamorph_clib
         metamorph-clib/src/gc.h
         metamorph-clib/src/lambda.h
         metamorph-clib/src/primf.h
-        metamorph-clib/src/test_functions.c)
+        metamorph-clib/src/test_functions.c metamorph-clib/src/main.c metamorph-clib/src/common/stack.c)

@@ -9,12 +9,16 @@ NONSTANDARD scheme_boolean_t obj_to_boolean(dyntype_t obj) {
     return (obj.type != SCHEME_TYPE_BOOLEAN || *obj.data.boolean_val != FALSE);
 }
 
-dyntype_t not(dyntype_t obj) {
-    return scheme_new_boolean(!(obj_to_boolean(obj)));
+BASE_FUNCTION(not) {
+    PARAMETER(obj)
+
+    PUSH_LITERAL(scheme_new_boolean(!(obj_to_boolean(obj))))
+    DESTROY_PARAM(obj)
 }
 
-dyntype_t boolean_q(dyntype_t obj) {
-    return scheme_new_boolean(obj.type == SCHEME_TYPE_BOOLEAN);
+BASE_FUNCTION(boolean_q) {
+    PARAMETER(obj)
+    PUSH_LITERAL(scheme_new_boolean(obj.type == SCHEME_TYPE_BOOLEAN));
 }
 
 dyntype_t boolean_eq(ELLIPSIS_PARAM(boolean)) {

@@ -52,7 +52,7 @@ void applicate_lambda(dyntype_t lambda, int id, activation_t* new_activation){
             for (i = 0; i < c_lambda.formal_parameters; i++) {
                 ptr[i] = new_activation->formal_parameters[i];
             }
-            ptr[i] = list(new_activation->formal_parameters + i, new_activation->number_parameters - c_lambda.formal_parameters);
+            ptr[i] = i_list(new_activation->formal_parameters + i, new_activation->number_parameters - c_lambda.formal_parameters);
             RELEASE_ARRAY(dyntype_t, new_activation->number_parameters, new_activation->formal_parameters)
             new_activation->number_parameters = i;
             new_activation->formal_parameters = ptr;

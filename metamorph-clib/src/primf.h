@@ -28,34 +28,34 @@ BASE_FUNCTION(flush_output_port);
 // Symbols
 
 // symbol?
-dyntype_t symbol_q(dyntype_t obj);
+BASE_FUNCTION(symbol_q);
 // symbol=?
-dyntype_t symbol_eq(ELLIPSIS_PARAM(obj));
+BASE_FUNCTION(symbol_eq);
 // symbol->string
-dyntype_t symbol_to_string(dyntype_t symbol);
+BASE_FUNCTION(symbol_to_string);
 // string->symbol
-dyntype_t string_to_symbol(dyntype_t string);
+BASE_FUNCTION(string_to_symbol);
 
 // Booleans
 
 NONSTANDARD scheme_boolean_t obj_to_boolean(dyntype_t obj);
 // not
-dyntype_t not(dyntype_t obj);
+BASE_FUNCTION(not);
 // boolean?
-dyntype_t boolean_q(dyntype_t obj);
+BASE_FUNCTION(boolean_q);
 // boolean=?
 dyntype_t boolean_eq(ELLIPSIS_PARAM(boolean));
 
 // Pairs
 
 // pair?
-dyntype_t pair_q(dyntype_t obj);
+BASE_FUNCTION(pair_q);
 // cons
-dyntype_t cons(dyntype_t obj1, dyntype_t obj2);
+BASE_FUNCTION(cons);
 // car
-dyntype_t car(dyntype_t pair);
+BASE_FUNCTION(car);
 // cdr
-dyntype_t cdr(dyntype_t pair);
+BASE_FUNCTION(cdr);
 // set-car!
 dyntype_t set_car_ex(dyntype_t pair, dyntype_t obj);
 // set-cdr!
@@ -77,9 +77,9 @@ dyntype_t set_cdr_ex(dyntype_t pair, dyntype_t obj);
 */
 
 // null?
-dyntype_t null_q(dyntype_t obj);
+BASE_FUNCTION(null_q);
 // list?
-dyntype_t list_q(dyntype_t obj);
+BASE_FUNCTION(list_q);
 
 // make-list
 dyntype_t make_list(int c_k);
@@ -87,7 +87,8 @@ dyntype_t make_list(int c_k);
 dyntype_t make_list_fill(int k, dyntype_t fill);
 
 // list
-dyntype_t list(ELLIPSIS_PARAM(obj));
+BASE_FUNCTION(list);
+dyntype_t i_list(ELLIPSIS_PARAM(obj));
 
 // TODO number type
 // length
@@ -199,6 +200,7 @@ dyntype_t list_set(dyntype_t list, int k, dyntype_t obj);
 // list-copy
 dyntype_t list_copy(dyntype_t list);
 
+// Numbers
 
 dyntype_t number_q(dyntype_t obj);
 
@@ -209,6 +211,10 @@ dyntype_t integer_q(dyntype_t obj);
 
 dyntype_t inexact_q(dyntype_t z);
 dyntype_t exact_q(dyntype_t z);
+
+BASE_FUNCTION(num_eq);
+
+BASE_FUNCTION(sub);
 
 /*
 (define exact-integer?
@@ -295,6 +301,8 @@ scheme_rational_t rational_copy(scheme_rational_t obj);
 (define remainder truncate-remainder)
 (define modulo floor-remainder)
 */
+
+
 
 void release_number(scheme_number_t number);
 dyntype_t copy_number(scheme_number_t number);

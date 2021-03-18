@@ -6,29 +6,51 @@
 #include "primf_internal.h"
 #include <string.h>
 
-dyntype_t symbol_q(dyntype_t obj) {
-    return scheme_new_boolean(obj.type == SCHEME_TYPE_SYMBOL);
+BASE_FUNCTION(symbol_q) {
+    PARAMETER(obj)
+    PUSH_LITERAL(scheme_new_boolean(obj.type == SCHEME_TYPE_SYMBOL))
+
+    DESTROY_PARAM(obj)
 }
 
-dyntype_t symbol_eq(ELLIPSIS_PARAM(obj)) {
-    if (obj[0].type != SCHEME_TYPE_SYMBOL)
-        return scheme_new_boolean(FALSE);
+BASE_FUNCTION(symbol_eq) {
+    ELLIPSIS
 
-    for (int i = 1; i < len; i++) {
-        if (obj[i].type != SCHEME_TYPE_SYMBOL
-            || (strcmp(*obj[0].data.symbol_val, *obj[i].data.symbol_val) != 0))
-            return scheme_new_boolean(FALSE);
+
+    if (ellipsis[0].type != SCHEME_TYPE_SYMBOL) {
+        PUSH_LITERAL(scheme_new_boolean(FALSE))
+        return;
     }
-    return scheme_new_boolean(TRUE);
+
+    for (int i = 1; i < n_ellipsis; i++) {
+        if (ellipsis[i].type != SCHEME_TYPE_SYMBOL
+            || (strcmp(*ellipsis[0].data.symbol_val, *ellipsis[i].data.symbol_val) != 0)){
+            PUSH_LITERAL(scheme_new_boolean(FALSE))
+            return;
+        }
+    }
+    PUSH_LITERAL(scheme_new_boolean(TRUE));
+
+    DESTROY_ELLIPSIS
 }
 
 // return immutable string on purpose - see r7rs page 44
-dyntype_t symbol_to_string(dyntype_t sym) {
+BASE_FUNCTION(symbol_to_string) {
+    PARAMETER(sym)
     REQUIRE_SCHEME_SYMBOL(sym, 0);
-    return scheme_literal_string(c_sym);
+    PUSH_LITERAL(scheme_literal_string(c_sym));
+
+    // not needed because the char pointer of the symbol is reused
+    //DESTROY_PARAM(sym)
 }
 
-dyntype_t string_to_symbol(dyntype_t str) {
+BASE_FUNCTION (string_to_symbol) {
+    PARAMETER(str)
+
     REQUIRE_SCHEME_STRING(str, 0);
-    return scheme_new_symbol(c_str);
+
+    PUSH_LITERAL(scheme_new_symbol(c_str))
+
+    // not needed because the char pointer of the string is reused
+    //DESTROY_PARAM(str)
 }
