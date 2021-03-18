@@ -8,6 +8,7 @@
 #include <math.h>
 #include <float.h>
 #include <limits.h>
+#include <string.h>
 
 // TODO: think about this
 #define BITS_SUB_ZERO 1024
@@ -290,4 +291,10 @@ scheme_boolean_t real_gte(scheme_real_t a, scheme_real_t b) {
 	else {
 		return FALSE;
 	}
+}
+
+dyntype_t real_to_string(scheme_real_t a) {
+    char out[1000];
+    sprintf(out, "%.5lf", a);
+    return scheme_new_string(out);
 }

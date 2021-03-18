@@ -165,8 +165,59 @@ scheme_boolean_t integer_gte(scheme_integer_t a, scheme_integer_t b) {
 	}
 }
 
+dyntype_t integer_to_string(scheme_integer_t a) {
+    char str[10000];
+
+    CATCH_MP_ERROR(mp_to_radix(&a, str, 10000, NULL, 10));
+
+    return scheme_new_string(str);
+}
+
 void integer_release(scheme_integer_t x) {
 	mp_clear(&x);
+}
+
+scheme_integer_t integer_create_s32(int a) {
+    mp_int out;
+    CATCH_MP_ERROR(mp_init(&out))
+
+    mp_set_i32(&out, a);
+    return out;
+}
+
+int integer_to_s32int(scheme_integer_t a) {
+    if(mp_sbin_size(&a) > (sizeof(int) + 1)) {
+        SET_TOMMATH_NUMBER_EXCEPTION
+    } else {
+        char out[5];
+        size_t written;
+        CATCH_MP_ERROR(mp_to_sbin(&a, out, 4, &written));
+        switch(written) {
+            case 1:
+                // only sign
+                return 0;
+            case 2: {
+                // one data byte
+                int res = ((int) out[1]);
+                return (out[0]) ? (-1) * res : res;
+            }
+            case 3: {
+                // two data byte
+                int res = (((int) out[1] << 8) + (int) out[2]);
+                return (out[0]) ? (-1) * res : res;
+            }
+            case 4: {
+                // three data byte
+                int res = (((int) out[1] << 16) + ((int) out[2] << 8) + (int) out[3]);
+                return (out[0]) ? (-1) * res : res;
+            }
+            case 5: {
+                // two data byte
+                int res = (((int) out[1] << 24) + ((int) out[2] << 16) + ((int) out[3] << 8) + out[4]);
+                return (out[0]) ? (-1) * res : res;
+            }
+        }
+    }
 }
 
 scheme_integer_t integer_copy(scheme_integer_t obj) {

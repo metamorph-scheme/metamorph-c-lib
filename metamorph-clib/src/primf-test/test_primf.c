@@ -910,6 +910,67 @@ TEST(integer_import_negative) {
     return 0;
 }
 
+TEST(integer_export_negative) {
+    mp_int a;
+    if (mp_init(&a) != MP_OKAY) {
+        MU_ASSERT("Number initialisation failed", FALSE);
+    }
+    mp_set_i64(&a, -20);
+
+    char out[5];
+    size_t written;
+    mp_to_sbin(&a, out, 4, &written);
+    printf("lucky numbers %d %d %d %d %d\n", out[0], out[1], out[2], out[3], written);
+
+    return 0;
+}
+
+TEST(integer_to_s32int) {
+    mp_int a;
+    if (mp_init(&a) != MP_OKAY) {
+        MU_ASSERT("Number initialisation failed", FALSE);
+    }
+    mp_set_i64(&a, -20);
+
+    int b = integer_to_s32int(a);
+
+    ASSERT_EQ("integer is not -20", -20, b);
+
+    return 0;
+}
+
+TEST(integer_to_s32int_2) {
+    mp_int a;
+    if (mp_init(&a) != MP_OKAY) {
+        MU_ASSERT("Number initialisation failed", FALSE);
+    }
+    mp_set_i64(&a, 2147483648);
+
+    TRY {
+        int b = integer_to_s32int(a);
+    }
+    CATCH{
+        CHECK_ERROR_TYPE(global_exception, INTERNAL_TYPE_TOMMATH_NUMBER_EXCEPTION);
+    }
+
+
+    return 0;
+}
+
+TEST(integer_to_s32int_3) {
+    mp_int a;
+    if (mp_init(&a) != MP_OKAY) {
+        MU_ASSERT("Number initialisation failed", FALSE);
+    }
+    mp_set_i64(&a, 2147483647);
+
+    int b = integer_to_s32int(a);
+
+    ASSERT_EQ("integer is not 2147483647", 2147483647, b);
+
+    return 0;
+}
+
 static char* all_tests() {
     MU_RUN_TEST(string_to_symbol);
     MU_RUN_TEST(string_to_symbol_wrong_type);
@@ -962,6 +1023,10 @@ static char* all_tests() {
     MU_RUN_TEST(rational_div);
     MU_RUN_TEST(integer_import);
     MU_RUN_TEST(integer_import_negative);
+    //MU_RUN_TEST(integer_export_negative);
+    MU_RUN_TEST(integer_to_s32int);
+    MU_RUN_TEST(integer_to_s32int_2);
+    MU_RUN_TEST(integer_to_s32int_3);
     return 0;
 }
 

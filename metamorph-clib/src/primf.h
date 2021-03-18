@@ -212,6 +212,8 @@ dyntype_t integer_q(dyntype_t obj);
 dyntype_t inexact_q(dyntype_t z);
 dyntype_t exact_q(dyntype_t z);
 
+BASE_FUNCTION(number_to_string);
+
 BASE_FUNCTION(num_eq);
 
 BASE_FUNCTION(sub);
@@ -225,6 +227,9 @@ BASE_FUNCTION(sub);
 // functions in numbers.c should only use these internal functions and no tommathlib functions or low-level struct initialization at all.
 
 // this API should also not differentiate between inexact or exact variants
+
+// to string functions return dyntypes for the sake of simpilicity in memory management
+// it makes clear that the function that uses the function has to release the dyntype
 
 // Metamorph Number API
 
@@ -248,6 +253,9 @@ scheme_boolean_t integer_gt(scheme_integer_t a, scheme_integer_t b);
 scheme_boolean_t integer_gte(scheme_integer_t a, scheme_integer_t b);
 scheme_boolean_t integer_lte(scheme_integer_t a, scheme_integer_t b);
 
+dyntype_t integer_to_string(scheme_integer_t a);
+int integer_to_s32int(scheme_integer_t a);
+
 void integer_release(scheme_integer_t);
 scheme_integer_t integer_copy(scheme_integer_t obj);
 
@@ -266,6 +274,8 @@ scheme_boolean_t real_lt(scheme_real_t a, scheme_real_t b);
 scheme_boolean_t real_lte(scheme_real_t a, scheme_real_t b);
 scheme_boolean_t real_gt(scheme_real_t a, scheme_real_t b);
 scheme_boolean_t real_gte(scheme_real_t a, scheme_real_t b);
+
+dyntype_t real_to_string(scheme_real_t a);
 
 void rational_min(scheme_rational_t * q);
 scheme_rational_sign_t rational_sign(scheme_rational_t a);
@@ -289,6 +299,8 @@ scheme_boolean_t rational_lte(scheme_rational_t a, scheme_rational_t b);
 scheme_boolean_t rational_gt(scheme_rational_t a, scheme_rational_t b);
 scheme_boolean_t rational_gte(scheme_rational_t a, scheme_rational_t b);
 
+dyntype_t rational_to_string(scheme_rational_t a);
+
 scheme_rational_t integer_to_rational(scheme_integer_t n);
 
 void rational_release(scheme_rational_t x);
@@ -302,7 +314,9 @@ scheme_rational_t rational_copy(scheme_rational_t obj);
 (define modulo floor-remainder)
 */
 
+void release_pair(scheme_pair_t pair);
 
+dyntype_t copy_pair(scheme_pair_t pair);
 
 void release_number(scheme_number_t number);
 dyntype_t copy_number(scheme_number_t number);

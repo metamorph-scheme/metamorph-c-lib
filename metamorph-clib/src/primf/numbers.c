@@ -748,6 +748,22 @@ dyntype_t scheme_div(ELLIPSIS_PARAM(x)) {
 	return scheme_new_number(acc);
 }
 
+BASE_FUNCTION(number_to_string) {
+    PARAMETER(num)
+    REQUIRE_SCHEME_NUMBER(num,0)
+    if(i_exact_q(c_num)) {
+        if(i_integer_q(c_num)) {
+            // is exact integer
+            PUSH_LITERAL(integer_to_string(*c_num.data.exact_integer_val))
+        } else {
+            // is exact rational
+            PUSH_LITERAL(rational_to_string(*c_num.data.exact_rational_val))
+        }
+    } else {
+        PUSH_LITERAL(real_to_string(*c_num.data.inexact_real_val))
+    }
+}
+
 void release_number(scheme_number_t number) {
 	char type = number.type;
 	switch (type) {

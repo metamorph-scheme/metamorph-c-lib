@@ -6,6 +6,7 @@
 #include "../cache.h"
 #include "../functions.h"
 #include "../tommath/tommath.h"
+#include <string.h>
 
 // manipulates rational instead of copying!
 void rational_min(scheme_rational_t* q) {
@@ -241,6 +242,21 @@ scheme_rational_t integer_to_rational(scheme_integer_t n) {
 	CATCH_MP_ERROR(mp_init_copy(&num, &n));
 	CATCH_MP_ERROR(mp_init_u32(&denom, 1));
 	return rational_create(denom, n);
+}
+
+dyntype_t rational_to_string(scheme_rational_t a) {
+    char n_str[10001];
+    char d_str[10001];
+    char str[20003];
+
+    CATCH_MP_ERROR(mp_to_radix(&a.numerator, n_str, 10000, NULL, 10));
+    CATCH_MP_ERROR(mp_to_radix(&a.denominator, d_str, 10000, NULL, 10));
+
+    strcat(str, n_str);
+    strcat(str, "/");
+    strcat(str, d_str);
+
+    return scheme_new_string(str);
 }
 
 void rational_release(scheme_rational_t x) {
