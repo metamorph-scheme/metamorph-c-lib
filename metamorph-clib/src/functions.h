@@ -61,7 +61,7 @@ void postjump();
 #define DESTROY_PARAM(NAME)     release_dyntype(NAME);
 #define DESTROY_ELLIPSIS        release_dyntypes(ellipsis, n_ellipsis); 
 #define PUSH(DYNTYPE)           stack_push(current_activation, DYNTYPE);
-#define PUSH_UNSPECIFIED        stack_push(current_activation, (dyntype_t){SCHEME_TYPE_UNSPECIFIED,0,0});
+#define PUSH_UNSPECIFIED        stack_push_literal(current_activation, (dyntype_t){SCHEME_TYPE_UNSPECIFIED,0,0});
 #define PUSH_LITERAL(DYNTYPE)   stack_push_literal(current_activation, DYNTYPE);
 #define POP                     stack_pop(current_activation)
 #define POP_LITERAL             stack_pop_literal(current_activation)
