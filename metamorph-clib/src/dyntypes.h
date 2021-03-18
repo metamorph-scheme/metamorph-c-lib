@@ -73,9 +73,7 @@ typedef struct {
   struct activation_struct_t* activation;
 } scheme_procedure_t;
 
-typedef struct {
-  char* name;
-} scheme_symbol_t;
+typedef char* scheme_symbol_t;
 
 typedef mp_int scheme_integer_t;
 
@@ -249,6 +247,9 @@ typedef struct scheme_pair_struct_t {
   }
 
 // Value constructors
+
+dyntype_t scheme_string(scheme_string_t obj, bool_t _mutable);
+dyntype_t scheme_symbol(scheme_symbol_t obj, bool_t _mutable);
 
 dyntype_t scheme_new_boolean(scheme_boolean_t obj);
 dyntype_t scheme_literal_boolean(scheme_boolean_t obj);
