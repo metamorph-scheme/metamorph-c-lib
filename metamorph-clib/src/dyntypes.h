@@ -73,9 +73,7 @@ typedef struct {
   struct activation_struct_t* activation;
 } scheme_procedure_t;
 
-typedef struct {
-  char* name;
-} scheme_symbol_t;
+typedef char* scheme_symbol_t;
 
 typedef mp_int scheme_integer_t;
 

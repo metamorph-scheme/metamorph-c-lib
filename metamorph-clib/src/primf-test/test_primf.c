@@ -34,7 +34,7 @@ TEST(string_to_symbol) {
     dyntype_t sym_dyn = string_to_symbol(dyn);
 
     CHECK_TYPE(sym_dyn, SCHEME_TYPE_SYMBOL);
-    ASSERT_EQ("Symbol name != nicesymbol",0,strcmp(sym_dyn.data.symbol_val->name, str));
+    ASSERT_EQ("Symbol name != nicesymbol",0,strcmp(*sym_dyn.data.symbol_val, str));
     ASSERT_EQ("Symbol is not mutable", TRUE, sym_dyn._mutable);
     return 0;
 }
@@ -104,9 +104,9 @@ TEST(symbol_q_negative) {
 }
 
 TEST(symbol_eq) {
-    dyntype_t dyn1 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol"});
-    dyntype_t dyn2 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol"});
-    dyntype_t dyn3 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol"});
+    dyntype_t dyn1 = scheme_literal_symbol( "nicesymbol");
+    dyntype_t dyn2 = scheme_literal_symbol("nicesymbol");
+    dyntype_t dyn3 = scheme_literal_symbol("nicesymbol");
     dyntype_t dyns[] = {dyn1, dyn2, dyn3};
 
     dyntype_t boolean_dyn = symbol_eq(dyns, 3);
@@ -119,9 +119,9 @@ TEST(symbol_eq) {
 }
 
 TEST(symbol_eq_negative) {
-    dyntype_t dyn1 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol"});
-    dyntype_t dyn2 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol2"});
-    dyntype_t dyn3 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol"});
+    dyntype_t dyn1 = scheme_literal_symbol("nicesymbol");
+    dyntype_t dyn2 = scheme_literal_symbol("nicesymbol2");
+    dyntype_t dyn3 = scheme_literal_symbol("nicesymbol");
     dyntype_t dyns[] = {dyn1, dyn2, dyn3};
 
     dyntype_t boolean_dyn = symbol_eq(dyns, 3);
@@ -134,9 +134,9 @@ TEST(symbol_eq_negative) {
 }
 
 TEST(symbol_eq_negative_2) {
-    dyntype_t dyn1 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol"});
-    dyntype_t dyn2 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol"});
-    dyntype_t dyn3 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol2"});
+    dyntype_t dyn1 = scheme_literal_symbol("nicesymbol");
+    dyntype_t dyn2 = scheme_literal_symbol("nicesymbol");
+    dyntype_t dyn3 = scheme_literal_symbol("nicesymbol2");
     dyntype_t dyns[] = {dyn1, dyn2, dyn3};
 
     dyntype_t boolean_dyn = symbol_eq(dyns, 3);
@@ -149,9 +149,9 @@ TEST(symbol_eq_negative_2) {
 }
 
 TEST(symbol_eq_negative_3) {
-    dyntype_t dyn1 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol1"});
-    dyntype_t dyn2 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol"});
-    dyntype_t dyn3 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol"});
+    dyntype_t dyn1 = scheme_literal_symbol("nicesymbol1");
+    dyntype_t dyn2 = scheme_literal_symbol("nicesymbol");
+    dyntype_t dyn3 = scheme_literal_symbol("nicesymbol");
     dyntype_t dyns[] = {dyn1, dyn2, dyn3};
 
     dyntype_t boolean_dyn = symbol_eq(dyns, 3);
@@ -165,8 +165,8 @@ TEST(symbol_eq_negative_3) {
 
 TEST(symbol_eq_wrong_type) {
     dyntype_t dyn1 = scheme_literal_string("nicesymbol");
-    dyntype_t dyn2 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol"});
-    dyntype_t dyn3 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol"});
+    dyntype_t dyn2 = scheme_literal_symbol("nicesymbol");
+    dyntype_t dyn3 = scheme_literal_symbol("nicesymbol");
     dyntype_t dyns[] = {dyn1, dyn2, dyn3};
 
     dyntype_t boolean_dyn = symbol_eq(dyns, 3);
@@ -179,8 +179,8 @@ TEST(symbol_eq_wrong_type) {
 }
 
 TEST(symbol_eq_wrong_type_2) {
-    dyntype_t dyn1 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol"});
-    dyntype_t dyn2 = scheme_literal_symbol((scheme_symbol_t) {"nicesymbol"});
+    dyntype_t dyn1 = scheme_literal_symbol("nicesymbol");
+    dyntype_t dyn2 = scheme_literal_symbol("nicesymbol");
     dyntype_t dyn3 = scheme_literal_string("nicesymbol");
     dyntype_t dyns[] = {dyn1, dyn2, dyn3};
 
@@ -362,7 +362,7 @@ TEST(length) {
 TEST(append) {
     dyntype_t str = scheme_literal_string("abc");
     dyntype_t list = make_list_fill(2, str);
-    dyntype_t sym = scheme_literal_symbol((scheme_symbol_t) { .name = "a" });
+    dyntype_t sym = scheme_literal_symbol( "a" );
     dyntype_t args[] = { list, sym };
 
     dyntype_t appended_list = append(args, 2);
@@ -372,7 +372,7 @@ TEST(append) {
     CHECK_TYPE(cdr(cdr(appended_list)), SCHEME_TYPE_SYMBOL);
     ASSERT_EQ("car is not string abc", 0,strcmp("abc", *car(appended_list).data.string_val));
     ASSERT_EQ("cadr is not string abc", 0, strcmp("abc", *car(cdr(appended_list)).data.string_val));
-    ASSERT_EQ("caddr is not symbol a", 0, strcmp("a", cdr(cdr(appended_list)).data.symbol_val->name));
+    ASSERT_EQ("caddr is not symbol a", 0, strcmp("a", *cdr(cdr(appended_list)).data.symbol_val));
 
     return 0;
 }
@@ -382,7 +382,7 @@ TEST(append_2) {
     dyntype_t str2 = scheme_literal_string("cba");
     dyntype_t list = make_list_fill(2, str);
     dyntype_t list2 = make_list_fill(1, str2);
-    dyntype_t sym = scheme_literal_symbol((scheme_symbol_t) { .name = "a" });
+    dyntype_t sym = scheme_literal_symbol("a" );
     dyntype_t args[] = { list, list2, sym };
 
     dyntype_t appended_list = append(args, 3);
@@ -393,7 +393,7 @@ TEST(append_2) {
     ASSERT_EQ("car is not string abc",0,strcmp("abc", *car(appended_list).data.string_val));
     ASSERT_EQ("cadr is not string abc", 0, strcmp("abc", *car(cdr(appended_list)).data.string_val));
     ASSERT_EQ("caddr is not cba", 0, strcmp("cba", *car(cdr(cdr(appended_list))).data.string_val));
-    ASSERT_EQ("cdddr is not symbol a", 0, strcmp("a", cdr(cdr(cdr(appended_list))).data.symbol_val->name));
+    ASSERT_EQ("cdddr is not symbol a", 0, strcmp("a", *cdr(cdr(cdr(appended_list))).data.symbol_val));
 
     return 0;
 }
@@ -445,7 +445,7 @@ TEST(append_6) {
     dyntype_t str2 = scheme_literal_string("cba");
     dyntype_t list = make_list_fill(2, str);
     dyntype_t list2 = make_list_fill(1, str2);
-    dyntype_t sym = scheme_literal_symbol((scheme_symbol_t) { .name = "a" });
+    dyntype_t sym = scheme_literal_symbol( "a" );
     dyntype_t args[] = { list, sym, list2 };
     
     TRY {

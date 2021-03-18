@@ -19,9 +19,9 @@ OBJ_CREATION_FUNCS(char, SCHEME_TYPE_CHAR)
 OBJ_CREATION_FUNCS(port, SCHEME_TYPE_PORT)
 
 dyntype_t scheme_symbol(scheme_symbol_t obj, bool_t _mutable) {
-    scheme_symbol_t *ptr = REQUEST(scheme_symbol_t);
-    ptr->name = REQUEST_ARRAY(char, strlen(obj.name));
-    strcpy(ptr->name, obj.name);
+    char** ptr = REQUEST(char*);
+    (*ptr) = REQUEST_ARRAY(char, strlen(obj));
+    strcpy(*ptr, obj);
     return (dyntype_t) {
         .type = SCHEME_TYPE_SYMBOL,
             ._mutable = _mutable,
@@ -132,7 +132,7 @@ void release_dyntype(dyntype_t dyntype){
         case(SCHEME_TYPE_SYMBOL): {
             scheme_symbol_t symbol;
             symbol = *dyntype.data.symbol_val;
-            RELEASE_ARRAY(char, strlen(symbol.name), symbol.name);
+            RELEASE_ARRAY(char, strlen(symbol), symbol);
             RELEASE(scheme_symbol_t, dyntype.data.symbol_val)
             break;
         }
@@ -199,10 +199,8 @@ dyntype_t copy_dyntype(dyntype_t dyntype) {
         return scheme_new_string(string);
     }
     case(SCHEME_TYPE_SYMBOL): {
-        scheme_symbol_t symbol;
-        symbol.name = REQUEST_ARRAY(char, strlen(dyntype.data.symbol_val->name));
-        strcpy(symbol.name, dyntype.data.symbol_val->name);
-        //return copy_symbol(symbol);
+        scheme_symbol_t symbol = REQUEST_ARRAY(char, strlen(*dyntype.data.symbol_val));
+        strcpy(symbol, *dyntype.data.symbol_val);
         return scheme_new_symbol(symbol);
     }
     case(SCHEME_TYPE_PAIR): {
