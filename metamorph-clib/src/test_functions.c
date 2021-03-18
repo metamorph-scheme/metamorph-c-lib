@@ -26,12 +26,15 @@ START(4)
    /* PUSH_LITERAL(scheme_literal_string("OUTPUT TEST 1\n"))
     write_string(1);*/
 
-    current_error_port(0);
+    PUSH_LITERAL(LAMBDA_BASE(current_error_port));
+    APPLICATE(0, 32432)
     //PUSH_LITERAL(scheme_literal_string("OUTPUT TEST 1\n"))
-    current_input_port(0);
-    read_line(1);
-    write_string(2);
-
+    PUSH_LITERAL(LAMBDA_BASE(current_input_port))
+    APPLICATE(0, 884038)
+    PUSH_LITERAL(LAMBDA_BASE(read_line))
+    APPLICATE(1,1532);
+    PUSH_LITERAL(LAMBDA_BASE(write_string))
+    APPLICATE(2,9734)
     PUSH_LITERAL(LAMBDA(89, 1))
     SET_GLOBAL_BOUND(0)
     POP;
@@ -41,9 +44,11 @@ START(4)
     PUSH_LITERAL(scheme_new_boolean(3))
     SET_GLOBAL_BOUND(2)
     POP;
-    current_output_port(0);
+    PUSH_LITERAL(LAMBDA_BASE(current_output_port))
+    APPLICATE(0,34534)
     PUSH_LITERAL(scheme_new_string("OUTPUT TEST 2\n"))
-    write_string(2);
+    PUSH_LITERAL(LAMBDA_BASE(write_string))
+    APPLICATE(2,8479)
     //PUSH_LITERAL(scheme_new_string("OUTPUT TEST 2\n"))
     //PUSH_LITERAL(scheme_new_string("OUTPUT TEST 2\n"))
 

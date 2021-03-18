@@ -21,6 +21,7 @@
 #define SCHEME_TYPE_PORT 11
 #define SCHEME_TYPE_UNSPECIFIED 12
 #define SCHEME_TYPE_CONTINUATION 13
+#define SCHEME_TYPE_BASE_PROCEDURE 14
 
 #define SCHEME_NUMERICAL_TYPE_EXACT_INTEGER 0
 #define SCHEME_NUMERICAL_TYPE_INEXACT_INTEGER 1
@@ -72,6 +73,10 @@ typedef struct {
   int variadic;
   struct activation_struct_t* activation;
 } scheme_procedure_t;
+
+typedef struct {
+    void (*function)(int);
+} scheme_base_procedure_t;
 
 typedef char* scheme_symbol_t;
 
@@ -132,6 +137,7 @@ typedef struct dyntype_t_struct {
     scheme_number_t* number_val;
     scheme_port_t* port_val;
     scheme_char_t* char_val;
+    scheme_base_procedure_t* base_procedure_val;
   } data;
 } dyntype_t;
 
@@ -225,6 +231,13 @@ typedef struct scheme_pair_struct_t {
     SET_TYPE_EXCEPTION(SCHEME_TYPE_PROCEDURE, PARAM.type, POS);\
   }
 
+#define REQUIRE_SCHEME_BASE_PROCEDURE(PARAM, POS) scheme_base_procedure_t c_##PARAM;\
+  if (PARAM.type == SCHEME_TYPE_BASE_PROCEDURE) { \
+    c_##PARAM = *PARAM.data.base_proc_val;\
+  } else {\
+    SET_TYPE_EXCEPTION(SCHEME_TYPE_BASE_PROCEDURE, PARAM.type, POS);\
+  }
+
 #define REQUIRE_SCHEME_CONTINUATION(PARAM, POS) scheme_continuation_t c_##PARAM;\
   if (PARAM.type == SCHEME_TYPE_CONTINUATION) { \
     c_##PARAM = *PARAM.data.continuation_val;\
@@ -266,6 +279,8 @@ dyntype_t scheme_literal_number(scheme_number_t obj);
 dyntype_t scheme_literal_port(scheme_port_t obj);
 dyntype_t scheme_new_char(scheme_char_t obj);
 dyntype_t scheme_literal_char(scheme_char_t obj);
+dyntype_t scheme_literal_base_procedure(scheme_base_procedure_t obj);
+dyntype_t scheme_new_base_procedure(scheme_base_procedure_t obj);
 
 scheme_number_t scheme_exact_integer(scheme_integer_t obj);
 scheme_number_t scheme_exact_rational(scheme_rational_t obj);

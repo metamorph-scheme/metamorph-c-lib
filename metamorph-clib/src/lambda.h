@@ -14,6 +14,7 @@ void release_procedure(scheme_procedure_t);
 
 #define LAMBDA(FUNCTION_ID, FORMAL_PARAMETERS)  create_lambda(current_activation,FUNCTION_ID, FORMAL_PARAMETERS, 0)
 #define LAMBDA_VARIADIC(FUNCTION_ID, FORMAL_PARAMETERS)  create_lambda(current_activation,FUNCTION_ID, FORMAL_PARAMETERS, 1)
+#define LAMBDA_BASE(FUNCTION_NAME)  scheme_literal_base_procedure((scheme_base_procedure_t){&FUNCTION_NAME})
 
 #define BOUND(PARENT, NUMBER) (*(bound(PARENT, NUMBER)))
 #define GLOBAL_BOUND(NUMBER) (root_activation->formal_parameters[NUMBER])
