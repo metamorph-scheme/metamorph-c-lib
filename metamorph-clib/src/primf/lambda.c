@@ -64,9 +64,11 @@ void applicate_lambda(dyntype_t lambda, int id, activation_t* new_activation){
         new_activation->return_address = id;
         //Current activation will be previous activation of new activation
         new_activation->previous_activation = current_activation;
+        current_activation = add_to_current_computation(new_activation);
         
     }
     else {
+        dyntype_t return_value = POP_LITERAL;
         finalize_call();
 
         //new activation will replace base activation
@@ -76,9 +78,9 @@ void applicate_lambda(dyntype_t lambda, int id, activation_t* new_activation){
         //Release current activation for constant memory
         //Current activation is no longer part of current computation
         remove_from_current_computation(current_activation);
+        current_activation = add_to_current_computation(new_activation);
+        PUSH_LITERAL(return_value);
     }
-
-    current_activation = add_to_current_computation(new_activation);
 
     //Set next jump to function
     return_address=c_lambda.function_id;
@@ -88,7 +90,7 @@ int count_references_procedure(scheme_procedure_t procedure,
                                 activation_t* activation) {
     if (procedure.activation == activation)
         return 1;
-    return count_references_activation(procedure.activation, activation);
+    return 0;
 }
 
 void release_procedure(scheme_procedure_t procedure){

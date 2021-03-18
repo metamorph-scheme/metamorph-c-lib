@@ -47,7 +47,7 @@ START(4)
     //PUSH_LITERAL(scheme_new_string("OUTPUT TEST 2\n"))
     //PUSH_LITERAL(scheme_new_string("OUTPUT TEST 2\n"))
 
-    PUSH_LITERAL(scheme_new_boolean(9000000))
+    PUSH_LITERAL(scheme_new_boolean(9000))
     PUSH(GLOBAL_BOUND(1))
     APPLICATE(1, 9683)
     SET_BOUND(0,3)
@@ -118,15 +118,17 @@ FUNCTION(456)
         printf("return value of call/cc: %d \n", *(BOUND(0, 0).data.boolean_val));
         printf("pop stack: %d \n", *(POP.data.boolean_val));
         PUSH_LITERAL(scheme_new_boolean(3))
-
         PUSH(BOUND(0, 0))
+        BODY(1)
+            PUSH_LITERAL(LAMBDA(4869,1))
+            SET_BOUND(0,0)
+        BODY_CLOSE
         RETURN
         BODY_CLOSE
     }
     else {
         BODY(3)
         BODY(3)
-
         PUSH_LITERAL(scheme_new_boolean(*(BOUND(2, 0).data.boolean_val) - 1))
             PUSH(GLOBAL_BOUND(1))
             TAIL_APPLICATE(1)
