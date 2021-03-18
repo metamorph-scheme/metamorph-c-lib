@@ -46,12 +46,16 @@ bool_t i_number_q(dyntype_t obj) {
 	return (obj.type == SCHEME_TYPE_NUMBER);
 }
 
-dyntype_t number_q(dyntype_t obj) {
-	return scheme_new_boolean(i_number_q(obj));
+BASE_FUNCTION(number_q) {
+    PARAMETER(obj)
+	PUSH_LITERAL(scheme_new_boolean(i_number_q(obj)));
+    DESTROY_PARAM(obj)
 }
 
-dyntype_t complex_q(dyntype_t obj) {
-	return number_q(obj);
+BASE_FUNCTION(complex_q) {
+    PARAMETER(obj)
+	PUSH_LITERAL(scheme_new_boolean(i_number_q(obj)))
+	DESTROY_PARAM(obj)
 }
 
 bool_t i_real_q(scheme_number_t obj) {
@@ -67,12 +71,16 @@ bool_t i_real_q(scheme_number_t obj) {
 	return (number_type == SCHEME_NUMERICAL_TYPE_INEXACT_REAL);
 }
 
-dyntype_t real_q(dyntype_t obj) {
+BASE_FUNCTION(real_q) {
+    PARAMETER(obj)
 	if (!i_number_q(obj)) {
-		return scheme_new_boolean(FALSE);
+		PUSH_LITERAL(scheme_new_boolean(FALSE));
+        DESTROY_PARAM(obj)
+        return;
 	}
 
-	return scheme_new_boolean(i_real_q(*obj.data.number_val));
+	PUSH_LITERAL(scheme_new_boolean(i_real_q(*obj.data.number_val)));
+	DESTROY_PARAM(obj)
 }
 
 bool_t i_rational_q(scheme_number_t obj) {
@@ -88,12 +96,17 @@ bool_t i_rational_q(scheme_number_t obj) {
     // TODO true for inexact reals that can be represented by rationals (rational? 3.5) => #t
 }
 
-dyntype_t rational_q(dyntype_t obj) {
+BASE_FUNCTION(rational_q) {
+    PARAMETER(obj)
+
 	if (!i_number_q(obj)) {
-		return scheme_new_boolean(FALSE);
+		PUSH_LITERAL(scheme_new_boolean(FALSE));
+		DESTROY_PARAM(obj)
+		return;
 	}
 
-	return scheme_new_boolean(i_rational_q(*obj.data.number_val));
+	PUSH_LITERAL(scheme_new_boolean(i_rational_q(*obj.data.number_val)));
+	DESTROY_PARAM(obj)
 }
 
 bool_t i_integer_q(scheme_number_t obj) {
@@ -105,12 +118,17 @@ bool_t i_integer_q(scheme_number_t obj) {
 	// TODO true for every inexact real x where (round x) is equal to x
 }
 
-dyntype_t integer_q(dyntype_t obj) {
+BASE_FUNCTION(integer_q) {
+    PARAMETER(obj)
+
 	if (!i_number_q(obj)) {
-		return scheme_new_boolean(FALSE);
+	    PUSH_LITERAL(scheme_new_boolean(FALSE))
+	    DESTROY_PARAM(obj)
+		return;
 	}
 
-	return scheme_new_boolean(i_integer_q(*obj.data.number_val));
+	PUSH_LITERAL(scheme_new_boolean(i_integer_q(*obj.data.number_val)))
+	DESTROY_PARAM(obj)
 }
 
 bool_t i_inexact_q(scheme_number_t z) {	
@@ -120,9 +138,11 @@ bool_t i_inexact_q(scheme_number_t z) {
 		|| number_type == SCHEME_NUMERICAL_TYPE_INEXACT_REAL);
 }
 
-dyntype_t inexact_q(dyntype_t z) {
+BASE_FUNCTION(inexact_q) {
+    PARAMETER(z)
 	REQUIRE_SCHEME_NUMBER(z, 0);
-	return scheme_new_boolean(i_inexact_q(c_z));
+	PUSH_LITERAL(scheme_new_boolean(i_inexact_q(c_z)));
+	DESTROY_PARAM(z)
 }
 
 bool_t i_exact_q(scheme_number_t z) {
@@ -131,10 +151,11 @@ bool_t i_exact_q(scheme_number_t z) {
 		|| number_type == SCHEME_NUMERICAL_TYPE_EXACT_RATIONAL);
 }
 
-dyntype_t exact_q(dyntype_t z) {
-	REQUIRE_SCHEME_NUMBER(z, 0);
-
-	return scheme_new_boolean(i_exact_q(c_z));
+BASE_FUNCTION(exact_q) {
+    PARAMETER(z)
+    REQUIRE_SCHEME_NUMBER(z, 0);
+    PUSH_LITERAL(scheme_new_boolean(i_exact_q(c_z)));
+    DESTROY_PARAM(z)
 }
 
 scheme_ord_t i_num_cmp(scheme_number_t a, scheme_number_t b) {
@@ -254,24 +275,32 @@ dyntype_t i_generic_num_cmp_or_equal(scheme_ord_t ord, ELLIPSIS_PARAM(x)) {
 
 BASE_FUNCTION(num_eq) {
     ELLIPSIS
-	PUSH_LITERAL((i_generic_num_cmp(SCHEME_EQ, ellipsis, n_ellipsis)));
-    //DESTROY_ELLIPSIS
+	PUSH_LITERAL((i_generic_num_cmp(SCHEME_EQ, ellipsis, n_ellipsis)))
+    DESTROY_ELLIPSIS
 }
 
-dyntype_t num_lt(ELLIPSIS_PARAM(x)) {
-	return i_generic_num_cmp(SCHEME_LT, x, len);
+BASE_FUNCTION(num_lt) {
+    ELLIPSIS
+	PUSH_LITERAL(i_generic_num_cmp(SCHEME_LT, ellipsis, n_ellipsis))
+    DESTROY_ELLIPSIS
 }
 
-dyntype_t num_gt(ELLIPSIS_PARAM(x)) {
-	return i_generic_num_cmp(SCHEME_GT, x, len);
+BASE_FUNCTION(num_gt) {
+    ELLIPSIS
+	PUSH_LITERAL(i_generic_num_cmp(SCHEME_GT, ellipsis, n_ellipsis))
+    DESTROY_ELLIPSIS
 }
 
-dyntype_t num_gte(ELLIPSIS_PARAM(x)) {
-	return i_generic_num_cmp_or_equal(SCHEME_GT, x, len);
+BASE_FUNCTION(num_gte) {
+    ELLIPSIS
+	PUSH_LITERAL(i_generic_num_cmp_or_equal(SCHEME_GT, ellipsis, n_ellipsis))
+	DESTROY_ELLIPSIS
 }
 
-dyntype_t num_lte(ELLIPSIS_PARAM(x)) {
-	return i_generic_num_cmp_or_equal(SCHEME_LT, x, len);
+BASE_FUNCTION(num_lte) {
+    ELLIPSIS
+	PUSH_LITERAL(i_generic_num_cmp_or_equal(SCHEME_LT, ellipsis, n_ellipsis))
+    DESTROY_ELLIPSIS
 }
 
 scheme_number_t i_add(scheme_number_t a, scheme_number_t b) {
@@ -357,27 +386,31 @@ scheme_number_t i_add(scheme_number_t a, scheme_number_t b) {
 	}
 }
 
-dyntype_t add(ELLIPSIS_PARAM(x)) {
-	if (len == 1) {
-		return x[0];
+BASE_FUNCTION(add) {
+    ELLIPSIS
+	if (n_ellipsis == 1) {
+	    PUSH_LITERAL(ellipsis[0])
+	    DESTROY_ELLIPSIS
+	    return;
 	}
 
-	dyntype_t f = x[0];
-	dyntype_t s = x[1];
+	dyntype_t f = ellipsis[0];
+	dyntype_t s = ellipsis[1];
 
 	REQUIRE_SCHEME_NUMBER(f, 0);
 	REQUIRE_SCHEME_NUMBER(s, 1);
 	scheme_number_t acc = i_add(c_f, c_s);
 
-	for (int i = 2; i < len; i++) {
-		dyntype_t elem = x[i];
+	for (int i = 2; i < n_ellipsis; i++) {
+		dyntype_t elem = ellipsis[i];
 		REQUIRE_SCHEME_NUMBER(elem, i);
 
 		scheme_number_t res = i_add(acc, c_elem);
 		release_number(acc);
 		acc = res;
 	}
-	return scheme_new_number(acc);
+	PUSH_LITERAL(scheme_new_number(acc))
+	DESTROY_ELLIPSIS
 }
 
 
@@ -465,27 +498,31 @@ scheme_number_t i_mul(scheme_number_t a, scheme_number_t b) {
 	}
 }
 
-dyntype_t mul(ELLIPSIS_PARAM(x)) {
-	if (len == 1) {
-		return x[0];
+BASE_FUNCTION(mul) {
+    ELLIPSIS
+	if (n_ellipsis == 1) {
+		PUSH_LITERAL(ellipsis[0])
+		DESTROY_ELLIPSIS
+		return;
 	}
 
-	dyntype_t f = x[0];
-	dyntype_t s = x[1];
+	dyntype_t f = ellipsis[0];
+	dyntype_t s = ellipsis[1];
 
 	REQUIRE_SCHEME_NUMBER(f, 0);
 	REQUIRE_SCHEME_NUMBER(s, 1);
 	scheme_number_t acc = i_mul(c_f, c_s);
 
-	for (int i = 2; i < len; i++) {
-		dyntype_t elem = x[i];
+	for (int i = 2; i < n_ellipsis; i++) {
+		dyntype_t elem = ellipsis[i];
 		REQUIRE_SCHEME_NUMBER(elem, i);
 
 		scheme_number_t res = i_mul(acc, c_elem);
 		release_number(acc);
 		acc = res;
 	}
-	return scheme_new_number(acc);
+	PUSH_LITERAL(scheme_new_number(acc))
+	DESTROY_ELLIPSIS
 }
 
 scheme_number_t i_sub(scheme_number_t a, scheme_number_t b) {
@@ -593,6 +630,7 @@ BASE_FUNCTION(sub) {
 		dyntype_t f = ellipsis[0];
 		REQUIRE_SCHEME_NUMBER(f, 0);
         PUSH_LITERAL(scheme_new_number(i_neg(c_f)))
+        DESTROY_ELLIPSIS
 		return;
 	}
 
@@ -612,7 +650,7 @@ BASE_FUNCTION(sub) {
 		acc = res;
 	}
 	PUSH_LITERAL(scheme_new_number(acc))
-	//DESTROY_ELLIPSIS
+	DESTROY_ELLIPSIS
 }
 
 bool_t i_zero_q(scheme_number_t x) {
@@ -625,10 +663,12 @@ bool_t i_zero_q(scheme_number_t x) {
 	return res;
 }
 
-dyntype_t zero_q(dyntype_t x) {
+BASE_FUNCTION(zero_q) {
+    PARAMETER(x)
 	REQUIRE_SCHEME_NUMBER(x, 0);
 
-	return scheme_new_boolean(i_zero_q(c_x));
+	PUSH_LITERAL(scheme_new_boolean(i_zero_q(c_x)))
+	DESTROY_PARAM(x)
 }
 
 scheme_number_t i_div(scheme_number_t a, scheme_number_t b) {
@@ -720,32 +760,36 @@ scheme_number_t i_div(scheme_number_t a, scheme_number_t b) {
 	}
 }
 
-dyntype_t scheme_div(ELLIPSIS_PARAM(x)) {
-	if (len == 1) {
-		dyntype_t f = x[0];
+BASE_FUNCTION(scheme_div) {
+    ELLIPSIS
+	if (n_ellipsis == 1) {
+		dyntype_t f = ellipsis[0];
 		REQUIRE_SCHEME_NUMBER(f, 0);
 
 		char constant_one[] = { 0, 0b00000001 };
 		scheme_number_t one = scheme_exact_integer(integer_create(constant_one, 2));
-		return scheme_new_number(i_div(one, c_f));
+		PUSH_LITERAL(scheme_new_number(i_div(one, c_f)))
+		DESTROY_ELLIPSIS
+		return;
 	}
 
-	dyntype_t f = x[0];
-	dyntype_t s = x[1];
+	dyntype_t f = ellipsis[0];
+	dyntype_t s = ellipsis[1];
 
 	REQUIRE_SCHEME_NUMBER(f, 0);
 	REQUIRE_SCHEME_NUMBER(s, 1);
 	scheme_number_t acc = i_div(c_f, c_s);
 
-	for (int i = 2; i < len; i++) {
-		dyntype_t elem = x[i];
+	for (int i = 2; i < n_ellipsis; i++) {
+		dyntype_t elem = ellipsis[i];
 		REQUIRE_SCHEME_NUMBER(elem, i);
 
 		scheme_number_t res = i_div(acc, c_elem);
 		release_number(acc);
 		acc = res;
 	}
-	return scheme_new_number(acc);
+	PUSH_LITERAL(scheme_new_number(acc))
+	DESTROY_ELLIPSIS
 }
 
 BASE_FUNCTION(number_to_string) {

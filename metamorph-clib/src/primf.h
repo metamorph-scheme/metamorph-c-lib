@@ -202,21 +202,30 @@ dyntype_t list_copy(dyntype_t list);
 
 // Numbers
 
-dyntype_t number_q(dyntype_t obj);
+BASE_FUNCTION(number_q);
 
-dyntype_t complex_q(dyntype_t obj);
-dyntype_t real_q(dyntype_t obj);
-dyntype_t rational_q(dyntype_t obj);
-dyntype_t integer_q(dyntype_t obj);
+BASE_FUNCTION(complex_q);
+BASE_FUNCTION(real_q);
+BASE_FUNCTION(rational_q);
+BASE_FUNCTION(integer_q);
 
-dyntype_t inexact_q(dyntype_t z);
-dyntype_t exact_q(dyntype_t z);
+BASE_FUNCTION(inexact_q);
+BASE_FUNCTION(exact_q);
 
 BASE_FUNCTION(number_to_string);
 
 BASE_FUNCTION(num_eq);
+BASE_FUNCTION(num_lt);
+BASE_FUNCTION(num_gt);
+BASE_FUNCTION(num_gte);
+BASE_FUNCTION(num_lte);
 
+BASE_FUNCTION(add);
 BASE_FUNCTION(sub);
+BASE_FUNCTION(mul);
+BASE_FUNCTION(scheme_div);
+
+BASE_FUNCTION(zero_q);
 
 /*
 (define exact-integer?
