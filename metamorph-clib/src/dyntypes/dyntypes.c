@@ -139,7 +139,7 @@ void release_dyntype(dyntype_t dyntype){
         case(SCHEME_TYPE_PAIR): {
             scheme_pair_t pair;
             pair = *dyntype.data.pair_val;
-            //release_pair(pair);
+            release_pair(pair);
             RELEASE(scheme_pair_t, dyntype.data.pair_val)
             break;
         }
@@ -206,8 +206,7 @@ dyntype_t copy_dyntype(dyntype_t dyntype) {
     case(SCHEME_TYPE_PAIR): {
         scheme_pair_t pair;
         pair = *dyntype.data.pair_val;
-        //return copy_pair(pair);
-        return scheme_new_pair(pair);
+        return copy_pair(pair);
     }
     case(SCHEME_TYPE_NUMBER): {
         scheme_number_t number;

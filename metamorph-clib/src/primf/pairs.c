@@ -260,18 +260,11 @@ BASE_FUNCTION(list) {
 //    return init;
 //}
 
-// TODO endrecursive for cdr deep copy
-dyntype_t copy_pair(scheme_pair_t pair) {
+void release_pair(scheme_pair_t pair) {
+    release_dyntype(pair.car);
+    release_dyntype(pair.cdr);
+}
 
-//    BODY(0)
-//
-//    dyntype_t init = SCHEME_NULL;
-//    dyntype_t* cursor = &init;
-//
-//
-//
-//    while(cursor->type != SCHEME_TYPE_PAIR)
-//
-//    BODY_CLOSE
-//    return scheme_new_pair(copied)
+dyntype_t copy_pair(scheme_pair_t pair) {
+    return scheme_new_pair(i_cons(copy_dyntype(pair.car), copy_dyntype(pair.cdr)));
 }
