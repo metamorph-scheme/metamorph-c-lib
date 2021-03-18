@@ -61,5 +61,5 @@ int count_references_continuation(scheme_continuation_t cont, activation_t* acti
 {
 	if (cont.activation == activation)
 		return 1;
-	return count_references_activation(cont.activation, activation);
+	//return count_references_activation(cont.activation, activation);
 }

@@ -88,7 +88,7 @@ int count_references_procedure(scheme_procedure_t procedure,
                                 activation_t* activation) {
     if (procedure.activation == activation)
         return 1;
-    return count_references_activation(procedure.activation, activation);
+    //return count_references_activation(procedure.activation, activation);
 }
 
 void release_procedure(scheme_procedure_t procedure){
