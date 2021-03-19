@@ -44,7 +44,7 @@ BASE_FUNCTION(not);
 // boolean?
 BASE_FUNCTION(boolean_q);
 // boolean=?
-dyntype_t boolean_eq(ELLIPSIS_PARAM(boolean));
+BASE_FUNCTION(boolean_eq);
 
 // Pairs
 
@@ -57,9 +57,9 @@ BASE_FUNCTION(car);
 // cdr
 BASE_FUNCTION(cdr);
 // set-car!
-dyntype_t set_car_ex(dyntype_t pair, dyntype_t obj);
+BASE_FUNCTION(set_car_ex);
 // set-cdr!
-dyntype_t set_cdr_ex(dyntype_t pair, dyntype_t obj);
+BASE_FUNCTION(set_cdr_ex);
 
 /*
 (define caar
@@ -92,7 +92,7 @@ dyntype_t i_list(ELLIPSIS_PARAM(obj));
 
 // TODO number type
 // length
-int length(dyntype_t list);
+BASE_FUNCTION(length);
 
 // append
 dyntype_t append(ELLIPSIS_PARAM(obj));
@@ -264,6 +264,7 @@ scheme_boolean_t integer_lte(scheme_integer_t a, scheme_integer_t b);
 
 dyntype_t integer_to_string(scheme_integer_t a);
 int integer_to_s32int(scheme_integer_t a);
+scheme_integer_t integer_create_s32(int a);
 
 void integer_release(scheme_integer_t);
 scheme_integer_t integer_copy(scheme_integer_t obj);

@@ -390,6 +390,7 @@ BASE_FUNCTION(add) {
     ELLIPSIS
 	if (n_ellipsis == 1) {
 	    PUSH_LITERAL(ellipsis[0])
+	    ellipsis[0] = SCHEME_UNSPECIFIED;
 	    DESTROY_ELLIPSIS
 	    return;
 	}
@@ -502,7 +503,8 @@ BASE_FUNCTION(mul) {
     ELLIPSIS
 	if (n_ellipsis == 1) {
 		PUSH_LITERAL(ellipsis[0])
-		DESTROY_ELLIPSIS
+        ellipsis[0] = SCHEME_UNSPECIFIED;
+        DESTROY_ELLIPSIS
 		return;
 	}
 
@@ -687,7 +689,9 @@ scheme_number_t i_div(scheme_number_t a, scheme_number_t b) {
 		// both exact
 		if (i_integer_q(a) && i_integer_q(b)) {
 			// both exact integer
-			return scheme_exact_rational(rational_create(*a.data.exact_integer_val, *b.data.exact_integer_val));
+			scheme_integer_t a_copy = integer_copy(*a.data.exact_integer_val);
+			scheme_integer_t b_copy = integer_copy(*b.data.exact_integer_val);
+			return scheme_exact_rational(rational_create(a_copy, b_copy));
 		}
 		else if (i_integer_q(a)) {
 			// b is the rational
@@ -769,6 +773,7 @@ BASE_FUNCTION(scheme_div) {
 		char constant_one[] = { 0, 0b00000001 };
 		scheme_number_t one = scheme_exact_integer(integer_create(constant_one, 2));
 		PUSH_LITERAL(scheme_new_number(i_div(one, c_f)))
+		release_number(one);
 		DESTROY_ELLIPSIS
 		return;
 	}

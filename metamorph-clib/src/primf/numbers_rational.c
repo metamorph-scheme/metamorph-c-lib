@@ -241,7 +241,7 @@ scheme_rational_t integer_to_rational(scheme_integer_t n) {
 	mp_int denom, num;
 	CATCH_MP_ERROR(mp_init_copy(&num, &n));
 	CATCH_MP_ERROR(mp_init_u32(&denom, 1));
-	return rational_create(denom, n);
+	return rational_create(denom, num);
 }
 
 dyntype_t rational_to_string(scheme_rational_t a) {

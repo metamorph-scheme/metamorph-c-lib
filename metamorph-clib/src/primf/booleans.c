@@ -21,14 +21,22 @@ BASE_FUNCTION(boolean_q) {
     PUSH_LITERAL(scheme_new_boolean(obj.type == SCHEME_TYPE_BOOLEAN));
 }
 
-dyntype_t boolean_eq(ELLIPSIS_PARAM(boolean)) {
-    if (boolean[0].type != SCHEME_TYPE_BOOLEAN)
-        return scheme_new_boolean(FALSE);
-
-    for (int i = 1; i < len; i++) {
-        if (boolean[i].type != SCHEME_TYPE_BOOLEAN
-            || *boolean[0].data.boolean_val != *boolean[i].data.boolean_val)
-            return scheme_new_boolean(FALSE);
+BASE_FUNCTION(boolean_eq) {
+    ELLIPSIS
+    if (ellipsis[0].type != SCHEME_TYPE_BOOLEAN) {
+        PUSH_LITERAL(scheme_new_boolean(FALSE))
+        DESTROY_ELLIPSIS
+        return;
     }
-    return scheme_new_boolean(TRUE);
+
+    for (int i = 1; i < n_ellipsis; i++) {
+        if (ellipsis[i].type != SCHEME_TYPE_BOOLEAN
+            || *ellipsis[0].data.boolean_val != *ellipsis[i].data.boolean_val) {
+            PUSH_LITERAL(scheme_new_boolean(FALSE))
+            DESTROY_ELLIPSIS
+            return;
+        }
+    }
+    PUSH_LITERAL(scheme_new_boolean(TRUE))
+    DESTROY_ELLIPSIS
 }

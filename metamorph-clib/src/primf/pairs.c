@@ -47,24 +47,34 @@ BASE_FUNCTION(cdr) {
     //DESTROY_PARAM(pair)
 }
 
-dyntype_t set_car_ex(dyntype_t pair, dyntype_t obj) {
+BASE_FUNCTION(set_car_ex) {
+    PARAMETER(pair)
+    PARAMETER(obj)
+
     // setting the car of a pair cannot alter the list status of a pair
     // as per definition in r7rs chapter 6.4 page 40
     REQUIRE_SCHEME_PAIR(pair, 0)
 
-        if (!pair._mutable)
-            SET_SETTING_IMMUTABLE_LOCATION;
+    if (!pair._mutable) {
+        SET_SETTING_IMMUTABLE_LOCATION
+    }
 
     c_pair.car = obj;
 
-    return SCHEME_UNSPECIFIED;
+    PUSH_UNSPECIFIED
+    DESTROY_PARAM(pair)
+    DESTROY_PARAM(obj)
 }
 
-dyntype_t set_cdr_ex(dyntype_t pair, dyntype_t obj) {
+BASE_FUNCTION(set_cdr_ex) {
+    PARAMETER(pair)
+    PARAMETER(obj)
+
     REQUIRE_SCHEME_PAIR(pair, 0)
 
-        if (!pair._mutable)
-            SET_SETTING_IMMUTABLE_LOCATION;
+    if (!pair._mutable) {
+        SET_SETTING_IMMUTABLE_LOCATION;
+    }
 
     if (i_list_q(obj))
         c_pair.list = TRUE;
@@ -73,13 +83,15 @@ dyntype_t set_cdr_ex(dyntype_t pair, dyntype_t obj) {
 
     c_pair.cdr = obj;
 
-    return SCHEME_UNSPECIFIED;
+    PUSH_UNSPECIFIED
+    DESTROY_PARAM(pair)
+    DESTROY_PARAM(obj)
 }
 
 BASE_FUNCTION(null_q) {
     PARAMETER(obj)
     PUSH_LITERAL(scheme_new_boolean(obj.type == SCHEME_TYPE_NULL));
-    //DESTROY_PARAM(obj)
+    DESTROY_PARAM(obj)
 }
 
 bool_t i_list_q(dyntype_t obj) {
@@ -91,7 +103,7 @@ bool_t i_list_q(dyntype_t obj) {
 BASE_FUNCTION(list_q) {
     PARAMETER(obj)
     PUSH_LITERAL(scheme_new_boolean(i_list_q(obj)))
-    //DESTROY_PARAM(obj)
+    DESTROY_PARAM(obj)
 }
 
 dyntype_t make_list(int c_k) {
@@ -148,7 +160,7 @@ dyntype_t i_list(ELLIPSIS_PARAM(x)) {
 
         dyntype_t new_empty_cdr = SCHEME_NULL;
 
-        new_pair = scheme_new_pair(i_cons(x[i], new_empty_cdr));
+        new_pair = scheme_new_pair(i_cons(copy_dyntype(x[i]), new_empty_cdr));
 
         *cur = new_pair;
         cur = &(new_pair.data.pair_val->cdr);
@@ -161,32 +173,35 @@ BASE_FUNCTION(list) {
 
     PUSH_LITERAL((i_list(ellipsis, n_ellipsis)))
 
-    //DESTROY_ELLIPSIS
+    DESTROY_ELLIPSIS
+}
+
+BASE_FUNCTION(length) {
+    PARAMETER(list)
+
+    if (list.type == SCHEME_TYPE_NULL) {
+        PUSH_LITERAL(scheme_new_number(scheme_exact_integer(integer_create_s32(0))))
+        DESTROY_PARAM(list)
+        return;
+    }
+
+    if(!i_list_q(list)) {
+        SET_BAD_ARGUMENT_EXCEPTION(0, "argument to length must be a list")
+    }
+
+    int init = 1;
+    dyntype_t* cur = &list;
+
+    while (cur->data.pair_val->cdr.type != SCHEME_TYPE_NULL) {
+        init++;
+        cur = &(cur->data.pair_val->cdr);
+    }
+
+    PUSH_LITERAL(scheme_new_number(scheme_exact_integer(integer_create_s32(init))))
+    DESTROY_PARAM(list)
 }
 
 // TODO uncomment and convert
-//// TODO number type
-//BASE_FUNCTION(length) {
-//    PARAMETER(list)
-//
-//    if (list.type == SCHEME_TYPE_NULL)
-//        return 0;
-//
-//    // TODO
-//    // if(!i_list_q(list))
-//      // return INTERNAL_BAD_ARGUMENT_EXCEPTION(0, "length: argument ist not a list");
-//
-//    int init = 1;
-//    dyntype_t* cur = &list;
-//
-//    while (cur->data.pair_val->cdr.type != SCHEME_TYPE_NULL) {
-//        init++;
-//        cur = &(cur->data.pair_val->cdr);
-//    }
-//
-//    PUSH_LITERAL(scheme_new_number(scheme_exact_integer(integer_create(...))))
-//    //DESTROY_PARAM(list)
-//}
 //
 //dyntype_t append(ELLIPSIS_PARAM(lists)) {
 //    if (len == 0)

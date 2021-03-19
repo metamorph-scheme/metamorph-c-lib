@@ -337,60 +337,75 @@ TEST(not_3) {
 
 
 TEST(boolean_eq) {
+    BODY(0)
     dyntype_t dyn1 = scheme_literal_boolean(TRUE);
     dyntype_t dyn2 = scheme_literal_boolean(TRUE);
     dyntype_t dyn3 = scheme_literal_boolean(TRUE);
-    dyntype_t dyns[] = {dyn1, dyn2, dyn3};
-
-    dyntype_t boolean_dyn = boolean_eq(dyns, 3);
+    PUSH_LITERAL(dyn1)
+    PUSH_LITERAL(dyn2)
+    PUSH_LITERAL(dyn3)
+    boolean_eq(3);
+    dyntype_t boolean_dyn = POP;
 
     CHECK_TYPE(boolean_dyn, SCHEME_TYPE_BOOLEAN);
     ASSERT_EQ("Boolean is not true", TRUE, *boolean_dyn.data.boolean_val);
     ASSERT_EQ("Boolean is not mutable", TRUE, boolean_dyn._mutable);
 
+    BODY_CLOSE
     return 0;
 }
 
 TEST(boolean_eq_one_boolean) {
+    BODY(0)
     dyntype_t dyn1 = scheme_literal_boolean(TRUE);
-    dyntype_t dyns[] = {dyn1};
 
-    dyntype_t boolean_dyn = boolean_eq(dyns, 1);
+    PUSH_LITERAL(dyn1)
+    boolean_eq(1);
+    dyntype_t boolean_dyn = POP;
 
     CHECK_TYPE(boolean_dyn, SCHEME_TYPE_BOOLEAN);
     ASSERT_EQ("Boolean is not true", TRUE, *boolean_dyn.data.boolean_val);
     ASSERT_EQ("Boolean is not mutable", TRUE, boolean_dyn._mutable);
 
+    BODY_CLOSE
     return 0;
 }
 
 TEST(boolean_eq_wrong_datatype) {
+    BODY(0)
     dyntype_t dyn1 = scheme_literal_boolean(TRUE);
     dyntype_t dyn2 = scheme_literal_string("abc");
     dyntype_t dyn3 = scheme_literal_boolean(TRUE);
-    dyntype_t dyns[] = {dyn1, dyn2, dyn3};
-
-    dyntype_t boolean_dyn = boolean_eq(dyns, 3);
+    PUSH_LITERAL(dyn1)
+    PUSH_LITERAL(dyn2)
+    PUSH_LITERAL(dyn3)
+    boolean_eq(3);
+    dyntype_t boolean_dyn = POP;
 
     CHECK_TYPE(boolean_dyn, SCHEME_TYPE_BOOLEAN);
     ASSERT_EQ("Boolean is not false", FALSE, *boolean_dyn.data.boolean_val);
     ASSERT_EQ("Boolean is not mutable", TRUE, boolean_dyn._mutable);
 
+    BODY_CLOSE
     return 0;
 }
 
 TEST(boolean_eq_negative) {
+    BODY(0)
     dyntype_t dyn1 = scheme_literal_boolean(TRUE);
     dyntype_t dyn2 = scheme_literal_boolean(FALSE);
     dyntype_t dyn3 = scheme_literal_boolean(TRUE);
-    dyntype_t dyns[] = {dyn1, dyn2, dyn3};
-
-    dyntype_t boolean_dyn = boolean_eq(dyns, 3);
+    PUSH_LITERAL(dyn1)
+    PUSH_LITERAL(dyn2)
+    PUSH_LITERAL(dyn3)
+    boolean_eq(3);
+    dyntype_t boolean_dyn = POP;
 
     CHECK_TYPE(boolean_dyn, SCHEME_TYPE_BOOLEAN);
     ASSERT_EQ("Boolean is not false", FALSE, *boolean_dyn.data.boolean_val);
     ASSERT_EQ("Boolean is not mutable", TRUE, boolean_dyn._mutable);
 
+    BODY_CLOSE
     return 0;
 }
 
@@ -421,14 +436,17 @@ TEST(boolean_eq_negative) {
 //    return 0;
 //}
 //
-//TEST(length) {
-//    dyntype_t list = make_list(3);
-//    int len = length(list);
-//
-//    ASSERT_EQ("lenght is not 3", 3, len);
-//
-//    return 0;
-//}
+TEST(length) {
+    dyntype_t list = make_list(3);
+
+    PUSH_LITERAL(list)
+    length(1);
+    dyntype_t n = POP;
+    REQUIRE_SCHEME_EXACT_INTEGER(n,0)
+    ASSERT_EQ("lenght is not 3", 3, integer_to_s32int(cn_n));
+
+    return 0;
+}
 //
 //TEST(append) {
 //    dyntype_t str = scheme_literal_string("abc");
@@ -997,7 +1015,7 @@ static char* all_tests() {
     MU_RUN_TEST(boolean_eq_negative);
 //    MU_RUN_TEST(make_list);
 //    MU_RUN_TEST(make_list_fill);
-//    MU_RUN_TEST(length);
+    MU_RUN_TEST(length);
 //    MU_RUN_TEST(append);
 //    MU_RUN_TEST(append_2);
 //    MU_RUN_TEST(append_3);
@@ -1008,12 +1026,15 @@ static char* all_tests() {
 //    MU_RUN_TEST(list_set_2);
 //    MU_RUN_TEST(list_set_3);
 //    MU_RUN_TEST(list_copy);
+
+    // old tests for custom arbitrary lenght integers
     //MU_RUN_TEST(integer_plus);
     //MU_RUN_TEST(integer_plus_2);
     //MU_RUN_TEST(integer_plus_3);
     //MU_RUN_TEST(integer_plus_negative);
     //MU_RUN_TEST(integer_subtract);
-    //MU_RUN_TEST(tommath_negative_division);
+
+    MU_RUN_TEST(tommath_negative_division);
     MU_RUN_TEST(rational_to_real);
     MU_RUN_TEST(real_to_rational);
     MU_RUN_TEST(real_to_rational_overflow_check);
