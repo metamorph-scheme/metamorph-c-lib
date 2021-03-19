@@ -28,38 +28,38 @@ BASE_FUNCTION(flush_output_port);
 // Symbols
 
 // symbol?
-dyntype_t symbol_q(dyntype_t obj);
+BASE_FUNCTION(symbol_q);
 // symbol=?
-dyntype_t symbol_eq(ELLIPSIS_PARAM(obj));
+BASE_FUNCTION(symbol_eq);
 // symbol->string
-dyntype_t symbol_to_string(dyntype_t symbol);
+BASE_FUNCTION(symbol_to_string);
 // string->symbol
-dyntype_t string_to_symbol(dyntype_t string);
+BASE_FUNCTION(string_to_symbol);
 
 // Booleans
 
 NONSTANDARD scheme_boolean_t obj_to_boolean(dyntype_t obj);
 // not
-dyntype_t not(dyntype_t obj);
+BASE_FUNCTION(not);
 // boolean?
-dyntype_t boolean_q(dyntype_t obj);
+BASE_FUNCTION(boolean_q);
 // boolean=?
-dyntype_t boolean_eq(ELLIPSIS_PARAM(boolean));
+BASE_FUNCTION(boolean_eq);
 
 // Pairs
 
 // pair?
-dyntype_t pair_q(dyntype_t obj);
+BASE_FUNCTION(pair_q);
 // cons
-dyntype_t cons(dyntype_t obj1, dyntype_t obj2);
+BASE_FUNCTION(cons);
 // car
-dyntype_t car(dyntype_t pair);
+BASE_FUNCTION(car);
 // cdr
-dyntype_t cdr(dyntype_t pair);
+BASE_FUNCTION(cdr);
 // set-car!
-dyntype_t set_car_ex(dyntype_t pair, dyntype_t obj);
+BASE_FUNCTION(set_car_ex);
 // set-cdr!
-dyntype_t set_cdr_ex(dyntype_t pair, dyntype_t obj);
+BASE_FUNCTION(set_cdr_ex);
 
 /*
 (define caar
@@ -77,9 +77,9 @@ dyntype_t set_cdr_ex(dyntype_t pair, dyntype_t obj);
 */
 
 // null?
-dyntype_t null_q(dyntype_t obj);
+BASE_FUNCTION(null_q);
 // list?
-dyntype_t list_q(dyntype_t obj);
+BASE_FUNCTION(list_q);
 
 // make-list
 dyntype_t make_list(int c_k);
@@ -87,11 +87,12 @@ dyntype_t make_list(int c_k);
 dyntype_t make_list_fill(int k, dyntype_t fill);
 
 // list
-dyntype_t list(ELLIPSIS_PARAM(obj));
+BASE_FUNCTION(list);
+dyntype_t i_list(ELLIPSIS_PARAM(obj));
 
 // TODO number type
 // length
-int length(dyntype_t list);
+BASE_FUNCTION(length);
 
 // append
 dyntype_t append(ELLIPSIS_PARAM(obj));
@@ -199,16 +200,32 @@ dyntype_t list_set(dyntype_t list, int k, dyntype_t obj);
 // list-copy
 dyntype_t list_copy(dyntype_t list);
 
+// Numbers
 
-dyntype_t number_q(dyntype_t obj);
+BASE_FUNCTION(number_q);
 
-dyntype_t complex_q(dyntype_t obj);
-dyntype_t real_q(dyntype_t obj);
-dyntype_t rational_q(dyntype_t obj);
-dyntype_t integer_q(dyntype_t obj);
+BASE_FUNCTION(complex_q);
+BASE_FUNCTION(real_q);
+BASE_FUNCTION(rational_q);
+BASE_FUNCTION(integer_q);
 
-dyntype_t inexact_q(dyntype_t z);
-dyntype_t exact_q(dyntype_t z);
+BASE_FUNCTION(inexact_q);
+BASE_FUNCTION(exact_q);
+
+BASE_FUNCTION(number_to_string);
+
+BASE_FUNCTION(num_eq);
+BASE_FUNCTION(num_lt);
+BASE_FUNCTION(num_gt);
+BASE_FUNCTION(num_gte);
+BASE_FUNCTION(num_lte);
+
+BASE_FUNCTION(add);
+BASE_FUNCTION(sub);
+BASE_FUNCTION(mul);
+BASE_FUNCTION(scheme_div);
+
+BASE_FUNCTION(zero_q);
 
 /*
 (define exact-integer?
@@ -219,6 +236,9 @@ dyntype_t exact_q(dyntype_t z);
 // functions in numbers.c should only use these internal functions and no tommathlib functions or low-level struct initialization at all.
 
 // this API should also not differentiate between inexact or exact variants
+
+// to string functions return dyntypes for the sake of simpilicity in memory management
+// it makes clear that the function that uses the function has to release the dyntype
 
 // Metamorph Number API
 
@@ -242,6 +262,10 @@ scheme_boolean_t integer_gt(scheme_integer_t a, scheme_integer_t b);
 scheme_boolean_t integer_gte(scheme_integer_t a, scheme_integer_t b);
 scheme_boolean_t integer_lte(scheme_integer_t a, scheme_integer_t b);
 
+dyntype_t integer_to_string(scheme_integer_t a);
+int integer_to_s32int(scheme_integer_t a);
+scheme_integer_t integer_create_s32(int a);
+
 void integer_release(scheme_integer_t);
 scheme_integer_t integer_copy(scheme_integer_t obj);
 
@@ -260,6 +284,8 @@ scheme_boolean_t real_lt(scheme_real_t a, scheme_real_t b);
 scheme_boolean_t real_lte(scheme_real_t a, scheme_real_t b);
 scheme_boolean_t real_gt(scheme_real_t a, scheme_real_t b);
 scheme_boolean_t real_gte(scheme_real_t a, scheme_real_t b);
+
+dyntype_t real_to_string(scheme_real_t a);
 
 void rational_min(scheme_rational_t * q);
 scheme_rational_sign_t rational_sign(scheme_rational_t a);
@@ -283,6 +309,8 @@ scheme_boolean_t rational_lte(scheme_rational_t a, scheme_rational_t b);
 scheme_boolean_t rational_gt(scheme_rational_t a, scheme_rational_t b);
 scheme_boolean_t rational_gte(scheme_rational_t a, scheme_rational_t b);
 
+dyntype_t rational_to_string(scheme_rational_t a);
+
 scheme_rational_t integer_to_rational(scheme_integer_t n);
 
 void rational_release(scheme_rational_t x);
@@ -295,6 +323,10 @@ scheme_rational_t rational_copy(scheme_rational_t obj);
 (define remainder truncate-remainder)
 (define modulo floor-remainder)
 */
+
+void release_pair(scheme_pair_t pair);
+
+dyntype_t copy_pair(scheme_pair_t pair);
 
 void release_number(scheme_number_t number);
 dyntype_t copy_number(scheme_number_t number);
