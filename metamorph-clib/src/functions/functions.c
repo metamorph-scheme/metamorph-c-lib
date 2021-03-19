@@ -9,11 +9,11 @@
 activation_t* current_activation;
 activation_t* root_activation;
 jmp_buf error_buffer;
-int return_address = 0;
 int balance=0;
 exception_t global_exception;
+target_id(*current_function)(int);
 
-void initprog(int globals){
+void init(int globals){
     initalize_allocator();
     root_activation = create_activation(globals);
     root_activation->previous_activation = NULL;
@@ -21,8 +21,17 @@ void initprog(int globals){
     current_activation=root_activation;
 }
 
-void applicate(int n_params, int id)
+void control_loop() {
+    target_id next_jump = {0, &prog};
+    while (current_function = next_jump.target_function) {
+        next_jump = (*current_function)(next_jump.marker);
+
+    }
+}
+
+target_id applicate(int n_params, int id)
 {
+    target_id next_jump;
     dyntype_t proc = POP_LITERAL;
     switch (proc.type)
     {
@@ -30,16 +39,11 @@ void applicate(int n_params, int id)
         activation_t* new_activation = create_activation(n_params);
         for (int i = 0; i < n_params; i++)
             new_activation->formal_parameters[i] = POP_LITERAL;
-        applicate_lambda(proc, id, new_activation);
+        next_jump = applicate_lambda(proc, id, new_activation);
         break;
     }
     case(SCHEME_TYPE_CONTINUATION): {
-        applicate_continuation(proc, n_params);
-        break;
-    }
-    case(SCHEME_TYPE_BASE_PROCEDURE): {
-        (*proc.data.base_procedure_val->function)(n_params);
-        return_address = id;
+        next_jump = applicate_continuation(proc, n_params);
         break;
     }
     default:
@@ -47,15 +51,18 @@ void applicate(int n_params, int id)
         break;
     }
     release_dyntype(proc);
+    return next_jump;
 }
 
 
-void prereturn() {
+target_id prereturn() {
     dyntype_t return_value = POP_LITERAL;
 
     finalize_call();
 
-    return_address = current_activation->return_address;
+    target_id return_jump;
+    return_jump.marker = current_activation->return_marker;
+    return_jump.target_function = current_activation->return_function;
 
     activation_t* returning_activation = current_activation;
     current_activation = returning_activation->previous_activation;
@@ -64,6 +71,8 @@ void prereturn() {
 
     //set return value
     PUSH_LITERAL(return_value);
+
+    return return_jump;
 }
 
 
@@ -108,7 +117,8 @@ void body(int defines)
     body->parent_activation = capture_activation(current_activation);
 
     body->previous_activation = current_activation;
-    body->return_address = -1;
+    body->return_marker = -1;
+    body->return_function = NULL;
     body->stack = NULL;
 
     current_activation=add_to_current_computation(body);
@@ -116,7 +126,7 @@ void body(int defines)
 
 int close_body()
 {
-    if (current_activation->return_address != -1)
+    if (current_activation->return_marker != -1)
         return 1;
     activation_t* body = current_activation;
     current_activation = body->parent_activation;

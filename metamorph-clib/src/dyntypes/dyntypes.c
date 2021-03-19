@@ -13,7 +13,6 @@
 OBJ_CREATION_FUNCS(boolean, SCHEME_TYPE_BOOLEAN)
 OBJ_CREATION_FUNCS(pair, SCHEME_TYPE_PAIR)
 OBJ_CREATION_FUNCS(procedure, SCHEME_TYPE_PROCEDURE)
-OBJ_CREATION_FUNCS(base_procedure, SCHEME_TYPE_BASE_PROCEDURE)
 OBJ_CREATION_FUNCS(continuation, SCHEME_TYPE_CONTINUATION)
 OBJ_CREATION_FUNCS(number, SCHEME_TYPE_NUMBER)
 OBJ_CREATION_FUNCS(char, SCHEME_TYPE_CHAR)
@@ -130,20 +129,20 @@ void release_dyntype(dyntype_t dyntype){
             RELEASE(scheme_string_t, dyntype.data.string_val)
             break;
         }
-        case(SCHEME_TYPE_SYMBOL): {
-            scheme_symbol_t symbol;
-            symbol = *dyntype.data.symbol_val;
-            RELEASE_ARRAY(char, strlen(symbol), symbol);
-            RELEASE(scheme_symbol_t, dyntype.data.symbol_val)
-            break;
-        }
-        case(SCHEME_TYPE_PAIR): {
-            scheme_pair_t pair;
-            pair = *dyntype.data.pair_val;
-            release_pair(pair);
-            RELEASE(scheme_pair_t, dyntype.data.pair_val)
-            break;
-        }
+        //case(SCHEME_TYPE_SYMBOL): {
+        //    scheme_symbol_t symbol;
+        //    symbol = *dyntype.data.symbol_val;
+        //    RELEASE_ARRAY(char, strlen(symbol), symbol);
+        //    RELEASE(scheme_symbol_t, dyntype.data.symbol_val)
+        //    break;
+        //}
+        //case(SCHEME_TYPE_PAIR): {
+        //    scheme_pair_t pair;
+        //    pair = *dyntype.data.pair_val;
+        //    release_pair(pair);
+        //    RELEASE(scheme_pair_t, dyntype.data.pair_val)
+        //    break;
+        //}
         case(SCHEME_TYPE_CONTINUATION): {
             scheme_continuation_t cont;
             cont = *dyntype.data.continuation_val;
@@ -151,23 +150,17 @@ void release_dyntype(dyntype_t dyntype){
             RELEASE(scheme_continuation_t, dyntype.data.continuation_val)
             break;
         }
-        case(SCHEME_TYPE_NUMBER): {
-            scheme_number_t number;
-            number = *dyntype.data.number_val;
-            release_number(number);
-            RELEASE(scheme_number_t, dyntype.data.number_val)
-            break;
-        }
+        //case(SCHEME_TYPE_NUMBER): {
+        //    scheme_number_t number;
+        //    number = *dyntype.data.number_val;
+        //    release_number(number);
+        //    RELEASE(scheme_number_t, dyntype.data.number_val)
+        //    break;
+        //}
         case(SCHEME_TYPE_CHAR): {
             scheme_char_t c;
             c = *dyntype.data.char_val;
             RELEASE(scheme_char_t, dyntype.data.char_val)
-            break;
-        }
-        case(SCHEME_TYPE_BASE_PROCEDURE): {
-            scheme_base_procedure_t proc;
-            proc = *dyntype.data.base_procedure_val;
-            RELEASE(scheme_base_procedure_t, dyntype.data.base_procedure_val)
             break;
         }
         case(SCHEME_TYPE_PORT): {
@@ -210,25 +203,20 @@ dyntype_t copy_dyntype(dyntype_t dyntype) {
         strcpy(symbol, *dyntype.data.symbol_val);
         return scheme_new_symbol(symbol);
     }
-    case(SCHEME_TYPE_PAIR): {
-        scheme_pair_t pair;
-        pair = *dyntype.data.pair_val;
-        return copy_pair(pair);
-    }
-    case(SCHEME_TYPE_NUMBER): {
-        scheme_number_t number;
-        number = *dyntype.data.number_val;
-        return copy_number(number);
-    }
+    //case(SCHEME_TYPE_PAIR): {
+    //    scheme_pair_t pair;
+    //    pair = *dyntype.data.pair_val;
+    //    return copy_pair(pair);
+    //}
+    //case(SCHEME_TYPE_NUMBER): {
+    //    scheme_number_t number;
+    //    number = *dyntype.data.number_val;
+    //    return copy_number(number);
+    //}
     case(SCHEME_TYPE_CHAR): {
         scheme_char_t c;
         c = *dyntype.data.char_val;
         return scheme_new_char(c);
-    }
-    case(SCHEME_TYPE_BASE_PROCEDURE): {
-        scheme_base_procedure_t proc;
-        proc = *dyntype.data.base_procedure_val;
-        return scheme_new_base_procedure(proc);
     }
     case(SCHEME_TYPE_PORT): {
         scheme_port_t port;

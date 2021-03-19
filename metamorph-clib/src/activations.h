@@ -2,6 +2,10 @@
 #define ACTIVATIONS_GLOB
 #include "dyntypes.h"
 
+typedef struct target_id {
+    int marker;
+    struct target_id(*target_function) (int);
+}target_id;
 
 typedef struct dyntype_stack_struct_t {
     dyntype_t value;
@@ -9,7 +13,8 @@ typedef struct dyntype_stack_struct_t {
 } dyntype_stack_t;
 
 typedef struct activation_struct_t {
-    int return_address;
+    int return_marker;
+    target_id(*return_function)(int);
     //Counts the number of objects, which can access data directly, i.e. lambdas
     int n_captures;
     //Count how many activations have the ability to make activation current activation 

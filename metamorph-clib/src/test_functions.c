@@ -12,50 +12,54 @@
 #include "activations.h"
 
 #ifdef _TEST_FUNCTIONS
+
+SIGNATUR(CONT_TEST);
+SIGNATUR(CONT_STORE);
+SIGNATUR(TEST1);
+
 struct X{
    int x;
    int y;
    char str[100];
 };
-
 START(4)           
     printf("start\n");
-    clock_t c0 = clock();
     clock_t c1;
 
-   /* PUSH_LITERAL(scheme_literal_string("OUTPUT TEST 1\n"))
-    write_string(1);*/
+    PUSH_LITERAL(scheme_literal_string("OUTPUT TEST 1\n"))
+    PUSH_LITERAL(LAMBDA(write_string,-1))
+    APPLICATE(1,23)
 
-    PUSH_LITERAL(LAMBDA_BASE(current_error_port));
-    APPLICATE(0, 32432)
-    //PUSH_LITERAL(scheme_literal_string("OUTPUT TEST 1\n"))
-    PUSH_LITERAL(LAMBDA_BASE(current_input_port))
-    APPLICATE(0, 884038)
-    PUSH_LITERAL(LAMBDA_BASE(read_line))
-    APPLICATE(1,1532);
-    PUSH_LITERAL(LAMBDA_BASE(write_string))
-    APPLICATE(2,9734)
-    PUSH_LITERAL(LAMBDA(89, 1))
+    //PUSH_LITERAL(LAMBDA_BASE(current_error_port));
+    //APPLICATE(0, 32432)
+    ////PUSH_LITERAL(scheme_literal_string("OUTPUT TEST 1\n"))
+    //PUSH_LITERAL(LAMBDA_BASE(current_input_port))
+    //APPLICATE(0, 884038)
+    PUSH_LITERAL(LAMBDA(read_line,-1))
+    APPLICATE(0,1532);
+    PUSH_LITERAL(LAMBDA(write_string,-1))
+    APPLICATE(1,9734)
+    PUSH_LITERAL(LAMBDA(TEST1, 1))
     SET_GLOBAL_BOUND(0)
     POP;
-    PUSH_LITERAL(LAMBDA(456, 1))
+    PUSH_LITERAL(LAMBDA(CONT_TEST, 1))
     SET_GLOBAL_BOUND(1)
     POP;
-    PUSH_LITERAL(scheme_new_boolean(3))
+    PUSH_LITERAL(scheme_new_boolean(2))
     SET_GLOBAL_BOUND(2)
     POP;
-    PUSH_LITERAL(LAMBDA_BASE(current_output_port))
-    APPLICATE(0,34534)
-    PUSH_LITERAL(scheme_new_string("OUTPUT TEST 2\n"))
-    PUSH_LITERAL(LAMBDA_BASE(write_string))
-    APPLICATE(2,8479)
+    //PUSH_LITERAL(LAMBDA_BASE(current_output_port))
+    //APPLICATE(0,34534)
+    //PUSH_LITERAL(scheme_new_string("OUTPUT TEST 2\n"))
+    //PUSH_LITERAL(LAMBDA_BASE(write_string))
+    //APPLICATE(2,8479)
     //PUSH_LITERAL(scheme_new_string("OUTPUT TEST 2\n"))
     //PUSH_LITERAL(scheme_new_string("OUTPUT TEST 2\n"))
 
     PUSH_LITERAL(scheme_new_boolean(9000))
     PUSH(GLOBAL_BOUND(1))
     APPLICATE(1, 9683)
-    SET_BOUND(0,3)
+    SET_GLOBAL_BOUND(3)
     POP;
     if (*(BOUND(0, 3)).data.boolean_val == 10) {
         PUSH_LITERAL(scheme_new_boolean(54))
@@ -80,17 +84,11 @@ START(4)
     PUSH_LITERAL(scheme_new_boolean(3))
     SET_GLOBAL_BOUND(2)
     POP;
-    c1 = clock();
-    double runtime_diff_ms = (c1 - c0) * 1000. / CLOCKS_PER_SEC;
-    printf("Runtime: %f \n", runtime_diff_ms);
-    printf("Last return value: %d \n", *(BOUND(0, 3)).data.boolean_val);
+
+    printf("Last return value: %d \n", *(BOUND(0, 2)).data.boolean_val);
 EXIT
 
-FUNCTION(54)
-    PUSH(BOUND(0, 1))
-    RETURN
-
-FUNCTION(89)
+FUNCTION(TEST1)
     if (*(BOUND(0,0).data.boolean_val) == 0) {
         PUSH_LITERAL(scheme_new_boolean(1))
         RETURN
@@ -100,11 +98,11 @@ FUNCTION(89)
     APPLICATE(1, 55)
     PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val)* (*POP.data.boolean_val)))
     RETURN
-
+END
 /*
     (define (f x) (if (= (- x 1) 0) 0 (f (- x 1))))
 */
-FUNCTION(456)
+FUNCTION(CONT_TEST)
     PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
     PUSH_LITERAL(scheme_new_boolean(*(POP.data.boolean_val) == 5))
     
@@ -114,8 +112,8 @@ FUNCTION(456)
         SET_BOUND(0, 0)
         POP;
         PUSH(BOUND(0,0))
-        PUSH_LITERAL(CONTINUATION(9508))
-        PUSH_LITERAL(LAMBDA(4869,1))
+        PUSH_LITERAL(LAMBDA(CONT_STORE,1))
+        PUSH_LITERAL(LAMBDA(call_with_current_continutation,-1))
         APPLICATE(1, 9508)
         printf("value of internal define: %d \n", *(BOUND(0,0).data.boolean_val));
         SET_BOUND(0,0)
@@ -125,7 +123,7 @@ FUNCTION(456)
         PUSH_LITERAL(scheme_new_boolean(3))
         PUSH(BOUND(0, 0))
         BODY(1)
-            PUSH_LITERAL(LAMBDA(4869,1))
+            PUSH_LITERAL(LAMBDA(CONT_STORE,1))
             SET_BOUND(0,0)
         BODY_CLOSE
         RETURN
@@ -146,8 +144,8 @@ FUNCTION(456)
         PUSH(BOUND(0,0))
         RETURN
     }
-
-FUNCTION(4869)
+END
+FUNCTION(CONT_STORE)
     PUSH(BOUND(0, 0))
     SET_GLOBAL_BOUND(2)
     POP;
@@ -155,12 +153,9 @@ FUNCTION(4869)
     //APPLICATE_CONTINUATION(BOUND(0,0))
     PUSH_LITERAL(scheme_new_boolean(10))
     RETURN
+END
 
-FUNCTION(8984)
-    PUSH_LITERAL(scheme_new_boolean(5))
-    RETURN
-
-FUNCTION(864)
+FUNCTION(TEST2)
     PUSH_LITERAL(scheme_new_boolean(*(BOUND(0, 0).data.boolean_val) - 1))
     PUSH_LITERAL(scheme_new_boolean(*(POP.data.boolean_val) == 5))
     

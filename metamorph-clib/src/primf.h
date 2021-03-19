@@ -9,57 +9,62 @@
 #define STANDARD(NAME)
 #define CATCH_MP_ERROR(EXPR) if((EXPR) != MP_OKAY) { SET_TOMMATH_NUMBER_EXCEPTION } 
 
+scheme_port_t i_current_output_port();
+
+scheme_port_t i_current_input_port();
+
 // Ports
-BASE_FUNCTION(current_input_port);
-BASE_FUNCTION(current_output_port);
-BASE_FUNCTION(current_error_port);
+SIGNATUR(current_input_port);
+SIGNATUR(current_output_port);
+SIGNATUR(current_error_port);
 
-BASE_FUNCTION(read_char);
-BASE_FUNCTION(peek_char);
-BASE_FUNCTION(read_line);
-BASE_FUNCTION(read_string);
+SIGNATUR(read_char);
+SIGNATUR(peek_char);
+SIGNATUR(read_line);
+SIGNATUR(read_string);
 
-BASE_FUNCTION(newline);
-BASE_FUNCTION(write_char);
-BASE_FUNCTION(write_string);
+SIGNATUR(newline);
+SIGNATUR(write_char);
+void i_write_string(dyntype_t string, dyntype_t * ellipsis, int n_ellipsis);
+SIGNATUR(write_string);
 
-BASE_FUNCTION(flush_output_port);
+SIGNATUR(flush_output_port);
 
 // Symbols
 
 // symbol?
-BASE_FUNCTION(symbol_q);
+SIGNATUR(symbol_q);
 // symbol=?
-BASE_FUNCTION(symbol_eq);
+SIGNATUR(symbol_eq);
 // symbol->string
-BASE_FUNCTION(symbol_to_string);
+SIGNATUR(symbol_to_string);
 // string->symbol
-BASE_FUNCTION(string_to_symbol);
+SIGNATUR(string_to_symbol);
 
 // Booleans
 
 NONSTANDARD scheme_boolean_t obj_to_boolean(dyntype_t obj);
 // not
-BASE_FUNCTION(not);
+SIGNATUR(not);
 // boolean?
-BASE_FUNCTION(boolean_q);
+SIGNATUR(boolean_q);
 // boolean=?
-BASE_FUNCTION(boolean_eq);
+SIGNATUR(boolean_eq);
 
 // Pairs
 
 // pair?
-BASE_FUNCTION(pair_q);
+SIGNATUR(pair_q);
 // cons
-BASE_FUNCTION(cons);
+SIGNATUR(cons);
 // car
-BASE_FUNCTION(car);
+SIGNATUR(car);
 // cdr
-BASE_FUNCTION(cdr);
+SIGNATUR(cdr);
 // set-car!
-BASE_FUNCTION(set_car_ex);
+SIGNATUR(set_car_ex);
 // set-cdr!
-BASE_FUNCTION(set_cdr_ex);
+SIGNATUR(set_cdr_ex);
 
 /*
 (define caar
@@ -77,9 +82,9 @@ BASE_FUNCTION(set_cdr_ex);
 */
 
 // null?
-BASE_FUNCTION(null_q);
+SIGNATUR(null_q);
 // list?
-BASE_FUNCTION(list_q);
+SIGNATUR(list_q);
 
 // make-list
 dyntype_t make_list(int c_k);
@@ -87,12 +92,12 @@ dyntype_t make_list(int c_k);
 dyntype_t make_list_fill(int k, dyntype_t fill);
 
 // list
-BASE_FUNCTION(list);
+SIGNATUR(list);
 dyntype_t i_list(ELLIPSIS_PARAM(obj));
 
 // TODO number type
 // length
-BASE_FUNCTION(length);
+SIGNATUR(length);
 
 // append
 dyntype_t append(ELLIPSIS_PARAM(obj));
@@ -202,30 +207,30 @@ dyntype_t list_copy(dyntype_t list);
 
 // Numbers
 
-BASE_FUNCTION(number_q);
+SIGNATUR(number_q);
 
-BASE_FUNCTION(complex_q);
-BASE_FUNCTION(real_q);
-BASE_FUNCTION(rational_q);
-BASE_FUNCTION(integer_q);
+SIGNATUR(complex_q);
+SIGNATUR(real_q);
+SIGNATUR(rational_q);
+SIGNATUR(integer_q);
 
-BASE_FUNCTION(inexact_q);
-BASE_FUNCTION(exact_q);
+SIGNATUR(inexact_q);
+SIGNATUR(exact_q);
 
-BASE_FUNCTION(number_to_string);
+SIGNATUR(number_to_string);
 
-BASE_FUNCTION(num_eq);
-BASE_FUNCTION(num_lt);
-BASE_FUNCTION(num_gt);
-BASE_FUNCTION(num_gte);
-BASE_FUNCTION(num_lte);
+SIGNATUR(num_eq);
+SIGNATUR(num_lt);
+SIGNATUR(num_gt);
+SIGNATUR(num_gte);
+SIGNATUR(num_lte);
 
-BASE_FUNCTION(add);
-BASE_FUNCTION(sub);
-BASE_FUNCTION(mul);
-BASE_FUNCTION(scheme_div);
+SIGNATUR(add);
+SIGNATUR(sub);
+SIGNATUR(mul);
+SIGNATUR(scheme_div);
 
-BASE_FUNCTION(zero_q);
+SIGNATUR(zero_q);
 
 /*
 (define exact-integer?
