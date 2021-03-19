@@ -17,8 +17,8 @@ scheme_pair_t i_cons(dyntype_t obj1, dyntype_t obj2) {
     bool_t list = i_list_q(obj2);
 
     scheme_pair_t pair = {
-      .car = copy_dyntype(obj1),
-      .cdr = copy_dyntype(obj2),
+      .car = obj1,
+      .cdr = obj2,
       .list = list
     };
 
@@ -28,7 +28,7 @@ scheme_pair_t i_cons(dyntype_t obj1, dyntype_t obj2) {
 BASE_FUNCTION(cons) {
     PARAMETER(obj1)
     PARAMETER(obj2)
-    PUSH_LITERAL(scheme_new_pair(i_cons(obj1, obj2)))
+    PUSH_LITERAL(scheme_new_pair(i_cons(copy_dyntype(obj1), copy_dyntype(obj2))))
     DESTROY_PARAM(obj1)
     DESTROY_PARAM(obj2)
 }
@@ -36,14 +36,14 @@ BASE_FUNCTION(cons) {
 BASE_FUNCTION(car) {
     PARAMETER(pair)
     REQUIRE_SCHEME_PAIR(pair, 0)
-    PUSH_LITERAL(c_pair.car);
+    PUSH_LITERAL(copy_dyntype(c_pair.car));
     DESTROY_PARAM(pair)
 }
 
 BASE_FUNCTION(cdr) {
     PARAMETER(pair)
     REQUIRE_SCHEME_PAIR(pair, 0)
-    PUSH_LITERAL(c_pair.cdr)
+    PUSH_LITERAL(copy_dyntype(c_pair.cdr))
     DESTROY_PARAM(pair)
 }
 
