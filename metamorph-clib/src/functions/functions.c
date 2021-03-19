@@ -24,22 +24,27 @@ void initprog(int globals){
 void applicate(int n_params, int id)
 {
     dyntype_t proc = POP_LITERAL;
-    activation_t* new_activation = create_activation(n_params);
-    for (int i = 0; i < n_params; i++)
-        new_activation->formal_parameters[i] = POP_LITERAL;
     switch (proc.type)
     {
     case(SCHEME_TYPE_PROCEDURE): {
+        activation_t* new_activation = create_activation(n_params);
+        for (int i = 0; i < n_params; i++)
+            new_activation->formal_parameters[i] = POP_LITERAL;
         applicate_lambda(proc, id, new_activation);
         break;
     }
     case(SCHEME_TYPE_CONTINUATION): {
-        applicate_continuation(proc, new_activation);
+        applicate_continuation(proc, n_params);
+        break;
+    }
+    case(SCHEME_TYPE_BASE_PROCEDURE): {
+        (*proc.data.base_procedure_val->function)(n_params);
+        return_address = id;
         break;
     }
     default:
         CRASH(APPLICATION_OF_NON_PROCEDURE_TYPE)
-            break;
+        break;
     }
     release_dyntype(proc);
 }

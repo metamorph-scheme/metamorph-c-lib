@@ -31,18 +31,14 @@ dyntype_t copy_continuation(dyntype_t cont_src)
 	return scheme_literal_continuation(cont);
 }
 
-void applicate_continuation(dyntype_t cont, activation_t* new_activation)
+void applicate_continuation(dyntype_t cont, int n_params)
 {
 	REQUIRE_SCHEME_CONTINUATION(cont, 0);
 
 	//Check number of arguments
-	if (new_activation->number_parameters != 1) CRASH(INVALID_NUMBER_ARGUMENTS)
+	if (n_params != 1) CRASH(INVALID_NUMBER_ARGUMENTS)
 
-	dyntype_t return_value = new_activation->formal_parameters[0];
-
-	//Destroy partially constructed activation
-	new_activation->number_parameters = 0;
-	release_activation(new_activation);
+	dyntype_t return_value = POP_LITERAL;
 
 	return_address = c_cont.continuation_id;
 
