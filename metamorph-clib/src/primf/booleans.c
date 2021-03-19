@@ -18,7 +18,8 @@ BASE_FUNCTION(not) {
 
 BASE_FUNCTION(boolean_q) {
     PARAMETER(obj)
-    PUSH_LITERAL(scheme_new_boolean(obj.type == SCHEME_TYPE_BOOLEAN));
+    PUSH_LITERAL(scheme_new_boolean(obj.type == SCHEME_TYPE_BOOLEAN))
+    DESTROY_PARAM(obj)
 }
 
 BASE_FUNCTION(boolean_eq) {
