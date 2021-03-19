@@ -54,7 +54,7 @@ void postjump();
                     }case(ID):{
 #define RETURN                  prereturn(); goto table;
 #define APPLICATE(PARAMS, ID)   applicate(PARAMS, ID); goto table; case(ID):;
-#define TAIL_APPLICATE(PARAMS)  applicate(PARAMS, -1); goto table;
+#define TAIL_APPLICATE(PARAMS)  applicate(PARAMS, -1); if(return_address!=-1){goto table;};
 
 #define PARAMETER(NAME)         dyntype_t NAME = POP_LITERAL; n_ellipsis--;
 #define ELLIPSIS                dyntype_t* ellipsis=stack_ellipsis(current_activation, n_ellipsis);
