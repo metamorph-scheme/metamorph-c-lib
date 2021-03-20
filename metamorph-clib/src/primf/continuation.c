@@ -4,11 +4,11 @@
 #include "../lambda.h"
 #include <math.h>
 
-dyntype_t create_continuation(target_id(*target_function)(int), int marker)
+dyntype_t create_continuation(target_id(*target_function)(int), int marker, activation_t* activation)
 {
 	scheme_continuation_t cont;
 	//Only current activation is copied, tail of computation (previous activations) is shared among compuations 
-	cont.activation = create_computation(current_activation);
+	cont.activation = create_computation(activation);
 	cont.marker = marker;
 	cont.target_function = target_function;
 	return scheme_literal_continuation(cont);
@@ -66,9 +66,9 @@ int count_references_continuation(scheme_continuation_t cont, activation_t* acti
 	return 0;
 }
 
-FUNCTION(call_with_current_continutation)
-	PUSH_LITERAL(CONTINUATION(1))
+EXPORT(call_with_current_continutation)
+	PUSH_LITERAL(create_continuation(current_activation->return_function,current_activation->return_marker, current_activation->previous_activation))
 	PUSH(BOUND(0,0))
-	APPLICATE(1,1)
+	TAIL_APPLICATE(1)
 	RETURN
 END

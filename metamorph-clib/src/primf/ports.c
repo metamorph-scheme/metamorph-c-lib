@@ -67,10 +67,10 @@ dyntype_t i_read_line(dyntype_t* ellipsis, int n_ellipsis) {
 	return string;
 }
 
-SIGNATUR(read_line) {
+EXPORT(read_line) 
 	PUSH_LITERAL(i_read_line(current_activation->formal_parameters, current_activation->number_parameters))
 	RETURN
-}
+END
 //BASE_FUNCTION(read_string){
 //	//TODO FIX
 //	ELLIPSIS;
@@ -95,26 +95,27 @@ SIGNATUR(read_line) {
 //	DESTROY_ELLIPSIS
 //}
 //
-//BASE_FUNCTION(newline) {
-//	ELLIPSIS
-//
-//	if (n_ellipsis) {
-//		dyntype_t port = ellipsis[0];
-//		REQUIRE_SCHEME_PORT(port, 0)
-//		fprintf(c_port, "\n");
-//	}
-//	else {
-//		current_output_port(0);
-//		dyntype_t port = POP_LITERAL;
-//		REQUIRE_SCHEME_PORT(port, 0)
-//		fprintf(c_port, "\n");
-//		release_dyntype(port);
-//	}
-//
-//	PUSH_UNSPECIFIED
-//
-//	DESTROY_ELLIPSIS
-//}
+BASE_FUNCTION(newline)
+ELLIPSIS
+{
+
+	if (n_ellipsis) {
+		dyntype_t port = ellipsis[0];
+		REQUIRE_SCHEME_PORT(port, 0)
+		fprintf(c_port, "\n");
+	}
+	else {
+		scheme_port_t port = i_current_output_port();
+		fprintf(port, "\n");
+	}
+
+	PUSH_UNSPECIFIED
+}
+
+EXPORT(newline)
+	base_newline(MAKE_ELLIPSIS(0));
+	RETURN
+END
 //
 //BASE_FUNCTION(write_char) {
 //	PARAMETER(c)
@@ -153,31 +154,35 @@ void i_write_string(dyntype_t string, dyntype_t *ellipsis, int n_ellipsis) {
 		fprintf(port, "%s", c_string);
 	}
 }
-
-SIGNATUR(write_string) {
+EXPORT(write_string) 
 
 	i_write_string(BOUND(0, 0), current_activation->formal_parameters + 1, current_activation->number_parameters - 1);
 	
 	PUSH_UNSPECIFIED
 	RETURN
+END
+BASE_FUNCTION(flush_output_port) 
+	ELLIPSIS
+{
+	if (n_ellipsis) {
+		dyntype_t port = ellipsis[0];
+		REQUIRE_SCHEME_PORT(port, 0);
+		fflush(c_port);
+	}
+	else {
+		current_output_port(0);
+		dyntype_t port = POP_LITERAL;
+		REQUIRE_SCHEME_PORT(port, 0);
+		fflush(c_port);
+		release_dyntype(port);
+	}
+	PUSH_UNSPECIFIED
 }
-//BASE_FUNCTION(flush_output_port) {
-//	ELLIPSIS
-//	if (n_ellipsis) {
-//		dyntype_t port = ellipsis[0];
-//		REQUIRE_SCHEME_PORT(port, 0);
-//		fflush(c_port);
-//	}
-//	else {
-//		current_output_port(0);
-//		dyntype_t port = POP_LITERAL;
-//		REQUIRE_SCHEME_PORT(port, 0);
-//		fflush(c_port);
-//		release_dyntype(port);
-//	}
-//	PUSH_UNSPECIFIED
-//	DESTROY_ELLIPSIS
-//}
+
+EXPORT(flush_output_port) 
+	base_flush_output_port(MAKE_ELLIPSIS(10));
+	RETURN
+END
 
 scheme_port_t i_current_output_port() {
 	return (stdout);
@@ -186,15 +191,16 @@ scheme_port_t i_current_input_port() {
 	return (stdin);
 }
 
-SIGNATUR(current_input_port){
+EXPORT(current_input_port)
 	PUSH_LITERAL(scheme_literal_port(i_current_input_port));
 	RETURN
-}
-SIGNATUR(current_output_port) {
+END
+EXPORT(current_output_port) 
 	PUSH_LITERAL (scheme_literal_port(i_current_output_port()));
 	RETURN
-}
-SIGNATUR(current_error_port) {
+END
+EXPORT(current_error_port)
 	PUSH_LITERAL(scheme_literal_port(stderr));
 	RETURN
-}
+END
+

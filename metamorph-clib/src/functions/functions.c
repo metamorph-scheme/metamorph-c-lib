@@ -7,18 +7,23 @@
 #include <stdlib.h>
 
 activation_t* current_activation;
-activation_t* root_activation;
+
 jmp_buf error_buffer;
 int balance=0;
 exception_t global_exception;
 target_id(*current_function)(int);
 
-void init(int globals){
+void init(int globals, activation_t** root_activation){
     initalize_allocator();
-    root_activation = create_activation(globals);
-    root_activation->previous_activation = NULL;
-    root_activation = add_to_current_computation(root_activation);
-    current_activation=root_activation;
+    *root_activation = create_activation(globals);
+    (*root_activation)->previous_activation = NULL;
+    *root_activation = add_to_current_computation(*root_activation);
+    current_activation=*root_activation;
+}
+
+void init_library(int globals, activation_t** root_activation) {
+    *root_activation = create_activation(globals);
+    (*root_activation)->previous_activation = NULL;
 }
 
 void control_loop() {
@@ -77,7 +82,6 @@ target_id prereturn() {
 
 
 void cleanup(){
-    release_activation(root_activation);
     exit(0);
 }
 
