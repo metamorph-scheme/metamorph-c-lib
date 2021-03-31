@@ -19,7 +19,8 @@ scheme_pair_t i_cons(dyntype_t obj1, dyntype_t obj2) {
     scheme_pair_t pair = {
       .car = obj1,
       .cdr = obj2,
-      .list = list
+      .list = list,
+      .references = 1
     };
 
     return pair;
@@ -36,14 +37,14 @@ BASE_FUNCTION(cons) {
 BASE_FUNCTION(car) {
     PARAMETER(pair)
     REQUIRE_SCHEME_PAIR(pair, 0)
-    PUSH_LITERAL(copy_dyntype(c_pair.car));
+    PUSH(c_pair.car)
     DESTROY_PARAM(pair)
 }
 
 BASE_FUNCTION(cdr) {
     PARAMETER(pair)
     REQUIRE_SCHEME_PAIR(pair, 0)
-    PUSH_LITERAL(copy_dyntype(c_pair.cdr))
+    PUSH(c_pair.cdr)
     DESTROY_PARAM(pair)
 }
 
@@ -59,7 +60,7 @@ BASE_FUNCTION(set_car_ex) {
         SET_SETTING_IMMUTABLE_LOCATION
     }
 
-    c_pair.car = obj;
+    pair.data.pair_val->car = copy_dyntype(obj);
 
     PUSH_UNSPECIFIED
     DESTROY_PARAM(pair)
@@ -77,11 +78,11 @@ BASE_FUNCTION(set_cdr_ex) {
     }
 
     if (i_list_q(obj))
-        c_pair.list = TRUE;
+        pair.data.pair_val->list = TRUE;
     else
-        c_pair.list = FALSE;
+        pair.data.pair_val->list = FALSE;
 
-    c_pair.cdr = obj;
+    pair.data.pair_val->cdr = copy_dyntype(obj);
 
     PUSH_UNSPECIFIED
     DESTROY_PARAM(pair)
@@ -276,10 +277,23 @@ BASE_FUNCTION(length) {
 //}
 
 void release_pair(scheme_pair_t pair) {
+
+    // decrement reference counter of subordinate pairs
+
     release_dyntype(pair.car);
     release_dyntype(pair.cdr);
 }
 
-dyntype_t copy_pair(scheme_pair_t pair) {
-    return scheme_new_pair(i_cons(copy_dyntype(pair.car), copy_dyntype(pair.cdr)));
+dyntype_t copy_pair(dyntype_t* pair) {
+    // if (2 . (3. ())) is copied
+    // a new "pair" in the sense of a container holding pointers
+    // is allocated, pointing to 2 and the pair (3.())
+    // i_cons increases the reference counter on (3.())
+    // because now two different pairs reference it:
+    // the original and the copied one
+    // Bot can be freed if they get gc'd because references == 0
+    // but (3.()) only if both of them get freed
+
+    pair->data.pair_val->references++;
+    return *pair;
 }
