@@ -91,5 +91,5 @@ int count_references_procedure(scheme_procedure_t procedure,
 
 void release_procedure(scheme_procedure_t procedure){
  
-    free_activation(procedure.activation);
+    gc_activation(procedure.activation);
 }
