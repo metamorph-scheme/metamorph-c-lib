@@ -152,7 +152,7 @@ void gc_activation(activation_t* activation) {
     release_activation(activation);
     //Parent activation is no longer captured
     if(parent_activation)
-        free_activation(parent_activation);
+        gc_activation(parent_activation);
 }
 
 void release_activation(activation_t* activation) {
