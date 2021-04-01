@@ -145,6 +145,7 @@ typedef struct scheme_pair_struct_t {
     dyntype_t car;
     dyntype_t cdr;
     bool_t list;
+    int references;
 } scheme_pair_t;
 
 // Throw Exception Macros

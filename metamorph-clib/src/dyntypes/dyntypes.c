@@ -138,10 +138,13 @@ void release_dyntype(dyntype_t dyntype){
             break;
         }
         case(SCHEME_TYPE_PAIR): {
-            scheme_pair_t pair;
-            pair = *dyntype.data.pair_val;
-            release_pair(pair);
-            RELEASE(scheme_pair_t, dyntype.data.pair_val)
+            scheme_pair_t * pair;
+            pair = dyntype.data.pair_val;
+            pair->references--;
+            if(pair->references == 0) {
+                release_pair(*pair);
+                RELEASE(scheme_pair_t, dyntype.data.pair_val)
+            }
             break;
         }
         case(SCHEME_TYPE_CONTINUATION): {
@@ -211,9 +214,7 @@ dyntype_t copy_dyntype(dyntype_t dyntype) {
         return scheme_new_symbol(symbol);
     }
     case(SCHEME_TYPE_PAIR): {
-        scheme_pair_t pair;
-        pair = *dyntype.data.pair_val;
-        return copy_pair(pair);
+        return copy_pair(&dyntype);
     }
     case(SCHEME_TYPE_NUMBER): {
         scheme_number_t number;

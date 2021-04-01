@@ -326,7 +326,7 @@ scheme_rational_t rational_copy(scheme_rational_t obj);
 
 void release_pair(scheme_pair_t pair);
 
-dyntype_t copy_pair(scheme_pair_t pair);
+dyntype_t copy_pair(dyntype_t* pair);
 
 void release_number(scheme_number_t number);
 dyntype_t copy_number(scheme_number_t number);
