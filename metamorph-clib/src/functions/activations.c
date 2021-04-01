@@ -148,11 +148,12 @@ void gc_activation(activation_t* activation) {
     activation->previous_activation = NULL;
     //Save parent activation
     activation_t* parent_activation = activation->parent_activation;
-    parent_activation->n_captures--;
     release_activation(activation);
     //Parent activation is no longer captured
-    if(parent_activation)
+    if(parent_activation){
+        parent_activation->n_captures--;
         gc_activation(parent_activation);
+    }
 }
 
 void release_activation(activation_t* activation) {
